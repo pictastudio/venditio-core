@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace PictaStudio\VenditioCore\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class VenditioCoreCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'venditio-core';
 
     public $description = 'My command';
 

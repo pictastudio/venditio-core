@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace PictaStudio\VenditioCore;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use VendorName\Skeleton\Commands\SkeletonCommand;
+use PictaStudio\VenditioCore\Commands\VenditioCoreCommand;
 
-class SkeletonServiceProvider extends PackageServiceProvider
+class VenditioCoreServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -16,10 +16,10 @@ class SkeletonServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('skeleton')
+            ->name('venditio-core')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_skeleton_table')
-            ->hasCommand(SkeletonCommand::class);
+            ->hasMigration('create_venditio-core_table')
+            ->hasCommand(VenditioCoreCommand::class);
     }
 }
