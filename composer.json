@@ -21,24 +21,26 @@
         "illuminate/contracts": "^10.0"
     },
     "require-dev": {
+        "drradao/laravel-bard": "^0.3.0",
+        "larastan/larastan": "^2.0.1",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^7.8",
-        "larastan/larastan": "^2.0.1",
         "orchestra/testbench": "^8.8",
-        "pestphp/pest": "^2.20",
+        "pestphp/pest": "^2.34",
         "pestphp/pest-plugin-arch": "^2.5",
-        "pestphp/pest-plugin-laravel": "^2.0"
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "pestphp/pest-plugin-type-coverage": "^2.8"
     },
     "autoload": {
         "psr-4": {
             "PictaStudio\\VenditioCore\\": "src/",
-            "PictaStudio\\VenditioCore\\Database\\Factories\\": "database/factories/"
+            "PictaStudio\\VenditioCore\\Database\\Factories\\": "database/factories/",
+            "PictaStudio\\VenditioCore\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PictaStudio\\VenditioCore\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "PictaStudio\\VenditioCore\\Tests\\": "tests/"
         }
     },
     "scripts": {

@@ -4,16 +4,12 @@ namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/*
-class ModelFactory extends Factory
+class CountryFactory extends Factory
 {
-    protected $model = YourModel::class;
-
-    public function definition()
+    public function definition(): array
     {
         return [
 
         ];
     }
 }
-*/

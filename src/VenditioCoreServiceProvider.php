@@ -2,14 +2,19 @@
 
 namespace PictaStudio\VenditioCore;
 
+use PictaStudio\VenditioCore\Commands\VenditioCoreCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use PictaStudio\VenditioCore\Commands\VenditioCoreCommand;
 
 class VenditioCoreServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
+        $migrations = collect(scandir(__DIR__ . '/../database/migrations'))
+            ->reject(fn (string $file) => in_array($file, ['.', '..']))
+            ->map(fn (string $file) => str($file)->beforeLast('.php'))
+            ->toArray();
+
         /*
          * This class is a Package Service Provider
          *
@@ -18,8 +23,8 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_venditio-core_table')
+            // ->hasViews()
+            ->hasMigrations($migrations)
             ->hasCommand(VenditioCoreCommand::class);
     }
 }
