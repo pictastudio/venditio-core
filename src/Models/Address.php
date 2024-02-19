@@ -5,6 +5,7 @@ namespace PictaStudio\VenditioCore\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Enums\AddressType;
 use PictaStudio\VenditioCore\Models\Traits\HasDefault;
@@ -26,6 +27,11 @@ class Address extends Model
         'type' => AddressType::class,
         'default' => 'boolean',
     ];
+
+    public function addressable(): MorphTo
+    {
+        return $this->morphTo();
+    }
 
     public function country(): BelongsTo
     {
