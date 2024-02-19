@@ -1,0 +1,43 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use PictaStudio\VenditioCore\Models\Order;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('order_lines', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Order::class);
+            $table->foreignIdFor('product_item_id');
+            $table->string('product_sku');
+            $table->string('product_name');
+            $table->integer('unit_price')->comment('prezzo unitario di listino');
+            $table->integer('unit_discount')->default(0)->comment('sconto unitario');
+            $table->integer('unit_final_price')->comment('prezzo finale prodotto inclusi sconti');
+            $table->integer('unit_final_price_tax')->comment('tassa unitaria calcolata su unit_final_price');
+            $table->integer('unit_final_price_taxable')->comment('prezzo unitario imponibile calcolato su unit_final_price');
+            $table->mediumInteger('qty')->comment('quantità ordinata');
+            $table->integer('total_final_price')->comment('prezzo totale');
+            $table->integer('tax_rate')->comment('aliquota tassa applicata');
+            $table->json('product_item')->comment('tutti i dati del prodotto salvati statici al momento dell\'ordine');
+            $table->timestamps();
+            $table->datetimes();
+            $table->softDeletesDatetime();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('order_lines');
+    }
+};

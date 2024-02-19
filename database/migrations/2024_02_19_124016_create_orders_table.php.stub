@@ -1,0 +1,52 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Schema;
+use PictaStudio\VenditioCore\Models\ShippingStatus;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class)->nullable();
+            $table->string('identifier', 100);
+            $table->foreignIdFor(ShippingStatus::class)->nullable();
+            $table->string('status', 50)->comment('pending, processing, completed, cancelled');
+            $table->string('tracking_code');
+            $table->dateTime('tracking_date')->comment('data di aggiornamento del tracking');
+            $table->string('courier_code');
+            $table->integer('sub_total_taxable')->comment('somma dei totali dei prodotti senza tasse');
+            $table->integer('sub_total_tax')->comment('somma delle tasse dei prodotti');
+            $table->integer('sub_total')->comment('somma dei totali dei prodotti');
+            $table->integer('shipping_fee')->default(0)->comment('costo spese di spedizione');
+            $table->integer('payment_fee')->default(0)->comment('pagato dal cliente');
+            $table->string('discount_ref')->comment('riferimento origine sconto');
+            $table->integer('discount_amount')->default(0)->comment('valore sconto sul carrello');
+            $table->integer('total_final')->comment('totale finale ordine');
+            $table->string('user_first_name');
+            $table->string('user_last_name');
+            $table->string('user_email');
+            $table->json('addresses')->comment('tutti i dati degli indirizzi salvati statici al momento dell\'ordine, formato: {"billing": {}, "shipping": {}}');
+            $table->text('customer_notes')->nullable();
+            $table->text('admin_notes')->nullable();
+            $table->dateTime('approved_at')->nullable();
+            $table->datetimes();
+            $table->softDeletesDatetime();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
+};
