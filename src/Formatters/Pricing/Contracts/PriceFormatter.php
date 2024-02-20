@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pricing\Contracts;
+namespace PictaStudio\VenditioCore\Formatters\Pricing\Contracts;
 
 interface PriceFormatter
 {

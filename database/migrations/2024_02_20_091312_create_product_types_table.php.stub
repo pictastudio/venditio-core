@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('shipping_statuses', function (Blueprint $table) {
+        Schema::create('product_types', function (Blueprint $table) {
             $table->id();
-            $table->string('external_code');
             $table->string('name');
+            $table->boolean('active')->default(true);
             $table->datetimes();
             $table->softDeletesDatetime();
         });
@@ -19,6 +19,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('shipping_statuses');
+        Schema::dropIfExists('product_types');
     }
 };

@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pricing;
+namespace PictaStudio\VenditioCore\Formatters\Pricing;
 
 use NumberFormatter;
+use PictaStudio\VenditioCore\Formatters\Pricing\Contracts\PriceFormatter;
 use PictaStudio\VenditioCore\Models\Currency;
-use PictaStudio\VenditioCore\Pricing\Contracts\PriceFormatter;
 
 class DefaultPriceFormatter implements PriceFormatter
 {
@@ -13,14 +13,12 @@ class DefaultPriceFormatter implements PriceFormatter
         public ?Currency $currency = null,
         public int $unitQty = 1
     ) {
-        if (!$this->currency) {
-            $this->currency = Currency::getDefault();
-        }
+        $this->currency ??= Currency::getDefault();
     }
 
     public function decimal(bool $rounding = true): float
     {
-        $convertedValue = $this->value / $this->currency->factor;
+        $convertedValue = $this->value / 10;
 
         return $rounding
             ? round($convertedValue, $this->currency->decimal_places)
@@ -29,7 +27,7 @@ class DefaultPriceFormatter implements PriceFormatter
 
     public function unitDecimal(bool $rounding = true): float
     {
-        $convertedValue = $this->value / $this->currency->factor / $this->unitQty;
+        $convertedValue = $this->value / 10 / $this->unitQty;
 
         return $rounding
             ? round($convertedValue, $this->currency->decimal_places)
@@ -56,6 +54,8 @@ class DefaultPriceFormatter implements PriceFormatter
 
         $formatter->setTextAttribute(NumberFormatter::CURRENCY_CODE, $this->currency->code);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $decimalPlaces ?? $this->currency->decimal_places);
+        $formatter->setAttribute(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, app()->getLocale() === 'it' ? ',' : '.');
+        $formatter->setAttribute(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, app()->getLocale() === 'it' ? '.' : ',');
 
         $formattedPrice = $formatter->format($value);
 

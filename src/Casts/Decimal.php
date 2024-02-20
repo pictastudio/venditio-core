@@ -5,15 +5,12 @@ namespace PictaStudio\VenditioCore\Base\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
-use PictaStudio\VenditioCore\DataTypes\Price as PriceDataType;
-use PictaStudio\VenditioCore\Models\Currency;
+use PictaStudio\VenditioCore\DataTypes\Decimal as DecimalDataType;
 
-class Price implements CastsAttributes
+class Decimal implements CastsAttributes
 {
-    public function get(Model $model, string $key, mixed $value, array $attributes): PriceDataType
+    public function get(Model $model, string $key, mixed $value, array $attributes): DecimalDataType
     {
-        $currency = $model->currency ?: Currency::getDefault();
-
         $value = preg_replace('/[^0-9]/', '', $value);
 
         Validator::make([
@@ -22,9 +19,8 @@ class Price implements CastsAttributes
             $key => 'nullable|numeric',
         ])->validate();
 
-        return new PriceDataType(
+        return new DecimalDataType(
             (int) $value,
-            $currency,
             // $model->priceable->unit_quantity ?? $model->unit_quantity ?? 1,
         );
     }

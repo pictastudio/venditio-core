@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use PictaStudio\VenditioCore\Models\ProductItem;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('inventories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(ProductItem::class);
+            $table->mediumInteger('stock');
+            $table->mediumInteger('stock_min')->nullable()->comment('quantità minima di stock (per allerta sottoscorta)');
+            $table->unsignedMediumInteger('price');
+            $table->datetimes();
+            $table->softDeletesDatetime();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('inventories');
+    }
+};

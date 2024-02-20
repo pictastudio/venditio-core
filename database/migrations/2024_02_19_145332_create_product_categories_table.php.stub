@@ -3,15 +3,18 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use PictaStudio\VenditioCore\Models\ProductCategory;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('shipping_statuses', function (Blueprint $table) {
+        Schema::create('product_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('external_code');
+            $table->foreignIdFor(ProductCategory::class, 'parent_id')->nullable();
             $table->string('name');
+            $table->boolean('active')->default(true);
+            $table->smallInteger('order');
             $table->datetimes();
             $table->softDeletesDatetime();
         });
@@ -19,6 +22,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('shipping_statuses');
+        Schema::dropIfExists('product_categories');
     }
 };

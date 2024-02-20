@@ -3,14 +3,12 @@
 namespace PictaStudio\VenditioCore\DataTypes;
 
 use PictaStudio\VenditioCore\Exceptions\InvalidDataTypeValueException;
-use PictaStudio\VenditioCore\Formatters\Pricing\DefaultPriceFormatter;
-use PictaStudio\VenditioCore\Models\Currency;
+use PictaStudio\VenditioCore\Formatters\Decimal\DefaultDecimalFormatter;
 
-class Price
+class Decimal
 {
     public function __construct(
         public mixed $value,
-        public Currency $currency,
         public int $unitQty = 1
     ) {
         if (!is_int($value)) {
@@ -21,7 +19,7 @@ class Price
     }
 
     /**
-     * Getter for methods/properties
+     * Getter for methods/properties.
      */
     public function __get(string $name)
     {
@@ -31,7 +29,7 @@ class Price
     }
 
     /**
-     * Cast class as a string
+     * Cast class as a string.
      */
     public function __toString(): string
     {
@@ -41,10 +39,9 @@ class Price
     private function formatter()
     {
         return app(
-            config('venditio-core.pricing.formatter', DefaultPriceFormatter::class),
+            config('venditio-core.decimal.formatter', DefaultDecimalFormatter::class),
             [
                 'value' => $this->value,
-                'currency' => $this->currency,
                 'unitQty' => $this->unitQty,
             ]
         );
@@ -67,7 +64,7 @@ class Price
     }
 
     /**
-     * Format the value with the currency
+     * Format the value
      *
      * @return string
      */
@@ -77,7 +74,7 @@ class Price
     }
 
     /**
-     * Format the unit value with the currency.
+     * Format the unit value
      *
      * @return string
      */
