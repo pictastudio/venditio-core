@@ -5,10 +5,11 @@ namespace PictaStudio\VenditioCore\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Base\Casts\Price;
 
-class OrderLine extends Model
+class Cart extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -21,23 +22,28 @@ class OrderLine extends Model
     ];
 
     protected $casts = [
-        'unit_price' => Price::class,
-        'unit_discount' => Price::class,
-        'unit_final_price' => Price::class,
-        'unit_final_price_tax' => Price::class,
-        'unit_final_price_taxable' => Price::class,
-        'total_final_price' => Price::class,
-        'tax_rate' => Price::class,
-        'product_item' => 'array',
+        'sub_total_taxable' => Price::class,
+        'sub_total_tax' => Price::class,
+        'sub_total' => Price::class,
+        'shipping_fee' => Price::class,
+        'payment_fee' => Price::class,
+        'discount_amount' => Price::class,
+        'total_final' => Price::class,
+        'addresses' => 'array',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function productItem(): BelongsTo
+    public function lines(): HasMany
     {
-        return $this->belongsTo(ProductItem::class);
+        return $this->hasMany(CartLine::class);
     }
 }

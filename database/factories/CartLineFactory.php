@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class OrderLineFactory extends Factory
+class CartLineFactory extends Factory
 {
     public function definition(): array
     {

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Base\Casts\Price;
 
-class OrderLine extends Model
+class CartLine extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -31,9 +31,9 @@ class OrderLine extends Model
         'product_item' => 'array',
     ];
 
-    public function order(): BelongsTo
+    public function cart(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Cart::class);
     }
 
     public function productItem(): BelongsTo

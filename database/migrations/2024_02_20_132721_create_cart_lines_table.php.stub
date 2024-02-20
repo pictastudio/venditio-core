@@ -3,16 +3,16 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Models\Order;
+use PictaStudio\VenditioCore\Models\Cart;
 use PictaStudio\VenditioCore\Models\ProductItem;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('order_lines', function (Blueprint $table) {
+        Schema::create('cart_lines', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Order::class);
+            $table->foreignIdFor(Cart::class);
             $table->foreignIdFor(ProductItem::class);
             $table->string('product_name');
             $table->string('product_sku');
@@ -25,7 +25,6 @@ return new class extends Migration
             $table->integer('total_final_price')->comment('prezzo totale');
             $table->integer('tax_rate')->comment('aliquota tassa applicata');
             $table->json('product_item')->comment('tutti i dati del prodotto salvati statici al momento dell\'ordine');
-            $table->timestamps();
             $table->datetimes();
             $table->softDeletesDatetime();
         });
@@ -33,6 +32,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('order_lines');
+        Schema::dropIfExists('cart_lines');
     }
 };
