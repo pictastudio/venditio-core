@@ -2,7 +2,7 @@
 
 namespace PictaStudio\VenditioCore;
 
-use PictaStudio\VenditioCore\Commands\VenditioCoreCommand;
+use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -23,8 +23,13 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
-            // ->hasViews()
             ->hasMigrations($migrations)
-            ->hasCommand(VenditioCoreCommand::class);
+            ->hasInstallCommand(function (InstallCommand $command) {
+                $command
+                    ->publishConfigFile()
+                    ->publishMigrations()
+                    ->copyAndRegisterServiceProviderInApp()
+                    ->askToRunMigrations();
+            });
     }
 }
