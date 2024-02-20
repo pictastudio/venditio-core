@@ -15,7 +15,7 @@ enum ProductMeasuringUnit: string
     case HOUR = 'h';
     case DAY = 'd';
     case WEEK = 'w';
-    case MONTH = 'm';
+    case MONTH = 'mo';
     case YEAR = 'y';
     case OTHER = 'other';
 }
