@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Base\Casts;
+namespace PictaStudio\VenditioCore\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +12,8 @@ class Price implements CastsAttributes
 {
     public function get(Model $model, string $key, mixed $value, array $attributes): PriceDataType
     {
-        $currency = $model->currency ?: Currency::getDefault();
+        // $currency = $model->currency ?: Currency::getDefault();
+        $currency = Currency::getDefault();
 
         $value = preg_replace('/[^0-9]/', '', $value);
 

@@ -16,7 +16,7 @@ class DefaultDecimalFormatter implements DecimalFormatter
 
     public function decimal(bool $rounding = true): float
     {
-        $convertedValue = $this->value / 10;
+        $convertedValue = $this->value / 100;
 
         return $rounding
             ? round($convertedValue, $this->decimalPlaces)
@@ -25,7 +25,7 @@ class DefaultDecimalFormatter implements DecimalFormatter
 
     public function unitDecimal(bool $rounding = true): float
     {
-        $convertedValue = $this->value / 10 / $this->unitQty;
+        $convertedValue = $this->value / 100 / $this->unitQty;
 
         return $rounding
             ? round($convertedValue, $this->decimalPlaces)
@@ -51,8 +51,8 @@ class DefaultDecimalFormatter implements DecimalFormatter
         $formatter = new NumberFormatter($locale, $formatterStyle);
 
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $decimalPlaces ?? $this->decimalPlaces);
-        $formatter->setAttribute(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, app()->getLocale() === 'it' ? ',' : '.');
-        $formatter->setAttribute(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, app()->getLocale() === 'it' ? '.' : ',');
+        $formatter->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, app()->getLocale() === 'it' ? ',' : '.');
+        $formatter->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, app()->getLocale() === 'it' ? '.' : ',');
 
         $formattedPrice = $formatter->format($value);
 

@@ -25,7 +25,6 @@ return new class extends Migration
             $table->integer('total_final_price')->comment('prezzo totale');
             $table->integer('tax_rate')->comment('aliquota tassa applicata');
             $table->json('product_item')->comment('tutti i dati del prodotto salvati statici al momento dell\'ordine');
-            $table->timestamps();
             $table->datetimes();
             $table->softDeletesDatetime();
         });

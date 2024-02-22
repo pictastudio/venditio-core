@@ -10,7 +10,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $migrations = collect(scandir(__DIR__ . '/../database/migrations'))
+        $migrations = collect(scandir($package->basePath('/../database/migrations')))
             ->reject(fn (string $file) => in_array($file, ['.', '..']))
             ->map(fn (string $file) => str($file)->beforeLast('.php'))
             ->toArray();

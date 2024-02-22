@@ -20,5 +20,16 @@ class CurrencySeeder extends Seeder
         //         'enabled' => true,
         //         'default' => true,
         //     ]);
+
+        Currency::query()
+            ->create([
+                'country_id' => Country::where('iso_2', 'IT')->value('id'),
+                'name' => 'Euro',
+                'code' => 'EUR',
+                'symbol' => '€',
+                'exchange_rate' => 1,
+                'enabled' => true,
+                'default' => true,
+            ]);
     }
 }

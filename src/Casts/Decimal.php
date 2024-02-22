@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Base\Casts;
+namespace PictaStudio\VenditioCore\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;

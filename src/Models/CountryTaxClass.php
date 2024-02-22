@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use PictaStudio\VenditioCore\Base\Casts\Price;
+use PictaStudio\VenditioCore\Casts\Price;
 
 class CountryTaxClass extends Pivot
 {
