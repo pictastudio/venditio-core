@@ -36,16 +36,16 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(config('venditio-core.models.user'));
     }
 
     public function shippingStatus(): BelongsTo
     {
-        return $this->belongsTo(ShippingStatus::class);
+        return $this->belongsTo(config('venditio-core.models.shipping_status'));
     }
 
     public function lines(): HasMany
     {
-        return $this->hasMany(OrderLine::class);
+        return $this->hasMany(config('venditio-core.models.order_line'));
     }
 }

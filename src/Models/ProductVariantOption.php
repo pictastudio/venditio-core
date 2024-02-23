@@ -32,11 +32,11 @@ class ProductVariantOption extends Model
 
     public function productVariant(): BelongsTo
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(config('venditio-core.models.product_variant'));
     }
 
     public function productItems(): BelongsToMany
     {
-        return $this->belongsToMany(ProductItem::class, 'product_configuration');
+        return $this->belongsToMany(config('venditio-core.models.product_item'), 'product_configuration');
     }
 }

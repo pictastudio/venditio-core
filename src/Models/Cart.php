@@ -34,16 +34,16 @@ class Cart extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(config('venditio-core.models.user'));
     }
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(config('venditio-core.models.order'));
     }
 
     public function lines(): HasMany
     {
-        return $this->hasMany(CartLine::class);
+        return $this->hasMany(config('venditio-core.models.cart_line'));
     }
 }

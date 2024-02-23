@@ -31,6 +31,6 @@ class ProductCustomField extends Model
 
     public function productType(): BelongsTo
     {
-        return $this->belongsTo(ProductType::class);
+        return $this->belongsTo(config('venditio-core.models.product_type'));
     }
 }

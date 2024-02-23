@@ -14,11 +14,11 @@ class User extends Authenticatable
 
     public function carts(): HasMany
     {
-        return $this->hasMany(Cart::class);
+        return $this->hasMany(config('venditio-core.models.cart'));
     }
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(config('venditio-core.models.order'));
     }
 }

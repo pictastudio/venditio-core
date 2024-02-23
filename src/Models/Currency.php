@@ -28,6 +28,6 @@ class Currency extends Model
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(config('venditio-core.models.country'));
     }
 }

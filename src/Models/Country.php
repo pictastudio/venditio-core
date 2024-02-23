@@ -22,19 +22,19 @@ class Country extends Model
 
     public function taxClasses(): BelongsToMany
     {
-        return $this->belongsToMany(TaxClass::class, 'country_tax_class')
-            ->using(CountryTaxClass::class)
+        return $this->belongsToMany(config('venditio-core.models.tax_class'), 'country_tax_class')
+            ->using(config('venditio-core.models.country_tax_class')::class)
             ->withTimestamps()
             ->withPivot('rate');
     }
 
     public function addresses(): HasMany
     {
-        return $this->hasMany(Address::class);
+        return $this->hasMany(config('venditio-core.models.address'));
     }
 
     public function currencies(): HasMany
     {
-        return $this->hasMany(Currency::class);
+        return $this->hasMany(config('venditio-core.models.currency'));
     }
 }

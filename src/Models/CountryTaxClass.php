@@ -20,11 +20,11 @@ class CountryTaxClass extends Pivot
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(config('venditio-core.models.country'));
     }
 
     public function taxClass(): BelongsTo
     {
-        return $this->belongsTo(TaxClass::class);
+        return $this->belongsTo(config('venditio-core.models.tax_class'));
     }
 }

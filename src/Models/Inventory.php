@@ -26,6 +26,6 @@ class Inventory extends Model
 
     public function productItem(): BelongsTo
     {
-        return $this->belongsTo(ProductItem::class);
+        return $this->belongsTo(config('venditio-core.models.product_item'));
     }
 }

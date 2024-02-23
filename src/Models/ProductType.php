@@ -31,16 +31,16 @@ class ProductType extends Model
 
     public function products(): HasMany
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(config('venditio-core.models.product'));
     }
 
     public function productVariants(): HasMany
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->hasMany(config('venditio-core.models.product_variant'));
     }
 
     public function productCustomFields(): HasMany
     {
-        return $this->hasMany(ProductCustomField::class);
+        return $this->hasMany(config('venditio-core.models.product_custom_field'));
     }
 }

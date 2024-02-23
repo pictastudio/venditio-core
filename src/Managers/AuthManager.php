@@ -6,7 +6,7 @@ use PictaStudio\VenditioCore\Models\User;
 
 class AuthManager
 {
-    const ROLE_SUPERADMIN = 'superadmin';
+    const ROLE_ROOT = 'root';
 
     const ROLE_ADMIN = 'admin';
 
@@ -26,7 +26,7 @@ class AuthManager
         return $this->user;
     }
 
-    public function getPermissionName(string $resource, string $action): string
+    public static function getPermissionName(string $resource, string $action): string
     {
         return $resource . ':' . $action;
     }
@@ -63,7 +63,7 @@ class AuthManager
     public static function getAllRoles(): array
     {
         return [
-            self::ROLE_SUPERADMIN,
+            self::ROLE_ROOT,
             self::ROLE_ADMIN,
             self::ROLE_USER,
         ];

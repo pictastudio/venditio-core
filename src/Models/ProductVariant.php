@@ -28,11 +28,11 @@ class ProductVariant extends Model
 
     public function productType(): BelongsTo
     {
-        return $this->belongsTo(ProductType::class);
+        return $this->belongsTo(config('venditio-core.models.product_type'));
     }
 
     public function productVariantOptions(): HasMany
     {
-        return $this->hasMany(ProductVariantOption::class);
+        return $this->hasMany(config('venditio-core.models.product_variant_option'));
     }
 }

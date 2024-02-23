@@ -57,21 +57,21 @@ class ProductItem extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(config('venditio-core.models.product'));
     }
 
     public function discount(): MorphMany
     {
-        return $this->morphMany(Discount::class, 'discountable');
+        return $this->morphMany(config('venditio-core.models.discount'), 'discountable');
     }
 
     public function productVariantOption(): BelongsToMany
     {
-        return $this->belongsToMany(ProductVariantOption::class, 'product_configuration');
+        return $this->belongsToMany(config('venditio-core.models.product_variant_option'), 'product_configuration');
     }
 
     public function inventory(): HasMany
     {
-        return $this->hasMany(Inventory::class);
+        return $this->hasMany(config('venditio-core.models.inventory'));
     }
 }

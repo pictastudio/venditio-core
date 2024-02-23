@@ -21,8 +21,8 @@ class TaxClass extends Model
 
     public function countries(): BelongsToMany
     {
-        return $this->belongsToMany(Country::class, 'country_tax_class')
-            ->using(CountryTaxClass::class)
+        return $this->belongsToMany(config('venditio-core.models.country'), 'country_tax_class')
+            ->using(config('venditio-core.models.country_tax_class'))
             ->withTimestamps()
             ->withPivot('rate');
     }

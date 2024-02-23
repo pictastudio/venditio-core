@@ -33,11 +33,11 @@ class OrderLine extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(config('venditio-core.models.order'));
     }
 
     public function productItem(): BelongsTo
     {
-        return $this->belongsTo(ProductItem::class);
+        return $this->belongsTo(config('venditio-core.models.product_item'));
     }
 }

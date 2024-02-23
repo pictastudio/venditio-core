@@ -33,11 +33,11 @@ class CartLine extends Model
 
     public function cart(): BelongsTo
     {
-        return $this->belongsTo(Cart::class);
+        return $this->belongsTo(config('venditio-core.models.cart'));
     }
 
     public function productItem(): BelongsTo
     {
-        return $this->belongsTo(ProductItem::class);
+        return $this->belongsTo(config('venditio-core.models.product_item'));
     }
 }

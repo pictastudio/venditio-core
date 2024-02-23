@@ -37,17 +37,17 @@ class ProductCategory extends Model
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(static::class, 'parent_id');
+        return $this->belongsTo(config('venditio-core.models.product_category'), 'parent_id');
     }
 
     public function children(): HasMany
     {
-        return $this->hasMany(static::class, 'parent_id');
+        return $this->hasMany(config('venditio-core.models.product_category'), 'parent_id');
     }
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_category_product')
+        return $this->belongsToMany(config('venditio-core.models.product'), 'product_category_product')
             ->withTimestamps();
     }
 }

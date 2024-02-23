@@ -51,32 +51,32 @@ class Product extends Model
 
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(config('venditio-core.models.brand'));
     }
 
     public function productType(): BelongsTo
     {
-        return $this->belongsTo(ProductType::class);
+        return $this->belongsTo(config('venditio-core.models.product_type'));
     }
 
     public function taxClass(): BelongsTo
     {
-        return $this->belongsTo(TaxClass::class);
+        return $this->belongsTo(config('venditio-core.models.tax_class'));
     }
 
     public function category(): BelongsToMany
     {
-        return $this->belongsToMany(ProductCategory::class, 'product_category_product')
+        return $this->belongsToMany(config('venditio-core.models.product_category'), 'product_category_product')
             ->withTimestamps();
     }
 
     public function discount(): MorphMany
     {
-        return $this->morphMany(Discount::class, 'discountable');
+        return $this->morphMany(config('venditio-core.models.discount'), 'discountable');
     }
 
     public function productItems(): HasMany
     {
-        return $this->hasMany(ProductItem::class);
+        return $this->hasMany(config('venditio-core.models.product_item'));
     }
 }

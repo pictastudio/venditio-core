@@ -21,6 +21,6 @@ class ShippingStatus extends Model
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(config('venditio-core.models.order'));
     }
 }
