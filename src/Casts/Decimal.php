@@ -11,6 +11,10 @@ class Decimal implements CastsAttributes
 {
     public function get(Model $model, string $key, mixed $value, array $attributes): DecimalDataType
     {
+        if ($value === null) {
+            return new DecimalDataType(0);
+        }
+
         $value = preg_replace('/[^0-9]/', '', $value);
 
         Validator::make([
@@ -28,7 +32,7 @@ class Decimal implements CastsAttributes
     public function set(Model $model, string $key, mixed $value, array $attributes): array
     {
         return [
-            $key => $value,
+            $key => ($value instanceof DecimalDataType ? $value->decimal() : $value) * 100,
         ];
     }
 }

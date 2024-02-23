@@ -17,8 +17,10 @@
     ],
     "require": {
         "php": "^8.1",
+        "illuminate/contracts": "^10.0",
         "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "^10.0"
+        "spatie/laravel-permission": "^6.3",
+        "spatie/laravel-sluggable": "^3.5"
     },
     "require-dev": {
         "drradao/laravel-bard": "^0.3.0",

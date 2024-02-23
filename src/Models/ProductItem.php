@@ -12,10 +12,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Casts\Decimal;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class ProductItem extends Model
 {
     use HasFactory;
+    use HasSlug;
     use SoftDeletes;
 
     protected $guarded = [
@@ -43,6 +46,13 @@ class ProductItem extends Model
             Active::class,
             new InDateRange('visible_from', 'visible_to'),
         ]);
+    }
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug');
     }
 
     public function product(): BelongsTo

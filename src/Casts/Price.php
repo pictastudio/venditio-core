@@ -15,6 +15,10 @@ class Price implements CastsAttributes
         // $currency = $model->currency ?: Currency::getDefault();
         $currency = Currency::getDefault();
 
+        if ($value === null) {
+            return new PriceDataType(0, $currency);
+        }
+
         $value = preg_replace('/[^0-9]/', '', $value);
 
         Validator::make([
@@ -33,7 +37,7 @@ class Price implements CastsAttributes
     public function set(Model $model, string $key, mixed $value, array $attributes): array
     {
         return [
-            $key => $value,
+            $key => ($value instanceof PriceDataType ? $value->decimal() : $value) * 100,
         ];
     }
 }
