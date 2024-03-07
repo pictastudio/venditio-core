@@ -2,15 +2,16 @@
 
 namespace PictaStudio\VenditioCore\Managers;
 
+use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as ContractsAuthManager;
 use PictaStudio\VenditioCore\Models\User;
 
-class AuthManager
+class AuthManager implements ContractsAuthManager
 {
-    const ROLE_ROOT = 'root';
+    const ROLE_ROOT = 'Root';
 
-    const ROLE_ADMIN = 'admin';
+    const ROLE_ADMIN = 'Admin';
 
-    const ROLE_USER = 'user';
+    const ROLE_USER = 'User';
 
     public function __construct(public User $user)
     {
@@ -26,46 +27,44 @@ class AuthManager
         return $this->user;
     }
 
-    public static function getPermissionName(string $resource, string $action): string
+    public function can(string $resource, string $action): bool
+    {
+        return $this->user->can($this->generatePermissionName($resource, $action));
+    }
+
+    public static function generatePermissionName(string $resource, string $action): string
     {
         return $resource . ':' . $action;
     }
 
-    public static function getResources(): array
+    public static function getPermissions(?string $resource = null): array
     {
-        return [
-            'user',
-            'role',
-            'address',
-            'cart',
-            'order',
-            'product',
-            'productCategory',
-            'brand',
-        ];
+        $resources = config('venditio-core.auth.resources');
+        $actions = config('venditio-core.auth.actions');
+
+        if ($resource) {
+            return static::generatePermission($resource, $actions);
+        }
+
+        return collect($resources)
+            ->map(fn (string $resource) => static::generatePermission($resource, $actions))
+            ->merge(static::getExtraPermissions())
+            ->flatten()
+            ->toArray();
     }
 
-    public static function getActions(): array
+    private static function getExtraPermissions(): array
     {
-        return [
-            'create',
-            'view',
-            'update',
-            'delete',
-        ];
+        return collect(config('venditio-core.auth.extra_permissions', []))
+            ->map(fn (array $actions, string $resource) => static::generatePermission($resource, $actions))
+            ->flatten()
+            ->toArray();
     }
 
-    public function can(string $resource, string $action): bool
+    private static function generatePermission(string $resource, array $actions): array
     {
-        return $this->user->can($this->getPermissionName($resource, $action));
-    }
-
-    public static function getAllRoles(): array
-    {
-        return [
-            self::ROLE_ROOT,
-            self::ROLE_ADMIN,
-            self::ROLE_USER,
-        ];
+        return collect($actions)
+            ->map(fn (string $action) => static::generatePermissionName($resource, $action))
+            ->toArray();
     }
 }

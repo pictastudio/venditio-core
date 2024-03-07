@@ -5,11 +5,14 @@ namespace PictaStudio\VenditioCore\Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use PictaStudio\VenditioCore\Enums\ProductMeasuringUnit;
 use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\VenditioCore\Models\Product;
 use PictaStudio\VenditioCore\Models\ProductType;
 use PictaStudio\VenditioCore\Models\TaxClass;
 
 class ProductFactory extends Factory
 {
+    protected $model = Product::class;
+
     public function definition(): array
     {
         return [
@@ -33,5 +36,33 @@ class ProductFactory extends Factory
             'depth' => fake()->randomNumber(3),
             'metadata' => json_encode(['keywords' => fake()->words(5)]),
         ];
+    }
+
+    public function inactive(): self
+    {
+        return $this->state([
+            'active' => false,
+        ]);
+    }
+
+    public function draft(): self
+    {
+        return $this->state([
+            'status' => 'draft',
+        ]);
+    }
+
+    public function published(): self
+    {
+        return $this->state([
+            'status' => 'published',
+        ]);
+    }
+
+    public function archived(): self
+    {
+        return $this->state([
+            'status' => 'archived',
+        ]);
     }
 }

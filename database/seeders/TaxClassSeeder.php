@@ -20,5 +20,9 @@ class TaxClassSeeder extends Seeder
         //     ->create([
         //         'name' => 'Standard',
         //     ]);
+
+        TaxClass::create([
+            'name' => 'Standard',
+        ]);
     }
 }

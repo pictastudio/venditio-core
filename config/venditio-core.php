@@ -1,8 +1,11 @@
 <?php
 
+use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Formatters\Decimal\DefaultDecimalFormatter;
 use PictaStudio\VenditioCore\Formatters\Pricing\DefaultPriceFormatter;
 use PictaStudio\VenditioCore\Managers\AuthManager;
+use PictaStudio\VenditioCore\Orders\Generators\OrderIdentifierGenerator;
+use PictaStudio\VenditioCore\Pipelines\Orders\Tasks\GenerateIdentifier;
 
 return [
 
@@ -16,6 +19,40 @@ return [
     */
     'auth' => [
         'manager' => AuthManager::class,
+        'roles' => [
+            'root' => AuthManager::ROLE_ROOT,
+            'admin' => AuthManager::ROLE_ADMIN,
+            'user' => AuthManager::ROLE_USER,
+        ],
+        'resources' => [
+            'user',
+            'role',
+            'address',
+            'cart',
+            'order',
+            'product',
+            'product-category',
+            'brand',
+        ],
+        'actions' => [
+            'view-any',
+            'view',
+            'create',
+            'update',
+            'delete',
+            'restore',
+            'force-delete',
+        ],
+        'extra_permissions' => [
+            // 'orders' => [
+            //     'export',
+            //     'export-bulk',
+            // ],
+        ],
+        'root_user' => [
+            'email' => env('VENDITIO_CORE_ROOT_USER_EMAIL'),
+            'password' => env('VENDITIO_CORE_ROOT_USER_PASSWORD'),
+        ],
     ],
 
     /*
@@ -52,15 +89,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Orders
+    |--------------------------------------------------------------------------
+    |
+    | Pipeline tasks are executed in the order they are defined
+    |
+    */
+    'orders' => [
+        'identifier_generator' => OrderIdentifierGenerator::class,
+        'pipelines' => [
+            'creation' => [
+                'tasks' => [
+                    GenerateIdentifier::class,
+                ],
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Pricing
     |--------------------------------------------------------------------------
     |
     | Specify the pricing formatter
     |
     */
-    'pricing' => [
-        'formatter' => DefaultPriceFormatter::class,
-    ],
+    // 'pricing' => [
+    //     'formatter' => DefaultPriceFormatter::class,
+    // ],
 
     /*
     |--------------------------------------------------------------------------
@@ -70,9 +126,9 @@ return [
     | Specify the decimal formatter
     |
     */
-    'decimal' => [
-        'formatter' => DefaultDecimalFormatter::class,
-    ],
+    // 'decimal' => [
+    //     'formatter' => DefaultDecimalFormatter::class,
+    // ],
 
     /*
     |--------------------------------------------------------------------------
@@ -87,6 +143,38 @@ return [
             'allow_null' => true, // allow null values to pass when checking date range
             'include_start_date' => true, // include the start date in the date range
             'include_end_date' => true, // include the end date in the date range
+        ],
+        'routes_to_exclude' => [
+            'filament.*',
+            'livewire.update',
+            // '*', // exclude all routes
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Api routes
+    |--------------------------------------------------------------------------
+    |
+    | Api routes configuration
+    |
+    */
+    'routes' => [
+        'api' => [
+            'v1' => [
+                'prefix' => 'venditio/api/v1',
+                'name' => 'venditio.api.v1',
+                'middleware' => ['api'],
+                // 'rate_limit' => [
+                //     'configure' => fn () => VenditioCore::configureRateLimiting('venditio/api/v1'),
+                // ],
+                'pagination' => [
+                    'per_page' => 15,
+                ],
+            ],
+            'enable' => true, // enable api routes
+            'include_timestamps' => false, // include updated_at and deleted_at timestamps in api responses
+            'json_resource_enable_wrapping' => false, // Illuminate\Http\Resources\Json\JsonResource::withoutWrapping();
         ],
     ],
 ];

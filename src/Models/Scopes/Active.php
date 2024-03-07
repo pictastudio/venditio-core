@@ -10,6 +10,10 @@ class Active implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
+        if (request()->routeIs(config('venditio-core.scopes.routes_to_exclude'))) {
+            return;
+        }
+
         $builder->where('active', true);
     }
 }

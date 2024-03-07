@@ -26,9 +26,13 @@ class InDateRange implements Scope
 
     public function apply(Builder $builder, Model $model): void
     {
+        if (request()->routeIs(config('venditio-core.scopes.routes_to_exclude'))) {
+            return;
+        }
+
         $builder->where(function (Builder $query) {
-            $this->buildQuery($query, $this->startColumn, $this->includeStartDate ? '>=' : '>');
-            $this->buildQuery($query, $this->endColumn, $this->includeEndDate ? '<=' : '<');
+            $this->buildQuery($query, $this->startColumn, $this->includeStartDate ? '<=' : '<');
+            $this->buildQuery($query, $this->endColumn, $this->includeEndDate ? '>=' : '>');
         });
     }
 

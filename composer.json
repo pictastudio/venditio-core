@@ -13,6 +13,11 @@
             "name": "Picta Studio",
             "email": "info@pictastudio.com",
             "role": "Developer"
+        },
+        {
+            "name": "Frameck",
+            "email": "fra9879@gmail.com",
+            "role": "Developer"
         }
     ],
     "require": {

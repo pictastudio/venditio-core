@@ -2,6 +2,13 @@
 
 namespace PictaStudio\VenditioCore;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use PictaStudio\VenditioCore\Facades\VenditioCore;
+use PictaStudio\VenditioCore\VenditioCore as VenditioCoreClass;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -31,5 +38,63 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
                     ->copyAndRegisterServiceProviderInApp()
                     ->askToRunMigrations();
             });
+    }
+
+    // public function registeringPackage()
+    // {
+    //     $this->app->bind('venditio-core', function (Application $app) {
+    //         return $app->make(VenditioCore::class);
+    //     });
+    // }
+
+    public function packageBooted(): void
+    {
+        $this->registerApiRoutes();
+    }
+
+    private function registerApiRoutes(): void
+    {
+        if (!config('venditio-core.routes.api.enable')) {
+            return;
+        }
+
+        if (!config('venditio-core.routes.api.json_resource_enable_wrapping')) {
+            JsonResource::withoutWrapping();
+        }
+
+        $this->registerPolicies();
+
+        // dd(file_get_contents($this->package->basePath('/../routes/v1/api.php')));
+        // $this->loadRoutesFrom($this->package->basePath('/../routes/v1/api.php'));
+
+        $prefix = config('venditio-core.routes.api.v1.prefix');
+
+        // VenditioCore::configureRateLimiting($prefix);
+        // config('venditio-core.routes.api.v1.rate_limit.configure')();
+
+        VenditioCoreClass::configureRateLimiting($prefix);
+
+        Route::middleware(config('venditio-core.routes.api.v1.middleware'))
+            ->prefix($prefix)
+            ->name(rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
+            ->group(fn () => (
+                $this->loadRoutesFrom($this->package->basePath('/../routes/v1/api.php'))
+            ));
+    }
+
+    private function registerPolicies(): void
+    {
+        foreach (config('venditio-core.models') as $model => $class) {
+            $model = str($model)->studly()->toString();
+
+            if (!class_exists("PictaStudio\VenditioCore\\Policies\\{$model}Policy")) {
+                continue;
+            }
+
+            Gate::policy(
+                "PictaStudio\VenditioCore\Models\\{$model}",
+                "PictaStudio\VenditioCore\Policies\\{$model}Policy"
+            );
+        }
     }
 }
