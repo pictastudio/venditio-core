@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductCategoryController;
 use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductItemController;
 
 /*
@@ -14,4 +15,5 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductItemController;
 |
 */
 
-Route::apiResource('products', ProductItemController::class)->only(['index', 'show']);
+Route::apiResource('product_items', ProductItemController::class)->only(['index', 'show']);
+Route::apiResource('product_categories', ProductCategoryController::class)->only(['index', 'show']);

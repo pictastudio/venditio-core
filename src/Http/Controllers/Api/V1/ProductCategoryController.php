@@ -7,12 +7,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductItem\StoreProductItemRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductItem\UpdateProductItemRequest;
-use PictaStudio\VenditioCore\Http\Resources\V1\ProductItemResource;
-use PictaStudio\VenditioCore\Models\ProductItem;
+use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\StoreProductCategoryRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\UpdateProductCategoryRequest;
+use PictaStudio\VenditioCore\Http\Resources\V1\ProductCategoryResource;
+use PictaStudio\VenditioCore\Models\ProductCategory;
 
-class ProductItemController extends Controller
+class ProductCategoryController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
@@ -39,7 +39,7 @@ class ProductItemController extends Controller
             $filters = $validationResponse;
         }
 
-        $productItems = ProductItem::query()
+        $productCategories = ProductCategory::query()
             ->when(
                 $hasFilters && isset($filters['ids']),
                 fn (Builder $query) => $query->whereIn('id', $filters['ids'])
@@ -52,25 +52,25 @@ class ProductItemController extends Controller
                 ),
             );
 
-        return ProductItemResource::collection($productItems);
+        return ProductCategoryResource::collection($productCategories);
     }
 
-    public function store(StoreProductItemRequest $request)
+    public function store(StoreProductCategoryRequest $request)
     {
 
     }
 
-    public function show(ProductItem $productItem): JsonResource
+    public function show(ProductCategory $productCategory): JsonResource
     {
-        return ProductItemResource::make($productItem);
+        return ProductCategoryResource::make($productCategory);
     }
 
-    public function update(UpdateProductItemRequest $request, ProductItem $productItem)
+    public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory)
     {
 
     }
 
-    public function destroy(ProductItem $productItem)
+    public function destroy(ProductCategory $productCategory)
     {
 
     }

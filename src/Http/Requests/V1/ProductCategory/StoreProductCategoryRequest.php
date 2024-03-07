@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1;
+namespace PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreProductItemRequest extends FormRequest
+class StoreProductCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
