@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Casts\Price;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class Inventory extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [
@@ -21,7 +22,7 @@ class Inventory extends Model
     ];
 
     protected $casts = [
-        'price' => Price::class,
+        'price' => 'decimal:2',
     ];
 
     public function productItem(): BelongsTo

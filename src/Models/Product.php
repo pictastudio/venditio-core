@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Casts\Decimal;
 use PictaStudio\VenditioCore\Enums\ProductMeasuringUnit;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class Product extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [
@@ -33,11 +34,11 @@ class Product extends Model
         'visible_from' => 'datetime',
         'visible_to' => 'datetime',
         'images' => 'array',
-        'measuring_unit' => ProductMeasuringUnit::class,
-        'weight' => Decimal::class,
-        'length' => Decimal::class,
-        'width' => Decimal::class,
-        'depth' => Decimal::class,
+        // 'measuring_unit' => ProductMeasuringUnit::class,
+        'weight' => 'decimal:2',
+        'length' => 'decimal:2',
+        'width' => 'decimal:2',
+        'depth' => 'decimal:2',
         'metadata' => 'array',
     ];
 
@@ -64,7 +65,7 @@ class Product extends Model
         return $this->belongsTo(config('venditio-core.models.tax_class'));
     }
 
-    public function category(): BelongsToMany
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(config('venditio-core.models.product_category'), 'product_category_product')
             ->withTimestamps();

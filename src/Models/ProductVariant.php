@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Scopes\Ordered;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class ProductVariant extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [

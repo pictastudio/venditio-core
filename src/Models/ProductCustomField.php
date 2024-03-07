@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Scopes\Ordered;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class ProductCustomField extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [

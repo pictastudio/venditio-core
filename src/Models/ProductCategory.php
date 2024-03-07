@@ -10,10 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\Ordered;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class ProductCategory extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [

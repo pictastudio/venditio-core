@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Casts\Price;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class Cart extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [
@@ -22,13 +23,13 @@ class Cart extends Model
     ];
 
     protected $casts = [
-        'sub_total_taxable' => Price::class,
-        'sub_total_tax' => Price::class,
-        'sub_total' => Price::class,
-        'shipping_fee' => Price::class,
-        'payment_fee' => Price::class,
-        'discount_amount' => Price::class,
-        'total_final' => Price::class,
+        'sub_total_taxable' => 'decimal:2',
+        'sub_total_tax' => 'decimal:2',
+        'sub_total' => 'decimal:2',
+        'shipping_fee' => 'decimal:2',
+        'payment_fee' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'total_final' => 'decimal:2',
         'addresses' => 'array',
     ];
 

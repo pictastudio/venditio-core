@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Enums\AddressType;
 use PictaStudio\VenditioCore\Models\Traits\HasDefault;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class Address extends Model
 {
     use HasDefault;
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [

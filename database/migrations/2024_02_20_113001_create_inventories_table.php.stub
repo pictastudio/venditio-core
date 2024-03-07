@@ -12,9 +12,9 @@ return new class extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(ProductItem::class);
-            $table->mediumInteger('stock');
+            $table->mediumInteger('stock')->default(0);
             $table->mediumInteger('stock_min')->nullable()->comment('quantità minima di stock (per allerta sottoscorta)');
-            $table->unsignedMediumInteger('price');
+            $table->decimal('price', 10, 2);
             $table->datetimes();
             $table->softDeletesDatetime();
         });

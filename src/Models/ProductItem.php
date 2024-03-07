@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Casts\Decimal;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class ProductItem extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use HasSlug;
     use SoftDeletes;
 
@@ -33,10 +34,10 @@ class ProductItem extends Model
         'visible_from' => 'datetime',
         'visible_to' => 'datetime',
         'images' => 'array',
-        'weight' => Decimal::class,
-        'length' => Decimal::class,
-        'width' => Decimal::class,
-        'depth' => Decimal::class,
+        'weight' => 'decimal:2',
+        'length' => 'decimal:2',
+        'width' => 'decimal:2',
+        'depth' => 'decimal:2',
         'metadata' => 'array',
     ];
 
@@ -70,8 +71,8 @@ class ProductItem extends Model
         return $this->belongsToMany(config('venditio-core.models.product_variant_option'), 'product_configuration');
     }
 
-    public function inventory(): HasMany
+    public function inventory(): HasOne
     {
-        return $this->hasMany(config('venditio-core.models.inventory'));
+        return $this->hasOne(config('venditio-core.models.inventory'));
     }
 }

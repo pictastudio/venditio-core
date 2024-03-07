@@ -4,7 +4,6 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use PictaStudio\VenditioCore\Casts\Price;
 
 class CountryTaxClass extends Pivot
 {
@@ -15,7 +14,7 @@ class CountryTaxClass extends Pivot
     ];
 
     protected $casts = [
-        'rate' => Price::class,
+        'rate' => 'decimal:2',
     ];
 
     public function country(): BelongsTo

@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Enums\DiscountType;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
+use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class Discount extends Model
 {
     use HasFactory;
+    use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [
@@ -24,6 +26,7 @@ class Discount extends Model
 
     protected $casts = [
         'type' => DiscountType::class,
+        'value' => 'decimal:2',
         'active' => 'boolean',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
