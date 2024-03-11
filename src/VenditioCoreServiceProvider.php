@@ -8,6 +8,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
+use PictaStudio\VenditioCore\Helpers\Cart\Contracts\CartIdentifierGeneratorInterface;
+use PictaStudio\VenditioCore\Helpers\Cart\Generators\CartIdentifierGenerator;
+use PictaStudio\VenditioCore\Helpers\Order\Contracts\OrderIdentifierGeneratorInterface;
+use PictaStudio\VenditioCore\Helpers\Order\Generators\OrderIdentifierGenerator;
 use PictaStudio\VenditioCore\VenditioCore as VenditioCoreClass;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -50,6 +54,9 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         $this->registerApiRoutes();
+
+        $this->app->bind(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
+        $this->app->bind(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
     }
 
     private function registerApiRoutes(): void

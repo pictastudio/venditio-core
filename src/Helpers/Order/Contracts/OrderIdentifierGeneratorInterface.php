@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Orders\Contracts;
+namespace PictaStudio\VenditioCore\Helpers\Order\Contracts;
 
 use PictaStudio\VenditioCore\Models\Order;
 

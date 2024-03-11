@@ -15,15 +15,15 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->nullable();
             $table->foreignIdFor(Order::class)->nullable();
             $table->string('identifier', 100);
-            $table->string('status', 50)->index()->comment('abandoned, active, completed, failed, pending etc...');
+            $table->string('status', 50)->index()->default('active')->comment('abandoned, active, completed, failed, pending etc...');
             $table->decimal('sub_total_taxable', 10, 2)->comment('somma dei totali dei prodotti senza tasse');
             $table->decimal('sub_total_tax', 10, 2)->comment('somma delle tasse dei prodotti');
             $table->decimal('sub_total', 10, 2)->comment('somma dei totali dei prodotti');
             $table->decimal('shipping_fee', 10, 2)->default(0.00)->comment('costo spese di spedizione');
             $table->decimal('payment_fee', 10, 2)->default(0.00)->comment('pagato dal cliente');
-            $table->string('discount_ref')->comment('riferimento origine sconto');
+            $table->string('discount_ref')->nullable()->comment('riferimento origine sconto');
             $table->decimal('discount_amount', 10, 2)->default(0.00)->comment('valore sconto sul carrello');
-            $table->decimal('total_final', 10, 2)->comment('totale finale ordine');
+            $table->decimal('total_final', 10, 2)->comment('totale finale carrello');
             $table->string('user_first_name');
             $table->string('user_last_name');
             $table->string('user_email');

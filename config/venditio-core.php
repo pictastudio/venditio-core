@@ -1,11 +1,13 @@
 <?php
 
+use PictaStudio\VenditioCore\Enums\OrderStatus;
+use PictaStudio\VenditioCore\Enums\ProductStatus;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Formatters\Decimal\DefaultDecimalFormatter;
 use PictaStudio\VenditioCore\Formatters\Pricing\DefaultPriceFormatter;
 use PictaStudio\VenditioCore\Managers\AuthManager;
-use PictaStudio\VenditioCore\Orders\Generators\OrderIdentifierGenerator;
-use PictaStudio\VenditioCore\Pipelines\Orders\Tasks\GenerateIdentifier;
+use PictaStudio\VenditioCore\Pipelines\Cart;
+use PictaStudio\VenditioCore\Pipelines\Order;
 
 return [
 
@@ -96,14 +98,60 @@ return [
     |
     */
     'orders' => [
-        'identifier_generator' => OrderIdentifierGenerator::class,
+        'status_enum' => OrderStatus::class,
         'pipelines' => [
             'creation' => [
                 'tasks' => [
-                    GenerateIdentifier::class,
+                    Order\Pipes\FillOrderFromCart::class,
+                    Order\Pipes\GenerateIdentifier::class,
                 ],
             ],
         ],
+        // 'statuses' => [
+        //     'pending' => 'pending',
+        //     'approved' => 'approved',
+        //     'shipped' => 'shipped',
+        //     'delivered' => 'delivered',
+        //     'cancelled' => 'cancelled',
+        // ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Carts
+    |--------------------------------------------------------------------------
+    |
+    | Pipeline tasks are executed in the order they are defined
+    |
+    */
+    'carts' => [
+        'pipelines' => [
+            'creation' => [
+                'tasks' => [
+                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\GenerateIdentifier::class,
+                    Cart\Pipes\CalculateTotals::class,
+                ],
+            ],
+            'update' => [
+                'tasks' => [
+                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\CalculateTotals::class,
+                ],
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Products
+    |--------------------------------------------------------------------------
+    |
+    */
+    'products' => [
+        'status_enum' => ProductStatus::class,
     ],
 
     /*

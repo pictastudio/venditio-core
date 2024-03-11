@@ -8,12 +8,10 @@ abstract class Pipeline
 {
     protected array $tasks = [];
 
-    public function run(object $payload): mixed
+    public function run(object|array $payload): mixed
     {
-        return PipelineFacade::send(
-            passable: $payload,
-        )->through(
-            pipes: $this->tasks,
-        )->thenReturn();
+        return PipelineFacade::send($payload)
+            ->through($this->tasks)
+            ->thenReturn();
     }
 }

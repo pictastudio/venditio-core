@@ -259,7 +259,7 @@ Table carts {
     payment_fee decimal(10,2) [not null, default: '0', note: 'pagato dal cliente']
     discount_ref varchar(255) [not null, note: 'riferimento origine sconto']
     discount_amount decimal(10,2) [not null, default: '0', note: 'valore sconto sul carrello']
-    total_final decimal(10,2) [not null, note: 'totale finale ordine']
+    total_final decimal(10,2) [not null, note: 'totale finale carrello']
     user_first_name varchar(255) [not null]
     user_last_name varchar(255) [not null]
     user_email varchar(255) [not null]

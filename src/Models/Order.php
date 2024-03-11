@@ -37,6 +37,15 @@ class Order extends Model
         'approved_at' => 'datetime',
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->mergeCasts([
+            'status' => config('venditio-core.orders.status_enum'),
+        ]);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(config('venditio-core.models.user'));

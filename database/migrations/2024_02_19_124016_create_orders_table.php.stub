@@ -13,8 +13,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->nullable();
-            $table->string('identifier', 100);
             $table->foreignIdFor(ShippingStatus::class)->nullable();
+            $table->string('identifier', 100);
             $table->string('status', 50)->index()->comment('pending, processing, completed, cancelled');
             $table->string('tracking_code')->nullable();
             $table->dateTime('tracking_date')->nullable()->comment('data di aggiornamento del tracking');

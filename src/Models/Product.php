@@ -42,6 +42,15 @@ class Product extends Model
         'metadata' => 'array',
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->mergeCasts([
+            'status' => config('venditio-core.products.status_enum'),
+        ]);
+    }
+
     protected static function booted(): void
     {
         static::addGlobalScopes([

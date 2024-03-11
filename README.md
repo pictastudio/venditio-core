@@ -119,14 +119,20 @@ return [
 By default the api routes provided by this package are public, with no authetication setup.
 You should provide the authentication layer in your app using something like `laravel/breeze` for SPA or other kinds of authentication.
 
+### Carts
+#### Generator
+Customize cart identifier generator
+Modify the bind in laravel container
+```php
+$this->app->bind(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
+```
+
 ### Orders
 #### Generator
 Customize order identifier generator
-Modify the class in config `venditio-core.orders.identifier_generator`
+Modify the bind in laravel container
 ```php
-'orders' => [
-    'identifier_generator' => App\Generators\MyCustomGenerator::class,
-],
+$this->app->bind(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
 ```
 ```php
 namespace App\Generators;

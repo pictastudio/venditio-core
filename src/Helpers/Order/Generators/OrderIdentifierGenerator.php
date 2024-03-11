@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Orders\Generators;
+namespace PictaStudio\VenditioCore\Helpers\Order\Generators;
 
+use PictaStudio\VenditioCore\Helpers\Order\Contracts\OrderIdentifierGeneratorInterface;
 use PictaStudio\VenditioCore\Models\Order;
-use PictaStudio\VenditioCore\Orders\Contracts\OrderIdentifierGeneratorInterface;
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 {
@@ -16,32 +16,29 @@ class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 
         $month = $order->created_at->format('m');
 
-        $latest = Order::query()
+        $latestIdentifier = Order::query()
             ->selectRaw('MAX(identifier) as identifier')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->whereNot('id', $order->getKey())
-            ->first();
+            ->value('identifier');
 
-        if (!$latest || !$latest->identifier) {
-            $increment = 1;
-        } else {
-            $segments = explode('-', $latest->identifier);
+        $identifierTemplate = '{year}-{month}-{increment}';
+        $increment = 1;
 
-            if (count($segments) == 1) {
-                $increment = 1;
-            } else {
+        if ($latestIdentifier) {
+            $segments = explode('-', $latestIdentifier);
+
+            if (count($segments) !== 1) {
                 $increment = end($segments) + 1;
             }
         }
 
-        $identifierTemplate = '{year}-{month}-{increment}';
-
         return str($identifierTemplate)
             ->swap([
-                'year' => $year,
-                'month' => $month,
-                'increment' => str_pad($increment, 4, 0, STR_PAD_LEFT),
+                '{year}' => $year,
+                '{month}' => $month,
+                '{increment}' => str_pad($increment, 6, 0, STR_PAD_LEFT),
             ])
             ->toString();
     }
