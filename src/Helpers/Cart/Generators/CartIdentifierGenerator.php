@@ -40,7 +40,7 @@ class CartIdentifierGenerator implements CartIdentifierGeneratorInterface
             ->swap([
                 '{year}' => $year,
                 '{month}' => $month,
-                '{increment}' => str_pad($increment, 6, 0, STR_PAD_LEFT),
+                '{increment}' => mb_str_pad($increment, 6, 0, STR_PAD_LEFT),
             ])
             ->toString();
     }
