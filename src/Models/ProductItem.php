@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -20,6 +21,7 @@ class ProductItem extends Model
     use HasFactory;
     use HasHelperMethods;
     use HasSlug;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $guarded = [

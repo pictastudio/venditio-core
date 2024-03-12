@@ -6,27 +6,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
 
-class CartResource extends JsonResource
+class OrderLineResource extends JsonResource
 {
     use HasAttributesToExclude;
 
     public function toArray($request)
     {
-        $attributes = Arr::except(
+        return Arr::except(
             parent::toArray($request),
             $this->getDefaultAttributesToExclude()
         );
-
-        return array_merge(
-            $attributes,
-            $this->getRelationshipsToInclude(),
-        );
-    }
-
-    protected function getRelationshipsToInclude(): array
-    {
-        return [
-            'lines' => CartLineResource::collection($this->whenLoaded('lines')),
-        ];
     }
 }

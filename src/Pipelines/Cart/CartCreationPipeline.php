@@ -15,6 +15,6 @@ class CartCreationPipeline extends Pipeline
 
     public function __construct()
     {
-        $this->tasks = config('venditio-core.carts.pipelines.creation.tasks');
+        $this->tasks = config('venditio-core.carts.pipelines.creation.pipes');
     }
 }

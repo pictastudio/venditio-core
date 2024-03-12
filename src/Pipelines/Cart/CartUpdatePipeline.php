@@ -15,6 +15,6 @@ class CartUpdatePipeline extends Pipeline
 
     public function __construct()
     {
-        $this->tasks = config('venditio-core.carts.pipelines.update.tasks');
+        $this->tasks = config('venditio-core.carts.pipelines.update.pipes');
     }
 }

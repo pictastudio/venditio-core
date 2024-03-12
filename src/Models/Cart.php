@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 
 class Cart extends Model
 {
     use HasFactory;
     use HasHelperMethods;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $guarded = [

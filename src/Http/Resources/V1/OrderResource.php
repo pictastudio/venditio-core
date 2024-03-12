@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
 
-class CartResource extends JsonResource
+class OrderResource extends JsonResource
 {
     use HasAttributesToExclude;
 
@@ -26,7 +26,7 @@ class CartResource extends JsonResource
     protected function getRelationshipsToInclude(): array
     {
         return [
-            'lines' => CartLineResource::collection($this->whenLoaded('lines')),
+            'lines' => OrderLineResource::collection($this->whenLoaded('lines')),
         ];
     }
 }

@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Enums\AddressType;
 use PictaStudio\VenditioCore\Models\Traits\HasDefault;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 
 class Address extends Model
 {
     use HasDefault;
     use HasFactory;
     use HasHelperMethods;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $guarded = [

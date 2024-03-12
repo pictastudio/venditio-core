@@ -27,7 +27,10 @@ class CalculateLines
     {
         $productItems = ProductItem::query()
             ->whereIn('id', $lines->pluck('product_item_id'))
-            ->with('inventory')
+            ->with([
+                'product',
+                'inventory',
+            ])
             ->get();
 
         return $lines->map(function ($line) use ($productItems) {
@@ -36,13 +39,13 @@ class CalculateLines
             $cartLine = new CartLine;
 
             $price = $productItem->inventory->price;
-            $unitDiscount = 0;
+            $unitDiscount = $price * (10 / 100);
 
             $taxRate = 0; // get 'rate' from 'country_tax_class' after getting the taxClass from the product
             $unitFinalPriceTax = 0;
             $unitFinalPriceTaxable = $price - $unitDiscount;
 
-            $cartLine->fill([
+            return $cartLine->fill([
                 'product_item_id' => $productItem->getKey(),
                 'product_name' => $productItem->name,
                 'product_sku' => $productItem->sku,
@@ -56,8 +59,6 @@ class CalculateLines
                 'tax_rate' => $taxRate,
                 'product_item' => $productItem->toArray(),
             ]);
-
-            return $cartLine;
         });
     }
 }

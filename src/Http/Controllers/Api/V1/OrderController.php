@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\CartDto;
+use PictaStudio\VenditioCore\Dto\OrderDto;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
-use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
+use PictaStudio\VenditioCore\Http\Requests\V1\Order\StoreOrderRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Order\UpdateOrderRequest;
+use PictaStudio\VenditioCore\Http\Resources\V1\OrderResource;
 use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
-use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
+use PictaStudio\VenditioCore\Models\Order;
+use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
 
-class CartController extends Controller
+class OrderController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
@@ -42,7 +42,7 @@ class CartController extends Controller
             $filters = $validationResponse;
         }
 
-        $carts = Cart::query()
+        $orders = Order::query()
             ->when(
                 $hasFilters && isset($filters['ids']),
                 fn (Builder $query) => $query->whereIn('id', $filters['ids'])
@@ -55,41 +55,33 @@ class CartController extends Controller
                 ),
             );
 
-        return CartResource::collection($carts);
+        return OrderResource::collection($orders);
     }
 
-    public function store(StoreCartRequest $request, CartCreationPipeline $pipeline): JsonResource
+    public function store(StoreOrderRequest $request, OrderCreationPipeline $pipeline): JsonResource
     {
-        $cart = $pipeline->run(
-            CartDto::fromArray(array_merge(
-                $request->validated(),
-                ['cart' => (app(config('venditio-core.models.cart')))->updateTimestamps()]
-            ))
+        $order = $pipeline->run(
+            OrderDto::fromCart(
+                Cart::findOrFail($request->input('cart_id'))
+            )
         );
 
-        return CartResource::make($cart);
+        return OrderResource::make($order);
     }
 
-    public function show(Cart $cart): JsonResource
+    public function show(Order $order): JsonResource
     {
-        return CartResource::make($cart->load('lines'));
+        return OrderResource::make($order->load('lines'));
     }
 
-    public function update(UpdateCartRequest $request, Cart $cart, CartUpdatePipeline $pipeline): JsonResource
+    public function update(UpdateOrderRequest $request, Order $order): JsonResource
     {
-        $cart = $pipeline->run(
-            CartDto::fromArray(array_merge(
-                $request->validated(),
-                ['cart' => $cart]
-            ))
-        );
-
-        return CartResource::make($cart);
+        return OrderResource::make($order);
     }
 
-    public function destroy(Cart $cart)
+    public function destroy(Order $order)
     {
-        $cart->delete();
+        $order->delete();
 
         return response()->noContent();
     }

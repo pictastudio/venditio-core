@@ -13,11 +13,11 @@ final class GenerateIdentifier
     ) {
     }
 
-    public function __invoke(Order $order, Closure $next): Closure
+    public function __invoke(Order $order, Closure $next): Order
     {
         $identifier = $this->generator->generate($order);
 
-        $order->update([
+        $order->fill([
             'identifier' => $identifier,
         ]);
 

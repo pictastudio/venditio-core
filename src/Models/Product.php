@@ -13,11 +13,13 @@ use PictaStudio\VenditioCore\Enums\ProductMeasuringUnit;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 
 class Product extends Model
 {
     use HasFactory;
     use HasHelperMethods;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $guarded = [

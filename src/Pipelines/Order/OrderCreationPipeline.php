@@ -16,6 +16,6 @@ class OrderCreationPipeline extends Pipeline
 
     public function __construct()
     {
-        $this->tasks = config('venditio-core.orders.pipelines.creation');
+        $this->tasks = config('venditio-core.orders.pipelines.creation.pipes');
     }
 }

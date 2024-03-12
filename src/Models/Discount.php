@@ -10,11 +10,13 @@ use PictaStudio\VenditioCore\Enums\DiscountType;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 
 class Discount extends Model
 {
     use HasFactory;
     use HasHelperMethods;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $guarded = [

@@ -91,6 +91,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Carts
+    |--------------------------------------------------------------------------
+    |
+    | Pipeline tasks are executed in the order they are defined
+    |
+    */
+    'carts' => [
+        'pipelines' => [
+            'creation' => [
+                'pipes' => [
+                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\GenerateIdentifier::class,
+                    Cart\Pipes\CalculateTotals::class,
+                ],
+            ],
+            'update' => [
+                'pipes' => [
+                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\CalculateTotals::class,
+                ],
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Orders
     |--------------------------------------------------------------------------
     |
@@ -101,9 +129,11 @@ return [
         'status_enum' => OrderStatus::class,
         'pipelines' => [
             'creation' => [
-                'tasks' => [
+                'pipes' => [
                     Order\Pipes\FillOrderFromCart::class,
                     Order\Pipes\GenerateIdentifier::class,
+                    Order\Pipes\CalculateLines::class,
+                    Order\Pipes\ApproveOrder::class,
                 ],
             ],
         ],
@@ -114,34 +144,6 @@ return [
         //     'delivered' => 'delivered',
         //     'cancelled' => 'cancelled',
         // ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Carts
-    |--------------------------------------------------------------------------
-    |
-    | Pipeline tasks are executed in the order they are defined
-    |
-    */
-    'carts' => [
-        'pipelines' => [
-            'creation' => [
-                'tasks' => [
-                    Cart\Pipes\FillUserDetails::class,
-                    Cart\Pipes\CalculateLines::class,
-                    Cart\Pipes\GenerateIdentifier::class,
-                    Cart\Pipes\CalculateTotals::class,
-                ],
-            ],
-            'update' => [
-                'tasks' => [
-                    Cart\Pipes\FillUserDetails::class,
-                    Cart\Pipes\CalculateLines::class,
-                    Cart\Pipes\CalculateTotals::class,
-                ],
-            ],
-        ],
     ],
 
     /*

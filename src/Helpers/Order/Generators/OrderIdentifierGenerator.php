@@ -20,7 +20,7 @@ class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
             ->selectRaw('MAX(identifier) as identifier')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->whereNot('id', $order->getKey())
+            // ->whereNot('id', $order->getKey())
             ->value('identifier');
 
         $identifierTemplate = '{year}-{month}-{increment}';
