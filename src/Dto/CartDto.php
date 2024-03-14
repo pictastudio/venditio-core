@@ -10,9 +10,9 @@ final class CartDto
     public function __construct(
         private Cart $cart,
         private ?int $userId,
-        private string $userFirstName,
-        private string $userLastName,
-        private string $userEmail,
+        private ?string $userFirstName,
+        private ?string $userLastName,
+        private ?string $userEmail,
         private ?string $discountRef,
         private array $billingAddress,
         private array $shippingAddress,
@@ -46,17 +46,17 @@ final class CartDto
         return $this->userId ?? auth()->id();
     }
 
-    public function getUserFirstName(): string
+    public function getUserFirstName(): ?string
     {
         return $this->userFirstName;
     }
 
-    public function getUserLastName(): string
+    public function getUserLastName(): ?string
     {
         return $this->userLastName;
     }
 
-    public function getUserEmail(): string
+    public function getUserEmail(): ?string
     {
         return $this->userEmail;
     }

@@ -110,7 +110,7 @@ return [
             'update' => [
                 'pipes' => [
                     Cart\Pipes\FillUserDetails::class,
-                    Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\UpdateLines::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
             ],

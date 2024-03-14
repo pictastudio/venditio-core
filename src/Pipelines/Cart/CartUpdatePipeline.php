@@ -11,10 +11,8 @@ use PictaStudio\VenditioCore\Pipelines\Pipeline;
  */
 class CartUpdatePipeline extends Pipeline
 {
-    protected array $tasks = [];
-
     public function __construct()
     {
-        $this->tasks = config('venditio-core.carts.pipelines.update.pipes');
+        $this->pipes = config('venditio-core.carts.pipelines.update.pipes');
     }
 }
