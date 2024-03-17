@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\CartDto;
+use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
 use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\VenditioCore\Models\Contracts\Cart as CartContract;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
 
@@ -42,7 +43,7 @@ class CartController extends Controller
             $filters = $validationResponse;
         }
 
-        $carts = Cart::query()
+        $carts = app(CartContract::class)::query()
             ->when(
                 $hasFilters && isset($filters['ids']),
                 fn (Builder $query) => $query->whereIn('id', $filters['ids'])
@@ -61,10 +62,7 @@ class CartController extends Controller
     public function store(StoreCartRequest $request, CartCreationPipeline $pipeline): JsonResource
     {
         $cart = $pipeline->run(
-            CartDto::fromArray(array_merge(
-                $request->validated(),
-                ['cart' => (app(config('venditio-core.models.cart')))->updateTimestamps()]
-            ))
+            app(CartDtoContract::class)::fromArray($request->validated())
         );
 
         return CartResource::make($cart);
@@ -78,7 +76,7 @@ class CartController extends Controller
     public function update(UpdateCartRequest $request, Cart $cart, CartUpdatePipeline $pipeline): JsonResource
     {
         $cart = $pipeline->run(
-            CartDto::fromArray(array_merge(
+            app(CartDtoContract::class)::fromArray(array_merge(
                 $request->validated(),
                 ['cart' => $cart]
             ))

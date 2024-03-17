@@ -2,21 +2,21 @@
 
 namespace PictaStudio\VenditioCore\Helpers\Order\Generators;
 
+use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Helpers\Order\Contracts\OrderIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Models\Order;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function generate(Order $order): string
+    public function generate(Model $order): string
     {
         $year = $order->created_at->year;
-
         $month = $order->created_at->format('m');
 
-        $latestIdentifier = Order::query()
+        $latestIdentifier = app(Order::class)::query()
             ->selectRaw('MAX(identifier) as identifier')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)

@@ -4,6 +4,8 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
 use PictaStudio\VenditioCore\Models\Traits\HasAddresses;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
@@ -25,12 +27,12 @@ class User extends Authenticatable
 
     public function carts(): HasMany
     {
-        return $this->hasMany(config('venditio-core.models.cart'));
+        return $this->hasMany(app(Cart::class));
     }
 
     public function orders(): HasMany
     {
-        return $this->hasMany(config('venditio-core.models.order'));
+        return $this->hasMany(app(Order::class));
     }
 
     public function isRoot(): bool

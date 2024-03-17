@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\OrderDto;
+use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Order\StoreOrderRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Order\UpdateOrderRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\OrderResource;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\VenditioCore\Models\Contracts\Cart as CartContract;
+use PictaStudio\VenditioCore\Models\Contracts\Order as OrderContract;
 use PictaStudio\VenditioCore\Models\Order;
 use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
 
@@ -42,7 +43,7 @@ class OrderController extends Controller
             $filters = $validationResponse;
         }
 
-        $orders = Order::query()
+        $orders = app(OrderContract::class)::query()
             ->when(
                 $hasFilters && isset($filters['ids']),
                 fn (Builder $query) => $query->whereIn('id', $filters['ids'])
@@ -61,8 +62,8 @@ class OrderController extends Controller
     public function store(StoreOrderRequest $request, OrderCreationPipeline $pipeline): JsonResource
     {
         $order = $pipeline->run(
-            OrderDto::fromCart(
-                Cart::findOrFail($request->input('cart_id'))
+            app(OrderDtoContract::class)::fromCart(
+                app(CartContract::class)::findOrFail($request->input('cart_id'))
             )
         );
 

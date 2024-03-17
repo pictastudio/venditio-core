@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PictaStudio\VenditioCore\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
+use PictaStudio\VenditioCore\Models\Contracts\User;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 
@@ -37,16 +40,16 @@ class Cart extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.user'));
+        return $this->belongsTo(app(User::class));
     }
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.order'));
+        return $this->belongsTo(app(Order::class));
     }
 
     public function lines(): HasMany
     {
-        return $this->hasMany(config('venditio-core.models.cart_line'));
+        return $this->hasMany(app(CartLine::class));
     }
 }

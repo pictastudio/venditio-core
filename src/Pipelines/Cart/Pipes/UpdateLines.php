@@ -3,14 +3,14 @@
 namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\CartLine;
-use PictaStudio\VenditioCore\Models\ProductItem;
+use PictaStudio\VenditioCore\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
 
 class UpdateLines
 {
-    public function __invoke(Cart $cart, Closure $next): Cart
+    public function __invoke(Model $cart, Closure $next): Model
     {
         $lines = self::calculateLines($cart->getRelation('lines'));
 
@@ -21,7 +21,7 @@ class UpdateLines
 
     public static function calculateLines(Collection $lines): Collection
     {
-        $productItems = ProductItem::query()
+        $productItems = app(ProductItem::class)::query()
             ->whereIn('id', $lines->pluck('product_item_id'))
             ->with([
                 'product',
@@ -32,7 +32,7 @@ class UpdateLines
         return $lines->map(function ($line) use ($productItems) {
             $productItem = $productItems->firstWhere('id', $line['product_item_id']);
 
-            $cartLine = CartLine::findOrFail($line['id']);
+            $cartLine = app(CartLine::class)::findOrFail($line['id']);
 
             $price = $productItem->inventory->price;
             $unitDiscount = $price * (10 / 100);

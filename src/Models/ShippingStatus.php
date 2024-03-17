@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class ShippingStatus extends Model
@@ -23,6 +24,6 @@ class ShippingStatus extends Model
 
     public function orders(): HasMany
     {
-        return $this->hasMany(config('venditio-core.models.order'));
+        return $this->hasMany(app(Order::class));
     }
 }

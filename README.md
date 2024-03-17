@@ -153,6 +153,13 @@ class MyCustomGenerator implements OrderIdentifierGeneratorInterface
 }
 ```
 
+TODO:
+- [ ] update outdated docs
+- [ ] docs on binding of models and dtos into container
+- [ ] pipeline docs
+- [ ] docs on `OrderStatus` enum and `Contracts\OrderStatus` on how it's used and the logic behind it
+- [ ] docs on customizing validation rules
+
 ## Testing
 
 ```bash

@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Enums\ProductMeasuringUnit;
+use PictaStudio\VenditioCore\Models\Contracts\Brand;
+use PictaStudio\VenditioCore\Models\Contracts\Discount;
+use PictaStudio\VenditioCore\Models\Contracts\ProductCategory;
+use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
+use PictaStudio\VenditioCore\Models\Contracts\ProductType;
+use PictaStudio\VenditioCore\Models\Contracts\TaxClass;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
@@ -63,32 +69,32 @@ class Product extends Model
 
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.brand'));
+        return $this->belongsTo(app(Brand::class));
     }
 
     public function productType(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.product_type'));
+        return $this->belongsTo(app(ProductType::class));
     }
 
     public function taxClass(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.tax_class'));
+        return $this->belongsTo(app(TaxClass::class));
     }
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(config('venditio-core.models.product_category'), 'product_category_product')
+        return $this->belongsToMany(app(ProductCategory::class), 'product_category_product')
             ->withTimestamps();
     }
 
     public function discount(): MorphMany
     {
-        return $this->morphMany(config('venditio-core.models.discount'), 'discountable');
+        return $this->morphMany(app(Discount::class), 'discountable');
     }
 
     public function productItems(): HasMany
     {
-        return $this->hasMany(config('venditio-core.models.product_item'));
+        return $this->hasMany(app(ProductItem::class));
     }
 }

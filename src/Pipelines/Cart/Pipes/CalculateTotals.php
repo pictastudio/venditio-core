@@ -3,11 +3,11 @@
 namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
-use PictaStudio\VenditioCore\Models\Cart;
+use Illuminate\Database\Eloquent\Model;
 
 class CalculateTotals
 {
-    public function __invoke(Cart $cart, Closure $next): Cart
+    public function __invoke(Model $cart, Closure $next): Model
     {
         $lines = $cart->getRelation('lines');
         $cart->unsetRelation('lines');

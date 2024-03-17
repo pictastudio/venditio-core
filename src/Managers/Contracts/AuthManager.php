@@ -2,11 +2,14 @@
 
 namespace PictaStudio\VenditioCore\Managers\Contracts;
 
-use PictaStudio\VenditioCore\Models\User;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use PictaStudio\VenditioCore\Models\Contracts\User;
 
 interface AuthManager
 {
-    public function getUser(): User;
+    public function user(User|Authenticatable $user): static;
+
+    public function getUser(): User|Authenticatable;
 
     public function can(string $resource, string $action): bool;
 

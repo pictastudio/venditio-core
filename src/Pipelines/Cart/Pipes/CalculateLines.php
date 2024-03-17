@@ -3,10 +3,11 @@
 namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\CartLine;
-use PictaStudio\VenditioCore\Models\ProductItem;
+use PictaStudio\VenditioCore\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
 
 class CalculateLines
 {
@@ -14,7 +15,7 @@ class CalculateLines
      * In this task the input data is a fresh instance of the Cart model (not yet persisted to the database)
      * The relation 'lines' is set on the Cart model with the plain array of lines (product_item_id, qty)
      */
-    public function __invoke(Cart $cart, Closure $next): Cart
+    public function __invoke(Model $cart, Closure $next): Model
     {
         $lines = self::calculateLines($cart->getRelation('lines'));
 
@@ -25,7 +26,7 @@ class CalculateLines
 
     public static function calculateLines(Collection $lines): Collection
     {
-        $productItems = ProductItem::query()
+        $productItems = app(ProductItem::class)::query()
             ->whereIn('id', $lines->pluck('product_item_id'))
             ->with([
                 'product',
@@ -36,7 +37,7 @@ class CalculateLines
         return $lines->map(function ($line) use ($productItems) {
             $productItem = $productItems->firstWhere('id', $line['product_item_id']);
 
-            $cartLine = new CartLine;
+            $cartLine = app(CartLine::class);
 
             $price = $productItem->inventory->price;
             $unitDiscount = $price * (10 / 100);

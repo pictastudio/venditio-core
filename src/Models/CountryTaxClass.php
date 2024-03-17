@@ -4,6 +4,8 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use PictaStudio\VenditioCore\Models\Contracts\Country;
+use PictaStudio\VenditioCore\Models\Contracts\TaxClass;
 
 class CountryTaxClass extends Pivot
 {
@@ -19,11 +21,11 @@ class CountryTaxClass extends Pivot
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.country'));
+        return $this->belongsTo(app(Country::class));
     }
 
     public function taxClass(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.tax_class'));
+        return $this->belongsTo(app(TaxClass::class));
     }
 }

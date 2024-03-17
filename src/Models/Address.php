@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Enums\AddressType;
+use PictaStudio\VenditioCore\Models\Contracts\Country;
 use PictaStudio\VenditioCore\Models\Traits\HasDefault;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
@@ -28,9 +28,17 @@ class Address extends Model
     ];
 
     protected $casts = [
-        'type' => AddressType::class,
         'default' => 'boolean',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->mergeCasts([
+            'status' => config('venditio-core.addresses.status_enum'),
+        ]);
+    }
 
     public function addressable(): MorphTo
     {
@@ -39,6 +47,6 @@ class Address extends Model
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.country'));
+        return $this->belongsTo(app(Country::class));
     }
 }

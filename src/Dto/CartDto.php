@@ -2,13 +2,15 @@
 
 namespace PictaStudio\VenditioCore\Dto;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
+use PictaStudio\VenditioCore\Models\Contracts\Cart;
 
-final class CartDto
+class CartDto implements CartDtoContract
 {
     public function __construct(
-        private Cart $cart,
+        private Model $cart,
         private ?int $userId,
         private ?string $userFirstName,
         private ?string $userLastName,
@@ -21,10 +23,10 @@ final class CartDto
 
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
-        return new self(
-            $data['cart'],
+        return new static(
+            $data['cart'] ?? static::getInstance(),
             $data['user_id'] ?? null,
             $data['user_first_name'] ?? null,
             $data['user_last_name'] ?? null,
@@ -36,7 +38,7 @@ final class CartDto
         );
     }
 
-    public function getCart(): Cart
+    public function getCart(): Model
     {
         return $this->cart;
     }
@@ -82,5 +84,25 @@ final class CartDto
     public function getLines(): Collection
     {
         return collect($this->lines);
+    }
+
+    public static function getInstance(): Model
+    {
+        return app(Cart::class);
+    }
+
+    public static function bindIntoContainer(): static
+    {
+        return new static(
+            static::getInstance(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            [],
+            [],
+            [],
+        );
     }
 }

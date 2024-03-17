@@ -2,19 +2,22 @@
 
 namespace PictaStudio\VenditioCore\Dto;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\Order;
+use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
+use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
+use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
 
-final class OrderDto
+class OrderDto implements OrderDtoContract
 {
     public function __construct(
-        private Order $order,
-        private ?Cart $cart,
+        private Model $order,
+        private ?Model $cart,
         private ?int $userId,
-        private string $userFirstName,
-        private string $userLastName,
-        private string $userEmail,
+        private ?string $userFirstName,
+        private ?string $userLastName,
+        private ?string $userEmail,
         private ?string $discountRef,
         private array $billingAddress,
         private array $shippingAddress,
@@ -24,10 +27,10 @@ final class OrderDto
 
     }
 
-    public static function fromCart(Cart $cart): self
+    public static function fromCart(Model $cart): static
     {
-        return new self(
-            (self::getOrderInstance())->updateTimestamps(),
+        return new static(
+            static::getInstance(),
             $cart,
             $cart->user_id,
             $cart->user_first_name,
@@ -41,10 +44,10 @@ final class OrderDto
         );
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
-        return new self(
-            $data['order'],
+        return new static(
+            $data['order'] ?? static::getInstance(),
             $data['cart'] ?? null,
             $data['user_id'] ?? null,
             $data['user_first_name'] ?? null,
@@ -58,12 +61,12 @@ final class OrderDto
         );
     }
 
-    public function getOrder(): Order
+    public function getOrder(): Order|Model
     {
         return $this->order;
     }
 
-    public function getCart(): Cart
+    public function getCart(): Cart|Model
     {
         return $this->cart;
     }
@@ -73,17 +76,17 @@ final class OrderDto
         return $this->userId ?? auth()->id();
     }
 
-    public function getUserFirstName(): string
+    public function getUserFirstName(): ?string
     {
         return $this->userFirstName;
     }
 
-    public function getUserLastName(): string
+    public function getUserLastName(): ?string
     {
         return $this->userLastName;
     }
 
-    public function getUserEmail(): string
+    public function getUserEmail(): ?string
     {
         return $this->userEmail;
     }
@@ -116,8 +119,25 @@ final class OrderDto
         return collect($this->lines);
     }
 
-    private static function getOrderInstance(): Order
+    public static function getInstance(): Model
     {
-        return app(config('venditio-core.models.order'));
+        return app(Order::class);
+    }
+
+    public static function bindIntoContainer(): static
+    {
+        return new static(
+            static::getInstance(),
+            app(CartDtoContract::class)::getInstance(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            [],
+            [],
+            null,
+            [],
+        );
     }
 }

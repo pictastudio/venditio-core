@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PictaStudio\VenditioCore\Models\Contracts\Discount;
+use PictaStudio\VenditioCore\Models\Contracts\Inventory;
+use PictaStudio\VenditioCore\Models\Contracts\Product;
+use PictaStudio\VenditioCore\Models\Contracts\ProductVariant;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
@@ -69,21 +73,21 @@ class ProductItem extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.product'));
+        return $this->belongsTo(app(Product::class));
     }
 
     public function discount(): MorphMany
     {
-        return $this->morphMany(config('venditio-core.models.discount'), 'discountable');
+        return $this->morphMany(app(Discount::class), 'discountable');
     }
 
     public function productVariantOption(): BelongsToMany
     {
-        return $this->belongsToMany(config('venditio-core.models.product_variant_option'), 'product_configuration');
+        return $this->belongsToMany(app(ProductVariant::class), 'product_configuration');
     }
 
     public function inventory(): HasOne
     {
-        return $this->hasOne(config('venditio-core.models.inventory'));
+        return $this->hasOne(app(Inventory::class));
     }
 }

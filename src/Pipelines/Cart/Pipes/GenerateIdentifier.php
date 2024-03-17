@@ -3,8 +3,8 @@
 namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Helpers\Cart\Contracts\CartIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Models\Cart;
 
 class GenerateIdentifier
 {
@@ -13,7 +13,7 @@ class GenerateIdentifier
     ) {
     }
 
-    public function __invoke(Cart $cart, Closure $next): Cart
+    public function __invoke(Model $cart, Closure $next): Model
     {
         $identifier = $this->generator->generate($cart);
 

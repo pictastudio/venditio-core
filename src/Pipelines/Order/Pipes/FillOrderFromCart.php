@@ -3,24 +3,23 @@
 namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Dto\OrderDto;
-use PictaStudio\VenditioCore\Enums\OrderStatus;
+use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
 use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\Order;
-use PictaStudio\VenditioCore\Models\OrderLine;
+use PictaStudio\VenditioCore\Models\Contracts\OrderLine;
 
 class FillOrderFromCart
 {
-    public function __invoke(OrderDto $orderDto, Closure $next): Order
+    public function __invoke(OrderDtoContract $orderDto, Closure $next): Model
     {
         $cart = $orderDto->getCart();
 
-        $order = $orderDto->getOrder();
+        $order = $orderDto->getOrder()->updateTimestamps();
 
         $order->fill([
             'user_id' => $orderDto->getUserId(),
-            'status' => OrderStatus::PENDING,
+            'status' => config('venditio-core.orders.status_enum')::getProcessingStatus(),
             // 'tracking_code' => null,
             // 'tracking_date' => null,
             // 'courier_code' => null,
@@ -38,7 +37,6 @@ class FillOrderFromCart
             'addresses' => $cart->addresses,
             'customer_notes' => $cart->notes,
             // 'admin_notes' => null,
-            // 'approved_at' => null,
         ]);
 
         $order->setRelation('lines', self::mapCartLineToOrderLine($cart));
@@ -46,10 +44,10 @@ class FillOrderFromCart
         return $next($order);
     }
 
-    public static function mapCartLineToOrderLine(Cart $cart): Collection
+    public static function mapCartLineToOrderLine(Cart|Model $cart): Collection
     {
         return $cart->lines->map(function ($line) {
-            $orderLine = new OrderLine;
+            $orderLine = app(OrderLine::class);
 
             return $orderLine->fill([
                 'product_item_id' => $line->product_item_id,

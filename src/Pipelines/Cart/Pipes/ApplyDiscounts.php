@@ -3,14 +3,15 @@
 namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Models\Cart;
 
-final class ApplyDiscounts
+class ApplyDiscounts
 {
     /**
      * Called just before cart totals are calculated.
      */
-    public function handle(Cart $cart, Closure $next): Closure
+    public function handle(Model $cart, Closure $next): Model
     {
         return $next($cart);
     }

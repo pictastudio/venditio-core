@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Helpers\Order\Contracts;
 
+use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Models\Order;
 
 interface OrderIdentifierGeneratorInterface
@@ -9,5 +10,5 @@ interface OrderIdentifierGeneratorInterface
     /**
      * Generate an identifier for the order.
      */
-    public function generate(Order $order): string;
+    public function generate(Model $order): string;
 }

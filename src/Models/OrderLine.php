@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
+use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class OrderLine extends Model
@@ -34,11 +36,11 @@ class OrderLine extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.order'));
+        return $this->belongsTo(app(Order::class));
     }
 
     public function productItem(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.product_item'));
+        return $this->belongsTo(app(ProductItem::class));
     }
 }

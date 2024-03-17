@@ -3,11 +3,11 @@
 namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 
 use Closure;
-use PictaStudio\VenditioCore\Models\Order;
+use Illuminate\Database\Eloquent\Model;
 
 class CalculateLines
 {
-    public function __invoke(Order $order, Closure $next): Order
+    public function __invoke(Model $order, Closure $next): Model
     {
         $lines = $order->getRelation('lines');
         $order->unsetRelation('lines');

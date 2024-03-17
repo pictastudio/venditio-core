@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PictaStudio\VenditioCore\Models\Contracts\OrderLine;
+use PictaStudio\VenditioCore\Models\Contracts\ShippingStatus;
+use PictaStudio\VenditioCore\Models\Contracts\User;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
 
@@ -48,16 +51,16 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.user'));
+        return $this->belongsTo(app(User::class));
     }
 
     public function shippingStatus(): BelongsTo
     {
-        return $this->belongsTo(config('venditio-core.models.shipping_status'));
+        return $this->belongsTo(app(ShippingStatus::class));
     }
 
     public function lines(): HasMany
     {
-        return $this->hasMany(config('venditio-core.models.order_line'));
+        return $this->hasMany(app(OrderLine::class));
     }
 }

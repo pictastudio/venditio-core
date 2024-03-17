@@ -2,10 +2,11 @@
 
 namespace PictaStudio\VenditioCore\Managers;
 
-use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as ContractsAuthManager;
-use PictaStudio\VenditioCore\Models\User;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
+use PictaStudio\VenditioCore\Models\Contracts\User;
 
-class AuthManager implements ContractsAuthManager
+class AuthManager implements AuthManagerContract
 {
     const ROLE_ROOT = 'Root';
 
@@ -13,16 +14,23 @@ class AuthManager implements ContractsAuthManager
 
     const ROLE_USER = 'User';
 
-    public function __construct(public User $user)
+    public function __construct(public User|Authenticatable $user)
     {
     }
 
-    public static function make(User $user): static
+    public static function make(User|Authenticatable $user): static
     {
         return new static($user);
     }
 
-    public function getUser(): User
+    public function user(User|Authenticatable $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getUser(): User|Authenticatable
     {
         return $this->user;
     }

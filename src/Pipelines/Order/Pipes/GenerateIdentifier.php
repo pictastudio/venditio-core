@@ -3,8 +3,8 @@
 namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Helpers\Order\Contracts\OrderIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Models\Order;
 
 final class GenerateIdentifier
 {
@@ -13,7 +13,7 @@ final class GenerateIdentifier
     ) {
     }
 
-    public function __invoke(Order $order, Closure $next): Order
+    public function __invoke(Model $order, Closure $next): Model
     {
         $identifier = $this->generator->generate($order);
 

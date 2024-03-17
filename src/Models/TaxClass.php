@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PictaStudio\VenditioCore\Models\Contracts\Country;
+use PictaStudio\VenditioCore\Models\Contracts\CountryTaxClass;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 
 class TaxClass extends Model
@@ -23,8 +25,8 @@ class TaxClass extends Model
 
     public function countries(): BelongsToMany
     {
-        return $this->belongsToMany(config('venditio-core.models.country'), 'country_tax_class')
-            ->using(config('venditio-core.models.country_tax_class'))
+        return $this->belongsToMany(app(Country::class), 'country_tax_class')
+            ->using(app(CountryTaxClass::class))
             ->withTimestamps()
             ->withPivot('rate');
     }

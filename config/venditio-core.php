@@ -1,13 +1,14 @@
 <?php
 
-use PictaStudio\VenditioCore\Enums\OrderStatus;
-use PictaStudio\VenditioCore\Enums\ProductStatus;
+use PictaStudio\VenditioCore\Enums;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Formatters\Decimal\DefaultDecimalFormatter;
 use PictaStudio\VenditioCore\Formatters\Pricing\DefaultPriceFormatter;
-use PictaStudio\VenditioCore\Managers\AuthManager;
+use PictaStudio\VenditioCore\Managers;
+use PictaStudio\VenditioCore\Models;
 use PictaStudio\VenditioCore\Pipelines\Cart;
 use PictaStudio\VenditioCore\Pipelines\Order;
+use PictaStudio\VenditioCore\Validations;
 
 return [
 
@@ -20,11 +21,11 @@ return [
     |
     */
     'auth' => [
-        'manager' => AuthManager::class,
+        // 'manager' => AuthManager::class,
         'roles' => [
-            'root' => AuthManager::ROLE_ROOT,
-            'admin' => AuthManager::ROLE_ADMIN,
-            'user' => AuthManager::ROLE_USER,
+            'root' => Managers\AuthManager::ROLE_ROOT,
+            'admin' => Managers\AuthManager::ROLE_ADMIN,
+            'user' => Managers\AuthManager::ROLE_USER,
         ],
         'resources' => [
             'user',
@@ -66,27 +67,69 @@ return [
     |
     */
     'models' => [
-        'address' => PictaStudio\VenditioCore\Models\Address::class,
-        'brand' => PictaStudio\VenditioCore\Models\Brand::class,
-        'cart' => PictaStudio\VenditioCore\Models\Cart::class,
-        'cart_line' => PictaStudio\VenditioCore\Models\CartLine::class,
-        'country' => PictaStudio\VenditioCore\Models\Country::class,
-        'country_tax_class' => PictaStudio\VenditioCore\Models\CountryTaxClass::class,
-        'currency' => PictaStudio\VenditioCore\Models\Currency::class,
-        'discount' => PictaStudio\VenditioCore\Models\Discount::class,
-        'inventory' => PictaStudio\VenditioCore\Models\Inventory::class,
-        'order' => PictaStudio\VenditioCore\Models\Order::class,
-        'order_line' => PictaStudio\VenditioCore\Models\OrderLine::class,
-        'product' => PictaStudio\VenditioCore\Models\Product::class,
-        'product_category' => PictaStudio\VenditioCore\Models\ProductCategory::class,
-        'product_custom_field' => PictaStudio\VenditioCore\Models\ProductCustomField::class,
-        'product_type' => PictaStudio\VenditioCore\Models\ProductType::class,
-        'product_item' => PictaStudio\VenditioCore\Models\ProductItem::class,
-        'product_variant' => PictaStudio\VenditioCore\Models\ProductVariant::class,
-        'product_variant_option' => PictaStudio\VenditioCore\Models\ProductVariantOption::class,
-        'shipping_status' => PictaStudio\VenditioCore\Models\ShippingStatus::class,
-        'tax_class' => PictaStudio\VenditioCore\Models\TaxClass::class,
-        'user' => PictaStudio\VenditioCore\Models\User::class,
+        Models\Contracts\Address::class => Models\Address::class,
+        Models\Contracts\Brand::class => Models\Brand::class,
+        Models\Contracts\Cart::class => Models\Cart::class,
+        Models\Contracts\CartLine::class => Models\CartLine::class,
+        Models\Contracts\Country::class => Models\Country::class,
+        Models\Contracts\CountryTaxClass::class => Models\CountryTaxClass::class,
+        Models\Contracts\Currency::class => Models\Currency::class,
+        Models\Contracts\Discount::class => Models\Discount::class,
+        Models\Contracts\Inventory::class => Models\Inventory::class,
+        Models\Contracts\Order::class => Models\Order::class,
+        Models\Contracts\OrderLine::class => Models\OrderLine::class,
+        Models\Contracts\Product::class => Models\Product::class,
+        Models\Contracts\ProductCategory::class => Models\ProductCategory::class,
+        Models\Contracts\ProductCustomField::class => Models\ProductCustomField::class,
+        Models\Contracts\ProductItem::class => Models\ProductItem::class,
+        Models\Contracts\ProductType::class => Models\ProductType::class,
+        Models\Contracts\ProductVariant::class => Models\ProductVariant::class,
+        Models\Contracts\ProductVariantOption::class => Models\ProductVariantOption::class,
+        Models\Contracts\ShippingStatus::class => Models\ShippingStatus::class,
+        Models\Contracts\TaxClass::class => Models\TaxClass::class,
+        Models\Contracts\User::class => Models\User::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    |
+    | Specify the validation classes with the rules to use when storing and updating models
+    |
+    */
+    'validations' => [
+        Validations\Contracts\AddressValidationRules::class => Validations\Address::class,
+        // Validations\Contracts\BrandValidationRules::class => Validations\Brand::class,
+        Validations\Contracts\CartValidationRules::class => Validations\Cart::class,
+        // Validations\Contracts\CartLineValidationRules::class => Validations\CartLine::class,
+        // Validations\Contracts\CountryValidationRules::class => Validations\Country::class,
+        // Validations\Contracts\CountryTaxClassValidationRules::class => Validations\CountryTaxClass::class,
+        // Validations\Contracts\CurrencyValidationRules::class => Validations\Currency::class,
+        // Validations\Contracts\DiscountValidationRules::class => Validations\Discount::class,
+        // Validations\Contracts\InventoryValidationRules::class => Validations\Inventory::class,
+        Validations\Contracts\OrderValidationRules::class => Validations\Order::class,
+        // Validations\Contracts\OrderLineValidationRules::class => Validations\OrderLine::class,
+        // Validations\Contracts\ProductValidationRules::class => Validations\Product::class,
+        // Validations\Contracts\ProductCategoryValidationRules::class => Validations\ProductCategory::class,
+        // Validations\Contracts\ProductCustomFieldValidationRules::class => Validations\ProductCustomField::class,
+        // Validations\Contracts\ProductItemValidationRules::class => Validations\ProductItem::class,
+        // Validations\Contracts\ProductTypeValidationRules::class => Validations\ProductType::class,
+        // Validations\Contracts\ProductVariantValidationRules::class => Validations\ProductVariant::class,
+        // Validations\Contracts\ProductVariantOptionValidationRules::class => Validations\ProductVariantOption::class,
+        // Validations\Contracts\ShippingStatusValidationRules::class => Validations\ShippingStatus::class,
+        // Validations\Contracts\TaxClassValidationRules::class => Validations\TaxClass::class,
+        // Validations\Contracts\UserValidationRules::class => Validations\User::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Addresses
+    |--------------------------------------------------------------------------
+    |
+    */
+    'addresses' => [
+        'type_enum' => Enums\AddressType::class,
     ],
 
     /*
@@ -126,7 +169,7 @@ return [
     |
     */
     'orders' => [
-        'status_enum' => OrderStatus::class,
+        'status_enum' => Enums\OrderStatus::class,
         'pipelines' => [
             'creation' => [
                 'pipes' => [
@@ -153,7 +196,7 @@ return [
     |
     */
     'products' => [
-        'status_enum' => ProductStatus::class,
+        'status_enum' => Enums\ProductStatus::class,
     ],
 
     /*

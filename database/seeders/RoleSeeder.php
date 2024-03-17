@@ -3,6 +3,7 @@
 namespace PictaStudio\VenditioCore\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -11,7 +12,7 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissions = config('venditio-core.auth.manager')::getPermissions();
+        $permissions = app(AuthManagerContract::class)->getPermissions();
 
         foreach ($permissions as $key => $permission) {
             Permission::findOrCreate($permission);

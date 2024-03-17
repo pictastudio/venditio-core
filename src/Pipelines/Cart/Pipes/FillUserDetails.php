@@ -3,14 +3,14 @@
 namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
-use PictaStudio\VenditioCore\Dto\CartDto;
-use PictaStudio\VenditioCore\Models\Cart;
+use Illuminate\Database\Eloquent\Model;
+use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 
 class FillUserDetails
 {
-    public function __invoke(CartDto $cartDto, Closure $next): Cart
+    public function __invoke(CartDtoContract $cartDto, Closure $next): Model
     {
-        $cart = $cartDto->getCart();
+        $cart = $cartDto->getCart()->updateTimestamps();
 
         $cart->fill([
             'user_id' => $cartDto->getUserId(),
