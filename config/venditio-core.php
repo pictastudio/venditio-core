@@ -7,6 +7,7 @@ use PictaStudio\VenditioCore\Formatters\Pricing\DefaultPriceFormatter;
 use PictaStudio\VenditioCore\Managers;
 use PictaStudio\VenditioCore\Models;
 use PictaStudio\VenditioCore\Pipelines\Cart;
+use PictaStudio\VenditioCore\Pipelines\CartLine;
 use PictaStudio\VenditioCore\Pipelines\Order;
 use PictaStudio\VenditioCore\Validations;
 
@@ -102,7 +103,7 @@ return [
         Validations\Contracts\AddressValidationRules::class => Validations\Address::class,
         // Validations\Contracts\BrandValidationRules::class => Validations\Brand::class,
         Validations\Contracts\CartValidationRules::class => Validations\Cart::class,
-        // Validations\Contracts\CartLineValidationRules::class => Validations\CartLine::class,
+        Validations\Contracts\CartLineValidationRules::class => Validations\CartLine::class,
         // Validations\Contracts\CountryValidationRules::class => Validations\Country::class,
         // Validations\Contracts\CountryTaxClassValidationRules::class => Validations\CountryTaxClass::class,
         // Validations\Contracts\CurrencyValidationRules::class => Validations\Currency::class,
@@ -145,8 +146,8 @@ return [
             'creation' => [
                 'pipes' => [
                     Cart\Pipes\FillUserDetails::class,
-                    Cart\Pipes\CalculateLines::class,
                     Cart\Pipes\GenerateIdentifier::class,
+                    Cart\Pipes\CalculateLines::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
             ],
@@ -155,6 +156,35 @@ return [
                     Cart\Pipes\FillUserDetails::class,
                     Cart\Pipes\UpdateLines::class,
                     Cart\Pipes\CalculateTotals::class,
+                ],
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Car Lines
+    |--------------------------------------------------------------------------
+    |
+    | Pipeline tasks are executed in the order they are defined
+    |
+    */
+    'cart_lines' => [
+        'pipelines' => [
+            'creation' => [
+                'pipes' => [
+                    CartLine\Pipes\FillProductInformations::class,
+                    CartLine\Pipes\ApplyDiscount::class,
+                    CartLine\Pipes\CalculateTaxes::class,
+                    CartLine\Pipes\CalculateTotal::class,
+                ],
+            ],
+            'update' => [
+                'pipes' => [
+                    CartLine\Pipes\FillProductInformations::class,
+                    CartLine\Pipes\ApplyDiscount::class,
+                    CartLine\Pipes\CalculateTaxes::class,
+                    CartLine\Pipes\CalculateTotal::class,
                 ],
             ],
         ],

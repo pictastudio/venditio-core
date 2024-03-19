@@ -12,17 +12,29 @@ class FillUserDetails
     {
         $cart = $cartDto->getCart()->updateTimestamps();
 
-        $cart->fill([
+        $billing = $cartDto->getBillingAddress();
+        $shipping = $cartDto->getShippingAddress();
+
+        $data = [
             'user_id' => $cartDto->getUserId(),
             'user_first_name' => $cartDto->getUserFirstName(),
             'user_last_name' => $cartDto->getUserLastName(),
             'user_email' => $cartDto->getUserEmail(),
             'discount_ref' => $cartDto->getDiscountRef(),
-            'addresses' => [
-                'billing' => $cartDto->getBillingAddress(),
-                'shipping' => $cartDto->getShippingAddress(),
-            ],
-        ]);
+            'addresses' => [],
+        ];
+
+        if (filled($billing)) {
+            $data['addresses']['billing'] = $billing;
+        }
+
+        if (filled($shipping)) {
+            $data['addresses']['shipping'] = $shipping;
+        }
+
+        $filteredData = collect($data)->filter(fn ($value) => filled($value));
+
+        $cart->fill($filteredData->toArray());
 
         $cart->setRelation('lines', $cartDto->getLines());
 

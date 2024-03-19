@@ -5,9 +5,9 @@ namespace PictaStudio\VenditioCore\Pipelines\Cart;
 use PictaStudio\VenditioCore\Pipelines\Pipeline;
 
 /**
- * Pipeline for creating an cart.
+ * Pipeline for creating a cart
  *
- * the expected payload is an instance of PictaStudio\VenditioCore\Dto\StoreCart
+ * the expected payload is an instance of PictaStudio\VenditioCore\Dto\CartDto
  */
 class CartCreationPipeline extends Pipeline
 {

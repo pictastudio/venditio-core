@@ -27,9 +27,9 @@ interface OrderDtoContract extends Dto
 
     public function getDiscountRef(): ?string;
 
-    public function getBillingAddress(): array;
+    public function getBillingAddress(): ?array;
 
-    public function getShippingAddress(): array;
+    public function getShippingAddress(): ?array;
 
     public function getCustomerNotes(): ?string;
 

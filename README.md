@@ -159,6 +159,7 @@ TODO:
 - [ ] pipeline docs
 - [ ] docs on `OrderStatus` enum and `Contracts\OrderStatus` on how it's used and the logic behind it
 - [ ] docs on customizing validation rules
+- [ ] fix updating cart lines in `CartUpdatePipeline`
 
 ## Testing
 

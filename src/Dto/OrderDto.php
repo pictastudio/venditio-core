@@ -19,8 +19,8 @@ class OrderDto implements OrderDtoContract
         private ?string $userLastName,
         private ?string $userEmail,
         private ?string $discountRef,
-        private array $billingAddress,
-        private array $shippingAddress,
+        private ?array $billingAddress,
+        private ?array $shippingAddress,
         private ?string $customerNotes,
         private array $lines,
     ) {
@@ -54,9 +54,9 @@ class OrderDto implements OrderDtoContract
             $data['user_last_name'] ?? null,
             $data['user_email'] ?? null,
             $data['discount_ref'] ?? null,
-            $data['billing_address'] ?? [],
-            $data['shipping_address'] ?? [],
-            $data['notes'] ?? [],
+            $data['billing_address'] ?? null,
+            $data['shipping_address'] ?? null,
+            $data['notes'] ?? null,
             $data['lines'] ?? [],
         );
     }
@@ -78,37 +78,37 @@ class OrderDto implements OrderDtoContract
 
     public function getUserFirstName(): ?string
     {
-        return $this->userFirstName;
+        return $this->userFirstName ?? $this->getOrder()?->user_first_name;
     }
 
     public function getUserLastName(): ?string
     {
-        return $this->userLastName;
+        return $this->userLastName ?? $this->getOrder()?->user_last_name;
     }
 
     public function getUserEmail(): ?string
     {
-        return $this->userEmail;
+        return $this->userEmail ?? $this->getOrder()?->user_email;
     }
 
     public function getDiscountRef(): ?string
     {
-        return $this->discountRef;
+        return $this->discountRef ?? $this->getOrder()?->discount_ref;
     }
 
-    public function getBillingAddress(): array
+    public function getBillingAddress(): ?array
     {
-        return $this->billingAddress;
+        return $this->billingAddress ?? $this->getOrder()?->addresses['billing'] ?? null;
     }
 
-    public function getShippingAddress(): array
+    public function getShippingAddress(): ?array
     {
-        return $this->shippingAddress;
+        return $this->shippingAddress ?? $this->getOrder()?->addresses['shipping'] ?? null;
     }
 
     public function getCustomerNotes(): ?string
     {
-        return $this->customerNotes;
+        return $this->customerNotes ?? $this->getOrder()?->customer_notes ?? null;
     }
 
     /**
@@ -134,8 +134,8 @@ class OrderDto implements OrderDtoContract
             null,
             null,
             null,
-            [],
-            [],
+            null,
+            null,
             null,
             [],
         );

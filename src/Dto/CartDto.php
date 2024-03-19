@@ -16,8 +16,8 @@ class CartDto implements CartDtoContract
         private ?string $userLastName,
         private ?string $userEmail,
         private ?string $discountRef,
-        private array $billingAddress,
-        private array $shippingAddress,
+        private ?array $billingAddress,
+        private ?array $shippingAddress,
         private array $lines,
     ) {
 
@@ -32,8 +32,8 @@ class CartDto implements CartDtoContract
             $data['user_last_name'] ?? null,
             $data['user_email'] ?? null,
             $data['discount_ref'] ?? null,
-            $data['billing_address'] ?? [],
-            $data['shipping_address'] ?? [],
+            $data['billing_address'] ?? null,
+            $data['shipping_address'] ?? null,
             $data['lines'] ?? [],
         );
     }
@@ -50,32 +50,32 @@ class CartDto implements CartDtoContract
 
     public function getUserFirstName(): ?string
     {
-        return $this->userFirstName;
+        return $this->userFirstName ?? $this->getCart()?->user_first_name;
     }
 
     public function getUserLastName(): ?string
     {
-        return $this->userLastName;
+        return $this->userLastName ?? $this->getCart()?->user_last_name;
     }
 
     public function getUserEmail(): ?string
     {
-        return $this->userEmail;
+        return $this->userEmail ?? $this->getCart()?->user_email;
     }
 
     public function getDiscountRef(): ?string
     {
-        return $this->discountRef;
+        return $this->discountRef ?? $this->getCart()?->discount_ref;
     }
 
-    public function getBillingAddress(): array
+    public function getBillingAddress(): ?array
     {
-        return $this->billingAddress;
+        return $this->billingAddress ?? $this->getCart()?->addresses['billing'] ?? null;
     }
 
-    public function getShippingAddress(): array
+    public function getShippingAddress(): ?array
     {
-        return $this->shippingAddress;
+        return $this->shippingAddress ?? $this->getCart()?->addresses['shipping'] ?? null;
     }
 
     /**
@@ -100,8 +100,8 @@ class CartDto implements CartDtoContract
             null,
             null,
             null,
-            [],
-            [],
+            null,
+            null,
             [],
         );
     }

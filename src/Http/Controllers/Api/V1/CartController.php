@@ -15,6 +15,7 @@ use PictaStudio\VenditioCore\Models\Cart;
 use PictaStudio\VenditioCore\Models\Contracts\Cart as CartContract;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
+use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
 
 class CartController extends Controller
 {
@@ -89,6 +90,44 @@ class CartController extends Controller
     {
         $cart->delete();
 
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Cart deleted successfully',
+        ]);
+    }
+
+    public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules)
+    {
+        $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getStoreValidationRules());
+
+        if ($validationResponse instanceof JsonResponse) {
+            return $validationResponse;
+        }
+
+        $cart->lines()->createMany($validationResponse['lines']);
+
+        return response()->json([
+            'message' => 'Lines added successfully',
+        ]);
+    }
+
+    public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules)
+    {
+        $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getUpdateValidationRules());
+
+        if ($validationResponse instanceof JsonResponse) {
+            return $validationResponse;
+        }
+
+        // pipeline per update cart lines
+
+        foreach ($validationResponse['lines'] as $line) {
+            $cart->lines()->find($line['id'])->update([
+                'qty' => $line['qty'],
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Lines updated successfully',
+        ]);
     }
 }

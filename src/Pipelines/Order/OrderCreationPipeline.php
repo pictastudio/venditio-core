@@ -7,7 +7,7 @@ use PictaStudio\VenditioCore\Pipelines\Pipeline;
 /**
  * Pipeline for creating an order.
  *
- * the expected payload is an instance of PictaStudio\VenditioCore\Models\Cart
+ * the expected payload is an instance of PictaStudio\VenditioCore\Dto\CartDto
  * the cart will be processed and converted into an order
  */
 class OrderCreationPipeline extends Pipeline

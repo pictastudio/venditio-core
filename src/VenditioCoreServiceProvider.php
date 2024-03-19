@@ -8,7 +8,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use PictaStudio\VenditioCore\Dto\CartDto;
+use PictaStudio\VenditioCore\Dto\CartLineDto;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
+use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
 use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
 use PictaStudio\VenditioCore\Dto\OrderDto;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
@@ -90,6 +92,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(OrderDtoContract::class, fn (Application $app) => OrderDto::bindIntoContainer());
         $this->app->singleton(CartDtoContract::class, fn (Application $app) => CartDto::bindIntoContainer());
+        $this->app->singleton(CartLineDtoContract::class, fn (Application $app) => CartLineDto::bindIntoContainer());
     }
 
     private function registerApiRoutes(): void
