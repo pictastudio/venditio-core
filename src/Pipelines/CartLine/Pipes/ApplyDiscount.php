@@ -9,7 +9,7 @@ class ApplyDiscount
 {
     public function __invoke(Model $cartLine, Closure $next): Model
     {
-        $discount = 0;
+        $discount = null;
         $unitDiscount = 0;
 
         if ($discount) {

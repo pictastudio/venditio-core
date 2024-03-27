@@ -36,7 +36,7 @@ class Address extends Model
         parent::__construct($attributes);
 
         $this->mergeCasts([
-            'status' => config('venditio-core.addresses.status_enum'),
+            'type' => config('venditio-core.addresses.type_enum'),
         ]);
     }
 
