@@ -2,6 +2,10 @@
 
 All notable changes to `venditio-core` will be documented in this file.
 
+## v0.1.3 - 2024-03-27
+
+fix + rename `HasDataToValidate` to `ValidatesData`
+
 ## v0.1.2 - 2024-03-19
 
 fix various + cart line pipeline
