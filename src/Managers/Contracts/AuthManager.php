@@ -9,7 +9,7 @@ interface AuthManager
 {
     public function user(User|Authenticatable $user): static;
 
-    public function getUser(): User|Authenticatable;
+    public function getUser(): User|Authenticatable|null;
 
     public function can(string $resource, string $action): bool;
 

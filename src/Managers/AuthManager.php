@@ -14,11 +14,11 @@ class AuthManager implements AuthManagerContract
 
     const ROLE_USER = 'User';
 
-    public function __construct(public User|Authenticatable $user)
+    public function __construct(public User|Authenticatable|null $user)
     {
     }
 
-    public static function make(User|Authenticatable $user): static
+    public static function make(User|Authenticatable|null $user): static
     {
         return new static($user);
     }
@@ -30,14 +30,14 @@ class AuthManager implements AuthManagerContract
         return $this;
     }
 
-    public function getUser(): User|Authenticatable
+    public function getUser(): User|Authenticatable|null
     {
         return $this->user;
     }
 
     public function can(string $resource, string $action): bool
     {
-        return $this->user->can($this->generatePermissionName($resource, $action));
+        return $this->user?->can($this->generatePermissionName($resource, $action));
     }
 
     public static function generatePermissionName(string $resource, string $action): string
