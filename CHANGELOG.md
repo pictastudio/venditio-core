@@ -2,6 +2,10 @@
 
 All notable changes to `venditio-core` will be documented in this file.
 
+## v0.1.4 - 2024-03-28
+
+allow null user in `AuthManager` constructor
+
 ## v0.1.3 - 2024-03-27
 
 fix + rename `HasDataToValidate` to `ValidatesData`
