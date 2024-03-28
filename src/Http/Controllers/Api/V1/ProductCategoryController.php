@@ -10,6 +10,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\StoreProductCategoryRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\UpdateProductCategoryRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductCategoryResource;
+use PictaStudio\VenditioCore\Models\Contracts\ProductCategory as ProductCategoryContract;
 use PictaStudio\VenditioCore\Models\ProductCategory;
 
 class ProductCategoryController extends Controller
@@ -39,7 +40,7 @@ class ProductCategoryController extends Controller
             $filters = $validationResponse;
         }
 
-        $productCategories = ProductCategory::query()
+        $productCategories = app(ProductCategoryContract::class)::query()
             ->when(
                 $hasFilters && isset($filters['ids']),
                 fn (Builder $query) => $query->whereIn('id', $filters['ids'])

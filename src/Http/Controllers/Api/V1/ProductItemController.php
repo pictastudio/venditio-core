@@ -10,6 +10,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductItem\StoreProductItemRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductItem\UpdateProductItemRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductItemResource;
+use PictaStudio\VenditioCore\Models\Contracts\ProductItem as ProductItemContract;
 use PictaStudio\VenditioCore\Models\ProductItem;
 
 class ProductItemController extends Controller
@@ -39,7 +40,7 @@ class ProductItemController extends Controller
             $filters = $validationResponse;
         }
 
-        $productItems = ProductItem::query()
+        $productItems = app(ProductItemContract::class)::query()
             ->when(
                 $hasFilters && isset($filters['ids']),
                 fn (Builder $query) => $query->whereIn('id', $filters['ids'])
