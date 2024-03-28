@@ -2,6 +2,10 @@
 
 All notable changes to `venditio-core` will be documented in this file.
 
+## v0.1.5 - 2024-03-28
+
+fix resolve models from container
+
 ## v0.1.4 - 2024-03-28
 
 allow null user in `AuthManager` constructor
