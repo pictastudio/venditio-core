@@ -124,8 +124,8 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
 
     private function registerPolicies(): void
     {
-        foreach (config('venditio-core.models') as $model => $class) {
-            $model = str($model)->studly()->toString();
+        foreach (config('venditio-core.models') as $contract => $model) {
+            $model = class_basename($model);
 
             if (!class_exists("PictaStudio\VenditioCore\\Policies\\{$model}Policy")) {
                 continue;
