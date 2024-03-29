@@ -23,8 +23,9 @@ class CalculateLines
         $lines = $cart->getAttribute('lines');
         unset($cart->lines); // remove the 'lines' attribute from the model (it's not a relation yet)
 
+        $finalLines = [];
         foreach ($lines as $key => $line) {
-            $lines[$key] = app(CartLineCreationPipeline::class)->run(
+            $finalLines[$key] = app(CartLineCreationPipeline::class)->run(
                 app(CartLineDtoContract::class)::fromArray([
                     'cart' => $cart,
                     'product_item_id' => $line['product_item_id'],
@@ -33,7 +34,7 @@ class CalculateLines
             );
         }
 
-        $cart->setRelation('lines', $lines);
+        $cart->setRelation('lines', $finalLines);
 
         return $next($cart);
     }
