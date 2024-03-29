@@ -17,5 +17,5 @@ describe('applies scopes correctly', function () {
         expect($products)->not->toContain($productInactive);
 
         getJson(config('venditio-core.routes.api.v1.prefix'))->assertJsonMissing(['id' => $productInactive->getKey()]);
-    })->todo();
+    })->todo()->skip();
 });

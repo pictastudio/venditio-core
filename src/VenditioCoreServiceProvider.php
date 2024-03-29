@@ -5,7 +5,6 @@ namespace PictaStudio\VenditioCore;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use PictaStudio\VenditioCore\Dto\CartDto;
 use PictaStudio\VenditioCore\Dto\CartLineDto;
@@ -105,7 +104,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
             JsonResource::withoutWrapping();
         }
 
-        $this->registerPolicies();
+        VenditioCoreClass::registerPolicies();
 
         $prefix = config('venditio-core.routes.api.v1.prefix');
 
@@ -120,21 +119,5 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
             ->group(fn () => (
                 $this->loadRoutesFrom($this->package->basePath('/../routes/v1/api.php'))
             ));
-    }
-
-    private function registerPolicies(): void
-    {
-        foreach (config('venditio-core.models') as $contract => $model) {
-            $model = class_basename($model);
-
-            if (!class_exists("PictaStudio\VenditioCore\\Policies\\{$model}Policy")) {
-                continue;
-            }
-
-            Gate::policy(
-                "PictaStudio\VenditioCore\Models\\{$model}",
-                "PictaStudio\VenditioCore\Policies\\{$model}Policy"
-            );
-        }
     }
 }
