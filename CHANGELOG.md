@@ -2,6 +2,10 @@
 
 All notable changes to `venditio-core` will be documented in this file.
 
+## v0.1.8 - 2024-04-05
+
+fix `FillOrderFromCart` and improved `ProductItemResource` api resource
+
 ## v0.1.7 - 2024-04-04
 
 - [fix registering model policies](https://github.com/pictastudio/venditio-core/commit/84a8d61e88b8f4c81f4102f73dcb7c13690eb656)
