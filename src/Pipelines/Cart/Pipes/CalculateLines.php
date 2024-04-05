@@ -25,7 +25,7 @@ class CalculateLines
 
         $finalLines = [];
         foreach ($lines as $key => $line) {
-            $finalLines[$key] = app(CartLineCreationPipeline::class)->run(
+            $finalLines[] = app(CartLineCreationPipeline::class)->run(
                 app(CartLineDtoContract::class)::fromArray([
                     'cart' => $cart,
                     'product_item_id' => $line['product_item_id'],

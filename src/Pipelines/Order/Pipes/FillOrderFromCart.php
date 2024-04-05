@@ -47,7 +47,7 @@ class FillOrderFromCart
     public static function mapCartLineToOrderLine(Cart|Model $cart): Collection
     {
         return $cart->lines->map(function ($line) {
-            $orderLine = app(OrderLine::class);
+            $orderLine = new (app(OrderLine::class)::class);
 
             return $orderLine->fill([
                 'product_item_id' => $line->product_item_id,

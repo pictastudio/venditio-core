@@ -119,6 +119,33 @@ return [
 By default the api routes provided by this package are public, with no authetication setup.
 You should provide the authentication layer in your app using something like `laravel/breeze` for SPA or other kinds of authentication.
 
+## Http Resources
+Example of an http resource, with the array key (`product_item.images`) we are telling which attribute we want to mutate and then the closure accepts as a parameter the value of that attribute
+You can use dot notation to access attributes because under the hood it uses `Arr::get` and `Arr::set` methods
+```php
+protected function transformAttributes(): array
+{
+    return [
+        'product_item.images' => fn (?array $images) => (
+            collect($images)
+                ->map(fn (array $image) => [
+                    'alt' => $image['alt'],
+                    'img' => asset('storage/' . $image['img']),
+                ])
+                ->toArray()
+        ),
+        'product_item.files' => fn (?array $files) => (
+            collect($files)
+                ->map(fn (array $file) => [
+                    'name' => $file['name'],
+                    'file' => asset('storage/' . $file['file']),
+                ])
+                ->toArray()
+        ),
+    ];
+}
+```
+
 ### Carts
 #### Generator
 Customize cart identifier generator
