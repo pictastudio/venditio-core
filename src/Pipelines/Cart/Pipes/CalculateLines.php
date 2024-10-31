@@ -6,10 +6,13 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\Contracts\CartLine;
-use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\ProductItem;
 use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineCreationPipeline;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 
 class CalculateLines
 {
@@ -19,24 +22,68 @@ class CalculateLines
      */
     public function __invoke(Model $cart, Closure $next): Model
     {
-        // $lines = self::calculateLines($cart->getRelation('lines'));
-        $lines = $cart->getAttribute('lines');
-        unset($cart->lines); // remove the 'lines' attribute from the model (it's not a relation yet)
+        // dump(
+        //     $cart->toArray(),
+        // );
+        
+        // // $lines = self::calculateLines($cart->getRelation('lines'));
+        // $lines = $cart->getAttribute('lines');
+        // unset($cart->lines); // remove the 'lines' attribute from the model (it's not a relation yet)
 
-        $finalLines = [];
-        foreach ($lines as $key => $line) {
-            $finalLines[] = app(CartLineCreationPipeline::class)->run(
-                app(CartLineDtoContract::class)::fromArray([
-                    'cart' => $cart,
-                    'product_item_id' => $line['product_item_id'],
-                    'qty' => $line['qty'],
-                ])
-            );
-        }
+        // $finalLines = [];
+        // foreach ($lines as $key => $line) {
+        //     $finalLines[] = CartLineCreationPipeline::make()->run(
+        //         app(CartLineDtoContract::class)::fromArray([
+        //             'cart' => $cart,
+        //             'product_item_id' => $line['product_item_id'],
+        //             'qty' => $line['qty'],
+        //         ])
+        //     );
+        // }
 
-        $cart->setRelation('lines', $finalLines);
+        // $cart->setRelation('lines', $finalLines);
+
+
+        $cart->setRelation(
+            'lines',
+            $this->calculateLines(
+                $cart->getRelation('lines')
+            )
+        );
+
+        // dd(
+        //     $cart->toArray(),
+        //     $cart->getRelation('lines'),
+        // );
 
         return $next($cart);
+    }
+
+    public function calculateLines(Collection $lines)
+    {
+        // $finalLines = [];
+        // foreach ($lines as $key => $line) {
+        //     $finalLines[] = CartLineCreationPipeline::make()->run(
+        //         // app(CartLineDtoContract::class)::fromArray([
+        //         //     'cart' => $cart,
+        //         //     'product_item_id' => $line['product_item_id'],
+        //         //     'qty' => $line['qty'],
+        //         // ])
+        //         $line
+        //     );
+        // }
+
+        // return $finalLines;
+
+        // $cartLines = query('cart_line')
+        //     ->whereIn('id', $lines->pluck('id'))
+        //     ->get();
+
+        return $lines->map(function (array $line) {
+            return CartLineCreationPipeline::make()->run(
+                resolve_dto('cart_line')::fromArray($line)
+            );
+        });
     }
 
     // public static function calculateLines(Collection $lines): Collection

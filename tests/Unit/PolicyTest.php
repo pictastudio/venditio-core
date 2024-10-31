@@ -13,7 +13,7 @@ it('registers the policy correctly', function () {
             continue;
         }
 
-        expect(Gate::getPolicyFor("PictaStudio\VenditioCore\Models\\{$model}")::class)
+        expect(Gate::getPolicyFor("PictaStudio\VenditioCore\Packages\Simple\Models\\{$model}")::class)
             ->toBe("PictaStudio\VenditioCore\Policies\\{$model}Policy");
     }
 })->group('policy');

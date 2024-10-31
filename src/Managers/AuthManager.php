@@ -2,9 +2,10 @@
 
 namespace PictaStudio\VenditioCore\Managers;
 
+use Closure;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Models\Contracts\User;
+use PictaStudio\VenditioCore\Packages\Simple\Models\User;
 
 class AuthManager implements AuthManagerContract
 {
@@ -18,8 +19,15 @@ class AuthManager implements AuthManagerContract
     {
     }
 
-    public static function make(User|Authenticatable|null $user = null): static
+    public static function make(Closure|User|Authenticatable|null $user = null): static
     {
+        $user = match (true) {
+            $user instanceof Closure => $user(),
+            $user instanceof User => $user,
+            $user instanceof Authenticatable => $user,
+            default => null,
+        };
+
         return new static($user);
     }
 

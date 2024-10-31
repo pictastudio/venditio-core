@@ -16,4 +16,11 @@ class StoreOrderRequest extends FormRequest
     {
         return $orderValidationRules->getStoreValidationRules();
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'user_id' => $this->user()?->getKey(),
+        ]);
+    }
 }

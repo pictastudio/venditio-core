@@ -10,50 +10,42 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\StoreProductCategoryRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\UpdateProductCategoryRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductCategoryResource;
-use PictaStudio\VenditioCore\Models\Contracts\ProductCategory as ProductCategoryContract;
-use PictaStudio\VenditioCore\Models\ProductCategory;
+use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class ProductCategoryController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
         $filters = request()->all();
-        $hasFilters = count($filters) > 0;
 
-        if ($hasFilters) {
-            $validationResponse = $this->validateData($filters, [
-                'all' => [
-                    'boolean',
-                ],
-                'ids' => [
-                    'array',
-                ],
-                'ids.*' => [
-                    Rule::exists('product_items', 'id'),
-                ],
-            ]);
+        $this->validateData($filters, [
+            'all' => [
+                'boolean',
+            ],
+            'id' => [
+                'array',
+            ],
+            'id.*' => [
+                Rule::exists('product_categories', 'id'),
+            ],
+        ]);
 
-            if ($validationResponse instanceof JsonResponse) {
-                return $validationResponse;
-            }
-
-            $filters = $validationResponse;
-        }
-
-        $productCategories = app(ProductCategoryContract::class)::query()
-            ->when(
-                $hasFilters && isset($filters['ids']),
-                fn (Builder $query) => $query->whereIn('id', $filters['ids'])
-            )
-            ->when(
-                $hasFilters && isset($filters['all']),
-                fn (Builder $query) => $query->get(),
-                fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                ),
-            );
-
-        return ProductCategoryResource::collection($productCategories);
+        return ProductCategoryResource::collection(
+            query('product_category')
+                ->when(
+                    isset($filters['id']),
+                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
+                )
+                ->when(
+                    isset($filters['all']),
+                    fn (Builder $query) => $query->get(),
+                    fn (Builder $query) => $query->paginate(
+                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
+                    ),
+                )
+        );
     }
 
     public function store(StoreProductCategoryRequest $request)

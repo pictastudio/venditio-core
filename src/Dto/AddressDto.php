@@ -5,15 +5,17 @@ namespace PictaStudio\VenditioCore\Dto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use PictaStudio\VenditioCore\Dto\Contracts\AddressDtoContract;
-use PictaStudio\VenditioCore\Models\Contracts\Address;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Address;
 
-class AddressDto implements AddressDtoContract
+use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+
+class AddressDto extends Dto implements AddressDtoContract
 {
     public function __construct(
         private Model $address,
         private ?Model $addressable,
         private ?string $type,
-        private bool $default,
+        private bool $isDefault,
         private ?string $firstName,
         private ?string $lastName,
         private ?string $email,
@@ -36,28 +38,21 @@ class AddressDto implements AddressDtoContract
 
     public static function fromArray(array $data): static
     {
-        return new static(
-            $data['address'] ?? static::getInstance(),
-            auth()->user(),
-            $data['type'] ?? null,
-            $data['default'] ?? false,
-            $data['first_name'] ?? null,
-            $data['last_name'] ?? null,
-            $data['email'] ?? null,
-            $data['sex'] ?? null,
-            $data['phone'] ?? null,
-            $data['vat_number'] ?? null,
-            $data['fiscal_code'] ?? null,
-            $data['company_name'] ?? null,
-            $data['address_line_1'] ?? null,
-            $data['address_line_2'] ?? null,
-            $data['city'] ?? null,
-            $data['state'] ?? null,
-            $data['zip'] ?? null,
-            $data['birth_date'] ?? null,
-            $data['birth_place'] ?? null,
-            $data['notes'] ?? null,
-        );
+        $data['address'] ??= static::getFreshInstance();
+        $data['addressable'] ??= auth()->user();
+
+        return parent::fromArray($data);
+    }
+
+    public function toModel(): Model
+    {
+        return $this->getFreshInstance()
+            ->fill($this->toArray());
+    }
+
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('address');
     }
 
     public function getAddress(): Address|Model
@@ -75,7 +70,7 @@ class AddressDto implements AddressDtoContract
         return $this->type;
     }
 
-    public function isDefault(): bool
+    public function getIsDefault(): bool
     {
         return $this->default;
     }
@@ -166,7 +161,7 @@ class AddressDto implements AddressDtoContract
             ?->addresses()
             ?->create([
                 'type' => config('venditio-core.addresses.type_enum')::tryFrom($this->getType()),
-                'default' => $this->isDefault(),
+                'is_default' => $this->getIsDefault(),
                 'first_name' => $this->getFirstName(),
                 'last_name' => $this->getLastName(),
                 'email' => $this->getEmail(),
@@ -192,7 +187,7 @@ class AddressDto implements AddressDtoContract
             // 'addressable_id' => $this->getAddressable()?->getKey(),
             // 'addressable_type' => $this->getAddressable()?->getMorphClass(),
             'type' => config('venditio-core.addresses.type_enum')::tryFrom($this->getType()),
-            'default' => $this->isDefault(),
+            'is_default' => $this->getIsDefault(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
             'email' => $this->getEmail(),
@@ -216,36 +211,5 @@ class AddressDto implements AddressDtoContract
         $this->getAddress()->update($updatedData);
 
         return $this->getAddress()->fill($updatedData);
-    }
-
-    public static function getInstance(): Model
-    {
-        return app(Address::class);
-    }
-
-    public static function bindIntoContainer(): static
-    {
-        return new static(
-            static::getInstance(),
-            null,
-            null,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-        );
     }
 }

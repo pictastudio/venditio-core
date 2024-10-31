@@ -9,6 +9,8 @@ class ApplyDiscount
 {
     public function __invoke(Model $cartLine, Closure $next): Model
     {
+        // TODO: implement discount logic (checking from discounts table with all possible rules)
+
         $discount = null;
         $unitDiscount = 0;
 

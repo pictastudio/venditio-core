@@ -3,8 +3,8 @@
 namespace PictaStudio\VenditioCore\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\Contracts\Cart;
-use PictaStudio\VenditioCore\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Packages\Simple\Models\CartLine;
 
 interface CartLineDtoContract extends Dto
 {
@@ -14,7 +14,7 @@ interface CartLineDtoContract extends Dto
 
     public function getCartLine(): CartLine|Model;
 
-    public function getProductItemId(): ?int;
+    public function getProductId(): ?int;
 
     public function getQty(): int;
 }

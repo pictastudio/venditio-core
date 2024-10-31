@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
-use PictaStudio\VenditioCore\Models\ProductCategory;
+use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
 use PictaStudio\VenditioCore\Policies\Traits\VenditioPolicyPermissions;
 
 class ProductCategoryPolicy

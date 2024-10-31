@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\Order;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Order;
 
 class ApproveOrder
 {

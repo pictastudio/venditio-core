@@ -11,54 +11,50 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Address\StoreAddressRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Address\UpdateAddressRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\AddressResource;
-use PictaStudio\VenditioCore\Models\Address;
-use PictaStudio\VenditioCore\Models\Contracts\Address as AddressContract;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Address;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class AddressController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorize('viewAny', Address::class);
+
         $filters = request()->all();
-        $hasFilters = count($filters) > 0;
 
-        if ($hasFilters) {
-            $validationResponse = $this->validateData($filters, [
-                'all' => [
-                    'boolean',
-                ],
-                'ids' => [
-                    'array',
-                ],
-                'ids.*' => [
-                    Rule::exists('product_items', 'id'),
-                ],
-            ]);
+        $this->validateData($filters, [
+            'all' => [
+                'boolean',
+            ],
+            'id' => [
+                'array',
+            ],
+            'id.*' => [
+                Rule::exists('addresses', 'id'),
+            ],
+        ]);
 
-            if ($validationResponse instanceof JsonResponse) {
-                return $validationResponse;
-            }
-
-            $filters = $validationResponse;
-        }
-
-        $addresss = app(AddressContract::class)::query()
-            ->when(
-                $hasFilters && isset($filters['ids']),
-                fn (Builder $query) => $query->whereIn('id', $filters['ids'])
-            )
-            ->when(
-                $hasFilters && isset($filters['all']),
-                fn (Builder $query) => $query->get(),
-                fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                ),
-            );
-
-        return AddressResource::collection($addresss);
+        return AddressResource::collection(
+            query('address')
+                ->when(
+                    isset($filters['id']),
+                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
+                )
+                ->when(
+                    isset($filters['all']),
+                    fn (Builder $query) => $query->get(),
+                    fn (Builder $query) => $query->paginate(
+                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
+                    ),
+                )
+        );
     }
 
     public function store(StoreAddressRequest $request): JsonResource
     {
+        $this->authorize('create', Address::class);
+
         return AddressResource::make(
             AddressDto::fromArray($request->validated())->create()
         );
@@ -66,11 +62,15 @@ class AddressController extends Controller
 
     public function show(Address $address): JsonResource
     {
+        $this->authorize('view', $address);
+
         return AddressResource::make($address);
     }
 
     public function update(UpdateAddressRequest $request, Address $address): JsonResource
     {
+        $this->authorize('update', $address);
+
         return AddressResource::make(
             AddressDto::fromArray(array_merge(
                 $request->validated(),
@@ -81,6 +81,8 @@ class AddressController extends Controller
 
     public function destroy(Address $address)
     {
+        $this->authorize('delete', $address);
+
         $address->delete();
 
         return response()->noContent();

@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\VenditioCore\Packages\Simple\Models\User;
 use PictaStudio\VenditioCore\Policies\Traits\VenditioPolicyPermissions;
 
 class UserPolicy

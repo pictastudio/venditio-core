@@ -13,6 +13,6 @@ class CartCreationPipeline extends Pipeline
 {
     public function __construct()
     {
-        $this->pipes = config('venditio-core.carts.pipelines.creation.pipes');
+        $this->pipes = config('venditio-core.carts.pipelines.create.pipes');
     }
 }

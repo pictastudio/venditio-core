@@ -5,9 +5,11 @@ namespace PictaStudio\VenditioCore\Dto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Cart;
 
-class CartDto implements CartDtoContract
+use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+
+class CartDto extends Dto implements CartDtoContract
 {
     public function __construct(
         private Model $cart,
@@ -16,26 +18,50 @@ class CartDto implements CartDtoContract
         private ?string $userLastName,
         private ?string $userEmail,
         private ?string $discountRef,
-        private ?array $billingAddress,
-        private ?array $shippingAddress,
-        private array $lines,
+        private ?array $addresses,
+        private array $lines = [],
     ) {
 
     }
 
     public static function fromArray(array $data): static
     {
-        return new static(
-            $data['cart'] ?? static::getInstance(),
-            $data['user_id'] ?? null,
-            $data['user_first_name'] ?? null,
-            $data['user_last_name'] ?? null,
-            $data['user_email'] ?? null,
-            $data['discount_ref'] ?? null,
-            $data['billing_address'] ?? null,
-            $data['shipping_address'] ?? null,
-            $data['lines'] ?? [],
-        );
+        $dto = parent::fromArray($data);
+
+        $dto->cart ??= static::getFreshInstance();
+
+        return $dto;
+    }
+
+    public function toArray(): array
+    {
+        $data = [];
+
+        foreach ($this as $key => $value) {
+            if (in_array($key, ['cart', 'lines'])) {
+                continue;
+            }
+
+            $key = str($key)->snake()->toString();
+
+            $data[$key] = $value;
+        }
+
+        return $data;
+    }
+
+    public function toModel(): Model
+    {
+        return $this->getFreshInstance()
+            ->fill($this->toArray());
+
+        // return ($this->getCart() ?? $this->getFreshInstance())
+        //     ->fill($this->toArray());
+    }
+
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('cart');
     }
 
     public function getCart(): Model
@@ -65,17 +91,12 @@ class CartDto implements CartDtoContract
 
     public function getDiscountRef(): ?string
     {
-        return $this->discountRef ?? $this->getCart()?->discount_ref;
+        return $this->discountRef ?? $this->getCart()?->discount_code;
     }
 
-    public function getBillingAddress(): ?array
+    public function getAddresses(): ?array
     {
-        return $this->billingAddress ?? $this->getCart()?->addresses['billing'] ?? null;
-    }
-
-    public function getShippingAddress(): ?array
-    {
-        return $this->shippingAddress ?? $this->getCart()?->addresses['shipping'] ?? null;
+        return $this->addresses ?? $this->getCart()?->addresses;
     }
 
     /**
@@ -84,25 +105,5 @@ class CartDto implements CartDtoContract
     public function getLines(): Collection
     {
         return collect($this->lines);
-    }
-
-    public static function getInstance(): Model
-    {
-        return app(Cart::class);
-    }
-
-    public static function bindIntoContainer(): static
-    {
-        return new static(
-            static::getInstance(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            [],
-        );
     }
 }

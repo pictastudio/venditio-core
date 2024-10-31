@@ -6,9 +6,11 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Models\Contracts\CartLine;
-use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\ProductItem;
 use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineUpdatePipeline;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 
 class UpdateLines
 {
@@ -21,16 +23,27 @@ class UpdateLines
 
         // dd($lines);
 
-        foreach ($lines as $key => $line) {
-            $lines[$key] = app(CartLineUpdatePipeline::class)->run(
-                app(CartLineDtoContract::class)::fromArray([
+        // foreach ($lines as $key => $line) {
+        //     $lines[$key] = CartLineUpdatePipeline::make()->run(
+        //         resolve_dto('cart_line')::fromArray([
+        //             'cart' => $cart,
+        //             'cart_line' => $line,
+        //             'product_item_id' => $line['product_item_id'],
+        //             'qty' => $line['qty'],
+        //         ])
+        //     );
+        // }
+
+        $lines->map(fn ($line) => (
+            CartLineUpdatePipeline::make()->run(
+                resolve_dto('cart_line')::fromArray([
                     'cart' => $cart,
                     'cart_line' => $line,
                     'product_item_id' => $line['product_item_id'],
                     'qty' => $line['qty'],
                 ])
-            );
-        }
+            )
+        ));
 
         // dd($lines);
 

@@ -21,9 +21,11 @@ class CalculateTotals
         $subTotalTaxable = $lines->sum('unit_final_price_taxable');
         $subTotalTax = $lines->sum('unit_final_price_tax');
         $subTotal = $lines->sum('total_final_price');
-        $totalFinal = $subTotal + $cart->shipping_fee + $cart->payment_fee - $cart->discount_amount;
+        // $totalFinal = $subTotal + $cart->shipping_fee + $cart->payment_fee - $cart->discount_amount; // discount is already calculated for each line
+        $totalFinal = $subTotal + $cart->shipping_fee + $cart->payment_fee;
 
         $cart->fill([
+            'status' => config('venditio-core.carts.status_enum')::getActiveStatus(),
             'sub_total_taxable' => $subTotalTaxable,
             'sub_total_tax' => $subTotalTax,
             'sub_total' => $subTotal,

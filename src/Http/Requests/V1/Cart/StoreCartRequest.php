@@ -16,4 +16,11 @@ class StoreCartRequest extends FormRequest
     {
         return $cartValidationRules->getStoreValidationRules();
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'user_id' => $this->user()?->getKey(),
+        ]);
+    }
 }

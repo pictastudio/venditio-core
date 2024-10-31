@@ -6,67 +6,61 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
+use PictaStudio\VenditioCore\Dto\CartDto;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
-use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\Contracts\Cart as CartContract;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 
 class CartController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
         $filters = request()->all();
-        $hasFilters = count($filters) > 0;
 
-        if ($hasFilters) {
-            $validationResponse = $this->validateData($filters, [
-                'all' => [
-                    'boolean',
-                ],
-                'ids' => [
-                    'array',
-                ],
-                'ids.*' => [
-                    Rule::exists('product_items', 'id'),
-                ],
-            ]);
+        $this->validateData($filters, [
+            'all' => [
+                'boolean',
+            ],
+            'id' => [
+                'array',
+            ],
+            'id.*' => [
+                Rule::exists('carts', 'id'),
+            ],
+        ]);
 
-            if ($validationResponse instanceof JsonResponse) {
-                return $validationResponse;
-            }
-
-            $filters = $validationResponse;
-        }
-
-        $carts = app(CartContract::class)::query()
-            ->when(
-                $hasFilters && isset($filters['ids']),
-                fn (Builder $query) => $query->whereIn('id', $filters['ids'])
-            )
-            ->when(
-                $hasFilters && isset($filters['all']),
-                fn (Builder $query) => $query->get(),
-                fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                ),
-            );
-
-        return CartResource::collection($carts);
+        return CartResource::collection(
+            query('cart')
+                ->when(
+                    isset($filters['id']),
+                    fn (Builder $query) => $query->whereIn('id', $filters['id']),
+                )
+                ->when(
+                    isset($filters['all']),
+                    fn (Builder $query) => $query->get(),
+                    fn (Builder $query) => $query->paginate(
+                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
+                    ),
+                )
+        );
     }
 
     public function store(StoreCartRequest $request, CartCreationPipeline $pipeline): JsonResource
     {
-        $cart = $pipeline->run(
-            app(CartDtoContract::class)::fromArray($request->validated())
+        return CartResource::make(
+            $pipeline->run(
+                resolve_dto('cart')::fromArray($request->validated())
+            )
         );
-
-        return CartResource::make($cart);
     }
 
     public function show(Cart $cart): JsonResource
@@ -76,14 +70,16 @@ class CartController extends Controller
 
     public function update(UpdateCartRequest $request, Cart $cart, CartUpdatePipeline $pipeline): JsonResource
     {
-        $cart = $pipeline->run(
-            app(CartDtoContract::class)::fromArray(array_merge(
-                $request->validated(),
-                ['cart' => $cart]
-            ))
+        return CartResource::make(
+            $pipeline->run(
+                resolve_dto('cart')::fromArray(
+                    array_merge(
+                        $request->validated(),
+                        ['cart' => $cart]
+                    )
+                )
+            )
         );
-
-        return CartResource::make($cart);
     }
 
     public function destroy(Cart $cart)

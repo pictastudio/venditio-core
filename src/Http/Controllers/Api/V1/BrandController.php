@@ -9,50 +9,42 @@ use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Address\StoreAddressRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\BrandResource;
-use PictaStudio\VenditioCore\Models\Brand;
-use PictaStudio\VenditioCore\Models\Contracts\Brand as BrandContract;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class BrandController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
         $filters = request()->all();
-        $hasFilters = count($filters) > 0;
 
-        if ($hasFilters) {
-            $validationResponse = $this->validateData($filters, [
-                'all' => [
-                    'boolean',
-                ],
-                'ids' => [
-                    'array',
-                ],
-                'ids.*' => [
-                    Rule::exists('product_items', 'id'),
-                ],
-            ]);
+        $this->validateData($filters, [
+            'all' => [
+                'boolean',
+            ],
+            'id' => [
+                'array',
+            ],
+            'id.*' => [
+                Rule::exists('brands', 'id'),
+            ],
+        ]);
 
-            if ($validationResponse instanceof JsonResponse) {
-                return $validationResponse;
-            }
-
-            $filters = $validationResponse;
-        }
-
-        $brands = app(BrandContract::class)::query()
-            ->when(
-                $hasFilters && isset($filters['ids']),
-                fn (Builder $query) => $query->whereIn('id', $filters['ids'])
-            )
-            ->when(
-                $hasFilters && isset($filters['all']),
-                fn (Builder $query) => $query->get(),
-                fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                ),
-            );
-
-        return BrandResource::collection($brands);
+        return BrandResource::collection(
+            query('brand')
+                ->when(
+                    isset($filters['id']),
+                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
+                )
+                ->when(
+                    isset($filters['all']),
+                    fn (Builder $query) => $query->get(),
+                    fn (Builder $query) => $query->paginate(
+                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
+                    ),
+                )
+        );
     }
 
     // public function store(StoreAddressRequest $request): JsonResource

@@ -2,8 +2,9 @@
 
 namespace PictaStudio\VenditioCore\Http\Resources\V1;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
 use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
 
@@ -12,18 +13,16 @@ class ProductItemResource extends JsonResource
     use CanTransformAttributes;
     use HasAttributesToExclude;
 
-    public function toArray($request)
+    public function toArray(Request $request)
     {
-        $attributes = Arr::except(
-            parent::toArray($request),
-            $this->getDefaultAttributesToExclude()
-        );
-
         return $this->applyAttributesTransformation(
-            array_merge(
-                $attributes,
-                $this->getRelationshipsToInclude(),
-            )
+            collect(parent::toArray($request))
+                ->except($this->getAttributesToExclude())
+                ->map(fn (mixed $value, string $key) => (
+                    $this->mutateAttributeBasedOnCast($key, $value)
+                ))
+                ->merge($this->getRelationshipsToInclude())
+                ->toArray()
         );
     }
 
@@ -41,7 +40,15 @@ class ProductItemResource extends JsonResource
                 collect($images)
                     ->map(fn (array $image) => [
                         'alt' => $image['alt'],
-                        'img' => asset('storage/' . $image['img']),
+                        'src' => URL::isValidUrl($image['src']) ? $image['src'] : asset('storage/' . $image['src']),
+                    ])
+                    ->toArray()
+            ),
+            'files' => fn (?array $files) => (
+                collect($files)
+                    ->map(fn (array $file) => [
+                        'name' => $file['name'],
+                        'src' => URL::isValidUrl($file['src']) ? $file['src'] : asset('storage/' . $file['src']),
                     ])
                     ->toArray()
             ),

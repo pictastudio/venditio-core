@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
 
 class ApplyDiscounts
 {

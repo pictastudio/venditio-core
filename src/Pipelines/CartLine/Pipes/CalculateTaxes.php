@@ -4,18 +4,21 @@ namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use PictaStudio\VenditioCore\Packages\Simple\Models\CountryTaxClass;
 
 class CalculateTaxes
 {
     public function __invoke(Model $cartLine, Closure $next): Model
     {
-        $price = $cartLine->unit_discount;
-        $unitDiscount = $cartLine->unit_final_price;
         $unitFinalPrice = $cartLine->unit_final_price;
 
-        $taxRate = 0; // get 'rate' from 'country_tax_class' after getting the taxClass from the product
-        $unitFinalPriceTax = 0; // tassa unitaria calcolata su unit_final_price
-        $unitFinalPriceTaxable = $unitFinalPrice - $unitFinalPriceTax;
+        $taxRate = $this->getTaxRate($cartLine->getAttribute('product'));
+
+        // il valore imponibile è uguale al prezzo finale (trattiamo il prezzo flat dei prodotti, privo di tasse)
+        $unitFinalPriceTaxable = $unitFinalPrice;
+
+        $unitFinalPriceTax = $unitFinalPrice * $taxRate / 100;
 
         $cartLine->fill([
             'unit_final_price_tax' => $unitFinalPriceTax,
@@ -24,5 +27,15 @@ class CalculateTaxes
         ]);
 
         return $next($cartLine);
+    }
+
+    private function getTaxRate(array $product): float
+    {
+        $taxClassId = Arr::get($product, 'tax_class_id');
+
+        return CountryTaxClass::query()
+            ->where('tax_class_id', $taxClassId)
+            ->firstOrFail()
+            ->rate;
     }
 }

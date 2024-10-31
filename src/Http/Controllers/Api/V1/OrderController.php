@@ -11,59 +11,53 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Order\StoreOrderRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Order\UpdateOrderRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\OrderResource;
-use PictaStudio\VenditioCore\Models\Contracts\Cart as CartContract;
-use PictaStudio\VenditioCore\Models\Contracts\Order as OrderContract;
-use PictaStudio\VenditioCore\Models\Order;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Order;
 use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 
 class OrderController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
         $filters = request()->all();
-        $hasFilters = count($filters) > 0;
 
-        if ($hasFilters) {
-            $validationResponse = $this->validateData($filters, [
-                'all' => [
-                    'boolean',
-                ],
-                'ids' => [
-                    'array',
-                ],
-                'ids.*' => [
-                    Rule::exists('product_items', 'id'),
-                ],
-            ]);
+        $this->validateData($filters, [
+            'all' => [
+                'boolean',
+            ],
+            'id' => [
+                'array',
+            ],
+            'id.*' => [
+                Rule::exists('orders', 'id'),
+            ],
+        ]);
 
-            if ($validationResponse instanceof JsonResponse) {
-                return $validationResponse;
-            }
-
-            $filters = $validationResponse;
-        }
-
-        $orders = app(OrderContract::class)::query()
-            ->when(
-                $hasFilters && isset($filters['ids']),
-                fn (Builder $query) => $query->whereIn('id', $filters['ids'])
-            )
-            ->when(
-                $hasFilters && isset($filters['all']),
-                fn (Builder $query) => $query->get(),
-                fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                ),
-            );
-
-        return OrderResource::collection($orders);
+        return OrderResource::collection(
+            query('order')
+                ->when(
+                    isset($filters['id']),
+                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
+                )
+                ->when(
+                    isset($filters['all']),
+                    fn (Builder $query) => $query->get(),
+                    fn (Builder $query) => $query->paginate(
+                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
+                    ),
+                )
+        );
     }
 
     public function store(StoreOrderRequest $request, OrderCreationPipeline $pipeline): JsonResource
     {
         $order = $pipeline->run(
-            app(OrderDtoContract::class)::fromCart(
-                app(CartContract::class)::findOrFail($request->input('cart_id'))
+            resolve_dto('order')::fromCart(
+                query('cart')
+                    ->where('status', config('venditio-core.carts.status_enum')::getActiveStatus())
+                    ->findOrFail($request->validated('cart_id'))
             )
         );
 

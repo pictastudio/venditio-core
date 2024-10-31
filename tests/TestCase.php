@@ -5,6 +5,8 @@ namespace PictaStudio\VenditioCore\Tests;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase as Orchestra;
+use PictaStudio\VenditioCore\Facades\VenditioCore;
+use PictaStudio\VenditioCore\Packages\Tools\PackageType;
 use PictaStudio\VenditioCore\VenditioCoreServiceProvider;
 
 class TestCase extends Orchestra
@@ -13,8 +15,13 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
+        $baseNamespace = match (VenditioCore::getPackageType()) {
+            PackageType::Simple => 'PictaStudio\\VenditioCore\\Packages\\Simple\\Database\\Factories',
+            PackageType::Advanced => 'PictaStudio\\VenditioCore\\Packages\\Advanced\\Database\\Factories',
+        };
+
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'PictaStudio\\VenditioCore\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => $baseNamespace . '\\' . class_basename($modelName) . 'Factory'
         );
     }
 

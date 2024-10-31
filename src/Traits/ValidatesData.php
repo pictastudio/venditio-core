@@ -2,21 +2,16 @@
 
 namespace PictaStudio\VenditioCore\Traits;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 trait ValidatesData
 {
-    public function validateData(array $data, array $rules): JsonResponse|array
+    public function validateData(array $data, array $rules): array
     {
         $validated = Validator::make($data, $rules);
 
-        if ($validated->errors()->isNotEmpty()) {
-            return response()->json([
-                'errors' => $validated->errors()->toArray(),
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        throw_if($validated->fails(), new ValidationException($validated));
 
         return $validated->safe()->all();
     }

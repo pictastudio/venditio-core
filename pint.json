@@ -64,7 +64,8 @@
         "semicolon_after_instruction": true,
         "return_assignment": true,
         "return_type_declaration": true,
-        "single_import_per_statement": true,
+        "single_import_per_statement": false,
+        "group_import": true,
         "single_line_after_imports": true,
         "space_after_semicolon": true,
         "statement_indentation": true,
@@ -79,13 +80,48 @@
         "is_null": true,
         "lambda_not_used_import": true,
         "mb_str_functions": true,
-        "no_empty_comment": true,
+        "no_empty_comment": false,
         "ordered_imports": {
             "sort_algorithm": "alpha",
             "imports_order": [
                 "const",
                 "class",
                 "function"
+            ]
+        },
+        "ordered_class_elements": {
+            "order": [
+                "use_trait",
+                "case",
+                "constant_public",
+                "constant_protected",
+                "constant_private",
+                "property_public",
+                "property_protected",
+                "property_private",
+                "property_static_public",
+                "property_static_protected",
+                "property_static_private",
+                "construct",
+                "destruct",
+                "magic",
+                "phpunit",
+                "method:casts",
+                "method_public_abstract",
+                "method_protected_abstract",
+                "method_private_abstract",
+                "method_public",
+                "method_protected",
+                "method_private",
+                "method_public_abstract_static",
+                "method_protected_abstract_static",
+                "method_private_abstract_static",
+                "method_public_static",
+                "method_protected_static",
+                "method_private_static",
+                "method_public",
+                "method_protected",
+                "method_private"
             ]
         }
     }

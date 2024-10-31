@@ -5,14 +5,17 @@ namespace PictaStudio\VenditioCore\Dto;
 use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Models\Contracts\CartLine;
+use PictaStudio\VenditioCore\Packages\Simple\Models\CartLine;
 
-class CartLineDto implements CartLineDtoContract
+use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+
+class CartLineDto extends Dto implements CartLineDtoContract
 {
     public function __construct(
         private Model $cart,
         private Model $cartLine,
-        private ?int $productItemId,
+        private ?int $productId,
         private int $qty,
     ) {
 
@@ -20,12 +23,21 @@ class CartLineDto implements CartLineDtoContract
 
     public static function fromArray(array $data): static
     {
-        return new static(
-            $data['cart'] ?? app(CartDtoContract::class)::getInstance(),
-            $data['cart_line'] ?? static::getInstance(),
-            $data['product_item_id'] ?? null,
-            $data['qty'] ?? 0,
-        );
+        $data['cart'] ??= resolve_dto('cart')::getFreshInstance();
+        $data['cart_line'] ??= static::getFreshInstance();
+
+        return parent::fromArray($data);
+    }
+
+    public function toModel(): Model
+    {
+        return $this->getFreshInstance()
+            ->fill($this->toArray());
+    }
+
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('cart_line');
     }
 
     public function getCart(): Model
@@ -38,28 +50,13 @@ class CartLineDto implements CartLineDtoContract
         return $this->cartLine;
     }
 
-    public function getProductItemId(): ?int
+    public function getProductId(): ?int
     {
-        return $this->productItemId;
+        return $this->productId;
     }
 
     public function getQty(): int
     {
         return $this->qty;
-    }
-
-    public static function getInstance(): Model
-    {
-        return app(CartLine::class);
-    }
-
-    public static function bindIntoContainer(): static
-    {
-        return new static(
-            app(CartDtoContract::class)::getInstance(),
-            static::getInstance(),
-            null,
-            0,
-        );
     }
 }

@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
 use PictaStudio\VenditioCore\Policies\Traits\VenditioPolicyPermissions;
 
 class CartPolicy
@@ -21,7 +21,8 @@ class CartPolicy
 
     public function view(User $user, Cart $cart): bool
     {
-        return $this->authorize('view', $user, $cart);
+        return $this->belongsToUser($user, $cart) &&
+            $this->authorize('view', $user, $cart);
     }
 
     public function create(User $user): bool
@@ -31,21 +32,30 @@ class CartPolicy
 
     public function update(User $user, Cart $cart): bool
     {
-        return $this->authorize('update', $user, $cart);
+        return $this->belongsToUser($user, $cart) &&
+            $this->authorize('update', $user, $cart);
     }
 
     public function delete(User $user, Cart $cart): bool
     {
-        return $this->authorize('delete', $user, $cart);
+        return $this->belongsToUser($user, $cart) &&
+            $this->authorize('delete', $user, $cart);
     }
 
     public function restore(User $user, Cart $cart): bool
     {
-        return $this->authorize('restore', $user, $cart);
+        return $this->belongsToUser($user, $cart) &&
+            $this->authorize('restore', $user, $cart);
     }
 
     public function forceDelete(User $user, Cart $cart): bool
     {
-        return $this->authorize('forceDelete', $user, $cart);
+        return $this->belongsToUser($user, $cart) &&
+            $this->authorize('forceDelete', $user, $cart);
+    }
+
+    public function belongsToUser(User $user, Cart $cart): bool
+    {
+        return $cart->user_id === $user->getKey();
     }
 }
