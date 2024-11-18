@@ -289,6 +289,7 @@ return [
                 'name' => 'venditio.api.v1',
                 'middleware' => ['api'],
                 // 'rate_limit' => [
+                //     'enabled' => true,
                 //     'configure' => fn () => VenditioCore::configureRateLimiting('venditio/api/v1'),
                 // ],
                 'pagination' => [

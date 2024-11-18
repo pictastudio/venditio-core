@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore;
 
+use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -111,7 +112,13 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         // VenditioCore::configureRateLimiting($prefix);
         // config('venditio-core.routes.api.v1.rate_limit.configure')();
 
-        VenditioCoreClass::configureRateLimiting($prefix);
+        if (config('venditio-core.routes.api.v1.rate_limit.enabled')) {
+            $configureCallback = config('venditio-core.routes.api.v1.rate_limit.configure');
+
+            if ($configureCallback instanceof Closure) {
+                $configureCallback();
+            }
+        }
 
         Route::middleware(config('venditio-core.routes.api.v1.middleware'))
             ->prefix($prefix)
