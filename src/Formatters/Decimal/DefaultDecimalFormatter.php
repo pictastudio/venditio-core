@@ -11,8 +11,7 @@ class DefaultDecimalFormatter implements DecimalFormatter
         public int $value,
         public int $unitQty = 1,
         public int $decimalPlaces = 2,
-    ) {
-    }
+    ) {}
 
     public function decimal(bool $rounding = true): float
     {

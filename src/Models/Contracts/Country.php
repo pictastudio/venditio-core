@@ -2,6 +2,4 @@
 
 namespace PictaStudio\VenditioCore\Models\Contracts;
 
-interface Country
-{
-}
+interface Country {}

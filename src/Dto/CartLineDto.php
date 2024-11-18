@@ -14,9 +14,7 @@ class CartLineDto implements CartLineDtoContract
         private Model $cartLine,
         private ?int $productItemId,
         private int $qty,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {

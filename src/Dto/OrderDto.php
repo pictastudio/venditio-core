@@ -23,9 +23,7 @@ class OrderDto implements OrderDtoContract
         private ?array $shippingAddress,
         private ?string $customerNotes,
         private array $lines,
-    ) {
-
-    }
+    ) {}
 
     public static function fromCart(Model $cart): static
     {

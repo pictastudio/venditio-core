@@ -14,9 +14,7 @@ class AuthManager implements AuthManagerContract
 
     const ROLE_USER = 'User';
 
-    public function __construct(public User|Authenticatable|null $user = null)
-    {
-    }
+    public function __construct(public User|Authenticatable|null $user = null) {}
 
     public static function make(User|Authenticatable|null $user = null): static
     {

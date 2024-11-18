@@ -56,23 +56,14 @@ class ProductCategoryController extends Controller
         return ProductCategoryResource::collection($productCategories);
     }
 
-    public function store(StoreProductCategoryRequest $request)
-    {
-
-    }
+    public function store(StoreProductCategoryRequest $request) {}
 
     public function show(ProductCategory $productCategory): JsonResource
     {
         return ProductCategoryResource::make($productCategory);
     }
 
-    public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory)
-    {
+    public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory) {}
 
-    }
-
-    public function destroy(ProductCategory $productCategory)
-    {
-
-    }
+    public function destroy(ProductCategory $productCategory) {}
 }

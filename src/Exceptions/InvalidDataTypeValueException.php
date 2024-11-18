@@ -4,6 +4,4 @@ namespace PictaStudio\VenditioCore\Exceptions;
 
 use Exception;
 
-class InvalidDataTypeValueException extends Exception
-{
-}
+class InvalidDataTypeValueException extends Exception {}

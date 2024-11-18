@@ -56,23 +56,14 @@ class ProductItemController extends Controller
         return ProductItemResource::collection($productItems);
     }
 
-    public function store(StoreProductItemRequest $request)
-    {
-
-    }
+    public function store(StoreProductItemRequest $request) {}
 
     public function show(ProductItem $productItem): JsonResource
     {
         return ProductItemResource::make($productItem);
     }
 
-    public function update(UpdateProductItemRequest $request, ProductItem $productItem)
-    {
+    public function update(UpdateProductItemRequest $request, ProductItem $productItem) {}
 
-    }
-
-    public function destroy(ProductItem $productItem)
-    {
-
-    }
+    public function destroy(ProductItem $productItem) {}
 }

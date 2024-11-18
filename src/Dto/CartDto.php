@@ -19,9 +19,7 @@ class CartDto implements CartDtoContract
         private ?array $billingAddress,
         private ?array $shippingAddress,
         private array $lines,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {

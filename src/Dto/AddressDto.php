@@ -30,9 +30,7 @@ class AddressDto implements AddressDtoContract
         private ?string $birthDate,
         private ?string $birthPlace,
         private ?string $notes,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {

@@ -13,8 +13,5 @@ class CreateProductItemForVariants
      *
      * @param  array  $productVariants  associative array where the key is the productVariant id and the value is the array of productVariantOptions
      */
-    public function execute(Product $product, array $productVariants): void
-    {
-
-    }
+    public function execute(Product $product, array $productVariants): void {}
 }

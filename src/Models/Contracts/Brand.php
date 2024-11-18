@@ -2,6 +2,4 @@
 
 namespace PictaStudio\VenditioCore\Models\Contracts;
 
-interface Brand
-{
-}
+interface Brand {}

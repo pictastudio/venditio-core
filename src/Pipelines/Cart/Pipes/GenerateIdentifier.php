@@ -10,8 +10,7 @@ class GenerateIdentifier
 {
     public function __construct(
         private readonly CartIdentifierGeneratorInterface $generator,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Model $cart, Closure $next): Model
     {
