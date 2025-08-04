@@ -3,6 +3,7 @@
 namespace PictaStudio\VenditioCore\Packages\Tools;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -182,7 +183,7 @@ abstract class PackageServiceProvider extends LaravelPackageToolsPackageServiceP
         return $this;
     }
 
-    public static function generateMigrationName(string $migrationFileName, Carbon $now): string
+    protected function generateMigrationName(string $migrationFileName, Carbon|CarbonImmutable $now): string
     {
         $migrationsPath = dirname($migrationFileName) . '/';
         $migrationFileName = basename($migrationFileName);
@@ -240,8 +241,10 @@ abstract class PackageServiceProvider extends LaravelPackageToolsPackageServiceP
         return dirname($reflector->getFileName());
     }
 
-    public function packageView(?string $namespace)
+    public function packageView(?string $namespace): ?string
     {
-        return $namespace === null ? $this->package->shortName() : $this->package->viewNamespace;
+        return is_null($namespace)
+            ? $this->package->shortName()
+            : $this->package->viewNamespace;
     }
 }
