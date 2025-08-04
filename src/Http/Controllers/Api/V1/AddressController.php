@@ -23,31 +23,20 @@ class AddressController extends Controller
 
         $filters = request()->all();
 
-        $this->validateData($filters, [
-            'all' => [
-                'boolean',
-            ],
-            'id' => [
-                'array',
-            ],
-            'id.*' => [
-                Rule::exists('addresses', 'id'),
-            ],
-        ]);
+        // $this->validateData($filters, [
+        //     'all' => [
+        //         'boolean',
+        //     ],
+        //     'id' => [
+        //         'array',
+        //     ],
+        //     'id.*' => [
+        //         Rule::exists('addresses', 'id'),
+        //     ],
+        // ]);
 
         return AddressResource::collection(
-            query('address')
-                ->when(
-                    isset($filters['id']),
-                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
-                )
-                ->when(
-                    isset($filters['all']),
-                    fn (Builder $query) => $query->get(),
-                    fn (Builder $query) => $query->paginate(
-                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                    ),
-                )
+            $this->applyBaseFilters(query('address'), $filters, 'address')
         );
     }
 

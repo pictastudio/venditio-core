@@ -50,7 +50,7 @@ class ProductItem extends Model
         parent::__construct($attributes);
 
         $this->mergeCasts([
-            'status' => config('venditio-core.products.status_enum'),
+            'status' => config('venditio-core.product.status_enum'),
         ]);
     }
 

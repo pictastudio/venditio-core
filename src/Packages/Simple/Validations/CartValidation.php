@@ -10,7 +10,7 @@ class CartValidation implements CartValidationRules
     public function getStoreValidationRules(): array
     {
         return [
-            'user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'nullable|integer|exists:users,id',
             'user_first_name' => 'nullable|string|max:255',
             'user_last_name' => 'nullable|string|max:255',
             'user_email' => 'nullable|email|max:255',
@@ -21,6 +21,8 @@ class CartValidation implements CartValidationRules
             'lines.*.product_item_id' => 'missing',
             'lines.*.product_id' => 'sometimes|integer|exists:products,id',
             'lines.*.qty' => 'sometimes|integer|min:1',
+
+            // TODO: add fields for discounts
         ];
     }
 

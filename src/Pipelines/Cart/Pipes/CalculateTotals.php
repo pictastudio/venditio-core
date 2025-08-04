@@ -25,7 +25,7 @@ class CalculateTotals
         $totalFinal = $subTotal + $cart->shipping_fee + $cart->payment_fee;
 
         $cart->fill([
-            'status' => config('venditio-core.carts.status_enum')::getActiveStatus(),
+            'status' => config('venditio-core.cart.status_enum')::getActiveStatus(),
             'sub_total_taxable' => $subTotalTaxable,
             'sub_total_tax' => $subTotalTax,
             'sub_total' => $subTotal,

@@ -32,6 +32,27 @@ enum CartStatus: string implements CartStatusContract
         return self::Cancelled;
     }
 
+    public static function getAbandonedStatus(): self
+    {
+        return self::Abandoned;
+    }
+
+    public static function getPendingStatuses(): array
+    {
+        return [
+            self::Processing,
+            self::Active,
+        ];
+    }
+
+    public static function getCompletedStatuses(): array
+    {
+        return [
+            self::Converted,
+            self::Cancelled,
+        ];
+    }
+
     public static function getInactiveStatuses(): array
     {
         return [

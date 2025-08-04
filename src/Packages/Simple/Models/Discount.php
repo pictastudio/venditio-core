@@ -2,6 +2,8 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -26,24 +28,42 @@ class Discount extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'type' => DiscountType::class,
-        'value' => 'decimal:2',
-        'active' => 'boolean',
-        'starts_at' => 'datetime',
-        'ends_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'type' => DiscountType::class,
+            'value' => 'decimal:2',
+            'active' => 'boolean',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+        ];
+    }
 
     protected static function booted(): void
     {
         static::addGlobalScopes([
             Active::class,
-            InDateRange::class,
+            // InDateRange::class,
         ]);
     }
 
     public function discountable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('active', true)
+            ->where('starts_at', '<=', now());
+    }
+
+    public function scopeInDateRange(Builder $query, CarbonInterface $startsAt, ?CarbonInterface $endsAt = null): Builder
+    {
+        return $query->where('starts_at', '<=', $startsAt)
+            ->when(
+                $endsAt,
+                fn (Builder $query, CarbonInterface $endsAt) => $query->where('ends_at', '>=', $endsAt),
+            );
     }
 }

@@ -26,31 +26,20 @@ class CartController extends Controller
     {
         $filters = request()->all();
 
-        $this->validateData($filters, [
-            'all' => [
-                'boolean',
-            ],
-            'id' => [
-                'array',
-            ],
-            'id.*' => [
-                Rule::exists('carts', 'id'),
-            ],
-        ]);
+        // $this->validateData($filters, [
+        //     'all' => [
+        //         'boolean',
+        //     ],
+        //     'id' => [
+        //         'array',
+        //     ],
+        //     'id.*' => [
+        //         Rule::exists('carts', 'id'),
+        //     ],
+        // ]);
 
         return CartResource::collection(
-            query('cart')
-                ->when(
-                    isset($filters['id']),
-                    fn (Builder $query) => $query->whereIn('id', $filters['id']),
-                )
-                ->when(
-                    isset($filters['all']),
-                    fn (Builder $query) => $query->get(),
-                    fn (Builder $query) => $query->paginate(
-                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                    ),
-                )
+            $this->applyBaseFilters(query('cart'), $filters, 'cart')
         );
     }
 
@@ -82,37 +71,29 @@ class CartController extends Controller
         );
     }
 
-    public function destroy(Cart $cart)
+    public function destroy(Cart $cart): JsonResponse
     {
-        $cart->delete();
+        $cart->purge();
 
-        return response()->json([
-            'message' => 'Cart deleted successfully',
-        ]);
+        return $this->successJsonResponse(
+            message: 'Cart deleted successfully',
+        );
     }
 
-    public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules)
+    public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getStoreValidationRules());
 
-        if ($validationResponse instanceof JsonResponse) {
-            return $validationResponse;
-        }
-
         $cart->lines()->createMany($validationResponse['lines']);
 
-        return response()->json([
-            'message' => 'Lines added successfully',
-        ]);
+        return $this->successJsonResponse(
+            message: 'Lines added successfully',
+        );
     }
 
-    public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules)
+    public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getUpdateValidationRules());
-
-        if ($validationResponse instanceof JsonResponse) {
-            return $validationResponse;
-        }
 
         // pipeline per update cart lines
 
@@ -122,8 +103,8 @@ class CartController extends Controller
             ]);
         }
 
-        return response()->json([
-            'message' => 'Lines updated successfully',
-        ]);
+        return $this->successJsonResponse(
+            message: 'Lines updated successfully',
+        );
     }
 }

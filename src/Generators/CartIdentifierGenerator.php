@@ -4,59 +4,43 @@ namespace PictaStudio\VenditioCore\Generators;
 
 use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Contracts\CartIdentifierGeneratorInterface;
+use Illuminate\Support\Str;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class CartIdentifierGenerator implements CartIdentifierGeneratorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function generate(Model $cart): string
     {
-        $year = $cart->created_at->year;
-        $month = $cart->created_at->format('m');
+        $timestamp = str(microtime(true))
+            ->replace('.', '')
+            ->substr(-7)
+            ->toFloat();
 
-        $latestIdentifier = query('cart')
-            ->withoutGlobalScopes()
-            ->selectRaw('MAX(identifier) as identifier')
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            // ->whereNot('id', $cart->getKey())
-            ->value('identifier');
-
-        $increment = 1;
-
-        if ($latestIdentifier) {
-            $segments = explode('-', $latestIdentifier);
-
-            if (count($segments) !== 1) {
-                $increment = end($segments) + 1;
-            }
-        }
+        $random = strtoupper(Str::random(6));
+        $increment = 0;
 
         while (
             query('cart')
                 ->withoutGlobalScopes()
-                ->where('identifier', $this->buildIdentifier($year, $month, $increment))
+                ->where('identifier', $this->buildIdentifier($timestamp + $increment, $random))
                 ->exists()
         ) {
             $increment++;
         }
 
-        return $this->buildIdentifier($year, $month, $increment);
+        return $this->buildIdentifier($timestamp + $increment, $random);
     }
 
-    private function buildIdentifier(int $year, string $month, int $increment): string
+    private function buildIdentifier(int $timestamp, string $random): string
     {
-        $identifierTemplate = '{year}-{month}-{increment}';
+        $identifierTemplate = '{random}-{timestamp}';
 
         return str($identifierTemplate)
             ->swap([
-                '{year}' => $year,
-                '{month}' => $month,
-                '{increment}' => mb_str_pad($increment, 6, 0, STR_PAD_LEFT),
+                '{timestamp}' => $timestamp,
+                '{random}' => $random,
             ])
             ->toString();
     }

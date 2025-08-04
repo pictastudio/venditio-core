@@ -10,9 +10,6 @@ use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function generate(Model $order): string
     {
         $year = $order->created_at->year;
@@ -23,7 +20,6 @@ class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
             ->selectRaw('MAX(identifier) as identifier')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            // ->whereNot('id', $order->getKey())
             ->value('identifier');
 
         $increment = 1;

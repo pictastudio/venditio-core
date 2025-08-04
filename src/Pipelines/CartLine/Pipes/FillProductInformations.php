@@ -28,7 +28,6 @@ class FillProductInformations
     {
         // dd($line);
 
-        $isSimple = VenditioCore::isSimple();
         // dd(
         //     $isSimple,
         //     app(CartValidationRules::class)->getStoreValidationRules(),
@@ -40,10 +39,10 @@ class FillProductInformations
         // $cartLine = get_fresh_model_instance('cart_line');
         $cartLine = $cartLineDto->getCartLine();
 
-        $product = $this->getProduct($cartLineDto);
+        $product = $this->fetchProduct($cartLineDto);
 
-        // if simple package is used the correct relation is 'product' otherwise 'product_item'
-        if ($cartLine instanceof CartLine) {
+        // if simple package is used the correct relation 'product' otherwise 'product_item'
+        if (VenditioCore::isSimple() && $cartLine instanceof CartLine) {
             $cartLine->product()->associate($product);
         } else {
             $cartLine->productItem()->associate($product);
@@ -88,13 +87,9 @@ class FillProductInformations
         return $next($cartLine);
     }
 
-    private function getProduct(CartLineDtoContract $cartLineDto): Model
+    private function fetchProduct(CartLineDtoContract $cartLineDto): Model
     {
-        // $productID = null;
-        // $productModel = null;
-        // $relationsToLoad = ['inventory'];
-
-        $productId = $cartLineDto->getProductId();
+        $productId = $cartLineDto->getPurchasableModelId();
 
         $relationsToLoad = [
             'inventory',

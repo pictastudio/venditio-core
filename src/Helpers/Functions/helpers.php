@@ -29,7 +29,7 @@ if (!function_exists('resolve_model')) {
      *                      'country_tax_class', 'currency', 'discount', 'inventory', 
      *                      'order', 'order_line', 'product', 'product_category', 
      *                      'shipping_status', 'tax_class', 'user'.
-     *                     'product_custom_field', 'product_item', 'product_type',
+     *                      'product_custom_field', 'product_item', 'product_type',
      *                      'product_variant', 'product_variant_option'
      */
     function resolve_model(string $model): string
@@ -52,7 +52,7 @@ if (!function_exists('query')) {
      *                      'country_tax_class', 'currency', 'discount', 'inventory', 
      *                      'order', 'order_line', 'product', 'product_category', 
      *                      'shipping_status', 'tax_class', 'user'.
-     *                     'product_custom_field', 'product_item', 'product_type',
+     *                      'product_custom_field', 'product_item', 'product_type',
      *                      'product_variant', 'product_variant_option'
      */
     function query(string $model): Builder
@@ -70,7 +70,7 @@ if (!function_exists('get_fresh_model_instance')) {
      *                      'country_tax_class', 'currency', 'discount', 'inventory', 
      *                      'order', 'order_line', 'product', 'product_category', 
      *                      'shipping_status', 'tax_class', 'user'.
-     *                     'product_custom_field', 'product_item', 'product_type',
+     *                      'product_custom_field', 'product_item', 'product_type',
      *                      'product_variant', 'product_variant_option'
      */
     function get_fresh_model_instance(string $model): Model
@@ -115,10 +115,32 @@ if (!function_exists('resolve_dto')) {
         // $packageType = VenditioCore::getPackageType();
     
         return match ($dto) {
-            'order' => config('venditio-core.orders.dto'),
-            'cart' => config('venditio-core.carts.dto'),
-            'cart_line' => config('venditio-core.cart_lines.dto'),
+            'order' => config('venditio-core.order.dto'),
+            'cart' => config('venditio-core.cart.dto'),
+            'cart_line' => config('venditio-core.cart_line.dto'),
             'address' => config('venditio-core.addresses.dto'),
+        };
+    }
+}
+
+if (!function_exists('resolve_enum')) {
+    /**
+     * Resolve the enum class for the given model/type, returns the fully qualified class name
+     * 
+     * @param string $enum Can be one of the following values:
+     *                     'order_status', 'cart_status', 'cart_line_status', 'address_type'
+     * 
+     * @return \PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\OrderStatus|\PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\CartStatus|\PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\CartLineStatus|\PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\AddressType
+     */
+    function resolve_enum(string $enum): string
+    {
+        // $packageType = VenditioCore::getPackageType();
+    
+        return match ($enum) {
+            'order_status' => config('venditio-core.order.status_enum'),
+            'cart_status' => config('venditio-core.cart.status_enum'),
+            'cart_line_status' => config('venditio-core.cart_line.status_enum'),
+            'address_type' => config('venditio-core.addresses.type_enum'),
         };
     }
 }

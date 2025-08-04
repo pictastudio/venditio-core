@@ -22,7 +22,5 @@ class VenditioCore extends Facade
     protected static function getFacadeAccessor(): string
     {
         return 'venditio-core';
-
-        // return \PictaStudio\VenditioCore\VenditioCore::class;
     }
 }

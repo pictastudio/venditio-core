@@ -21,7 +21,7 @@ class FillOrderFromCart
         // dd($orderDto->toModel()->toArray());
 
         // $cart = query('cart')
-        //     ->where('status', config('venditio-core.carts.status_enum')::getActiveStatus())
+        //     ->where('status', config('venditio-core.cart.status_enum')::getActiveStatus())
         //     ->findOrFail($requestValidated['cart_id']);
 
         // throw_if(
@@ -34,7 +34,7 @@ class FillOrderFromCart
         // // move this inside the OrderDto toArray method
         // $order->fill([
         //     'user_id' => auth()->id(),
-        //     'status' => config('venditio-core.orders.status_enum')::getProcessingStatus(),
+        //     'status' => config('venditio-core.order.status_enum')::getProcessingStatus(),
         //     // 'tracking_code' => null,
         //     // 'tracking_date' => null,
         //     // 'courier_code' => null,

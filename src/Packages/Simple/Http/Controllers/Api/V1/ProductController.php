@@ -20,31 +20,20 @@ class ProductController extends Controller
     {
         $filters = request()->all();
 
-        $this->validateData($filters, [
-            'all' => [
-                'boolean',
-            ],
-            'id' => [
-                'array',
-            ],
-            'id.*' => [
-                Rule::exists('products', 'id'),
-            ],
-        ]);
+        // $this->validateData($filters, [
+        //     'all' => [
+        //         'boolean',
+        //     ],
+        //     'id' => [
+        //         'array',
+        //     ],
+        //     'id.*' => [
+        //         Rule::exists('products', 'id'),
+        //     ],
+        // ]);
 
         return ProductResource::collection(
-            query('product')
-                ->when(
-                    isset($filters['id']),
-                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
-                )
-                ->when(
-                    isset($filters['all']),
-                    fn (Builder $query) => $query->get(),
-                    fn (Builder $query) => $query->paginate(
-                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                    ),
-                )
+            $this->applyBaseFilters(query('product'), $filters, 'product')
         );
     }
 

@@ -10,11 +10,11 @@ interface CartLineDtoContract extends Dto
 {
     public static function fromArray(array $data): static;
 
-    public function getCart(): Cart|Model;
+    // public function getCart(): Cart|Model;
 
     public function getCartLine(): CartLine|Model;
 
-    public function getProductId(): ?int;
+    public function getPurchasableModelId(): ?int;
 
     public function getQty(): int;
 }

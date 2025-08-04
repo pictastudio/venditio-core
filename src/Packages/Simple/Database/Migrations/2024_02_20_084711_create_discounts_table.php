@@ -13,10 +13,15 @@ return new class extends Migration
             $table->morphs('discountable');
             $table->string('type', 20)->comment('percentage, fixed');
             $table->decimal('value', 10, 2);
-            $table->string('name');
+            $table->string('name')->nullable();
+            $table->string('code', 50)->unique();
             $table->boolean('active')->default(true);
-            $table->dateTime('starts_at')->nullable();
-            $table->dateTime('ends_at')->nullable();
+            $table->dateTime('starts_at')->comment('the datetime the discount starts at');
+            $table->dateTime('ends_at')->nullable()->comment('the datetime the discount ends at, if NULL it won\'t expire');
+            $table->unsignedInteger('uses')->default(0)->comment('how many times the discount has been used');
+            $table->unsignedInteger('max_uses')->nullable()->comment('how many times the discount can be used');
+            $table->integer('priority')->default(0)->comment('the order of priority');
+            $table->boolean('stop_after_propagation')->default(false)->comment('whether this discount will stop others after propagating');
             $table->datetimes();
             $table->softDeletesDatetime();
         });

@@ -19,31 +19,20 @@ class BrandController extends Controller
     {
         $filters = request()->all();
 
-        $this->validateData($filters, [
-            'all' => [
-                'boolean',
-            ],
-            'id' => [
-                'array',
-            ],
-            'id.*' => [
-                Rule::exists('brands', 'id'),
-            ],
-        ]);
+        // $this->validateData($filters, [
+        //     'all' => [
+        //         'boolean',
+        //     ],
+        //     'id' => [
+        //         'array',
+        //     ],
+        //     'id.*' => [
+        //         Rule::exists('brands', 'id'),
+        //     ],
+        // ]);
 
         return BrandResource::collection(
-            query('brand')
-                ->when(
-                    isset($filters['id']),
-                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
-                )
-                ->when(
-                    isset($filters['all']),
-                    fn (Builder $query) => $query->get(),
-                    fn (Builder $query) => $query->paginate(
-                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                    ),
-                )
+            $this->applyBaseFilters(query('brand'), $filters, 'brand')
         );
     }
 

@@ -23,6 +23,8 @@ use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Packages\Advanced\Validations\CartLineValidation as CartLineValidationAdvanced;
 use PictaStudio\VenditioCore\Packages\Advanced\Validations\CartValidation as CartValidationAdvanced;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Product as SimpleProduct;
+use PictaStudio\VenditioCore\Packages\Advanced\Models\Product as AdvancedProduct;
 use PictaStudio\VenditioCore\Packages\Simple\Models\User;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\AddressValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\CartLineValidation;
@@ -160,8 +162,18 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
 
     private function registerMorphMap(): void
     {
-        Relation::morphMap([
+        $morphMap = [
             'user' => User::class,
-        ]);
+        ];
+
+        if (VenditioCoreFacade::isSimple()) {
+            $morphMap['product'] = SimpleProduct::class;
+            $morphMap['product_item'] = SimpleProduct::class;
+        } else {
+            $morphMap['product'] = AdvancedProduct::class;
+            $morphMap['product_item'] = AdvancedProduct::class;
+        }
+
+        Relation::morphMap($morphMap);
     }
 }

@@ -12,8 +12,8 @@ use PictaStudio\VenditioCore\Pipelines\Pipeline;
  */
 class OrderCreationPipeline extends Pipeline
 {
-    public function __construct()
+    public function getPipes(): array
     {
-        $this->pipes = config('venditio-core.orders.pipelines.create.pipes');
+        return config('venditio-core.order.pipelines.create.pipes');
     }
 }

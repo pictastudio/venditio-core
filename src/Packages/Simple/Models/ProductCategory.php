@@ -29,9 +29,12 @@ class ProductCategory extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'active' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'active' => 'boolean',
+        ];
+    }
 
     protected static function booted(): void
     {

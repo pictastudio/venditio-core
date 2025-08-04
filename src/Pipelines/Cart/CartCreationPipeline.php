@@ -11,8 +11,8 @@ use PictaStudio\VenditioCore\Pipelines\Pipeline;
  */
 class CartCreationPipeline extends Pipeline
 {
-    public function __construct()
+    public function getPipes(): array
     {
-        $this->pipes = config('venditio-core.carts.pipelines.create.pipes');
+        return config('venditio-core.cart.pipelines.create.pipes');
     }
 }

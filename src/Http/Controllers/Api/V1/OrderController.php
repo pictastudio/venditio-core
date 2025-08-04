@@ -23,31 +23,20 @@ class OrderController extends Controller
     {
         $filters = request()->all();
 
-        $this->validateData($filters, [
-            'all' => [
-                'boolean',
-            ],
-            'id' => [
-                'array',
-            ],
-            'id.*' => [
-                Rule::exists('orders', 'id'),
-            ],
-        ]);
+        // $this->validateData($filters, [
+        //     'all' => [
+        //         'boolean',
+        //     ],
+        //     'id' => [
+        //         'array',
+        //     ],
+        //     'id.*' => [
+        //         Rule::exists('orders', 'id'),
+        //     ],
+        // ]);
 
         return OrderResource::collection(
-            query('order')
-                ->when(
-                    isset($filters['id']),
-                    fn (Builder $query) => $query->whereIn('id', $filters['id'])
-                )
-                ->when(
-                    isset($filters['all']),
-                    fn (Builder $query) => $query->get(),
-                    fn (Builder $query) => $query->paginate(
-                        request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                    ),
-                )
+            $this->applyBaseFilters(query('order'), $filters, 'order')
         );
     }
 
@@ -56,7 +45,7 @@ class OrderController extends Controller
         $order = $pipeline->run(
             resolve_dto('order')::fromCart(
                 query('cart')
-                    ->where('status', config('venditio-core.carts.status_enum')::getActiveStatus())
+                    ->where('status', config('venditio-core.cart.status_enum')::getActiveStatus())
                     ->findOrFail($request->validated('cart_id'))
             )
         );

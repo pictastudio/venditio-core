@@ -10,6 +10,8 @@ interface CartDtoContract extends Dto
 {
     public static function fromArray(array $data): static;
 
+    public static function getFreshInstance(): Model;
+
     public function getCart(): Cart|Model;
 
     public function getUserId(): ?int;

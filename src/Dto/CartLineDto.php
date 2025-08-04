@@ -13,9 +13,9 @@ use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 class CartLineDto extends Dto implements CartLineDtoContract
 {
     public function __construct(
-        private Model $cart,
+        // private Model $cart,
         private Model $cartLine,
-        private ?int $productId,
+        private ?int $purchasableModelId,
         private int $qty,
     ) {
 
@@ -23,10 +23,17 @@ class CartLineDto extends Dto implements CartLineDtoContract
 
     public static function fromArray(array $data): static
     {
-        $data['cart'] ??= resolve_dto('cart')::getFreshInstance();
-        $data['cart_line'] ??= static::getFreshInstance();
+        // $data['cart'] ??= resolve_dto('cart')::getFreshInstance();
+        // $data['cart_line'] ??= static::getFreshInstance();
 
-        return parent::fromArray($data);
+        // return parent::fromArray($data);
+
+        return new static(
+            // cart: resolve_dto('cart')::fromArray($data['cart']),
+            cartLine: $data['cart_line'] ?? static::getFreshInstance(),
+            purchasableModelId: $data['purchasable_model_id'] ?? null,
+            qty: $data['qty'] ?? 0,
+        );
     }
 
     public function toModel(): Model
@@ -40,19 +47,19 @@ class CartLineDto extends Dto implements CartLineDtoContract
         return get_fresh_model_instance('cart_line');
     }
 
-    public function getCart(): Model
-    {
-        return $this->cart;
-    }
+    // public function getCart(): Model
+    // {
+    //     return $this->cart;
+    // }
 
     public function getCartLine(): CartLine|Model
     {
         return $this->cartLine;
     }
 
-    public function getProductId(): ?int
+    public function getPurchasableModelId(): ?int
     {
-        return $this->productId;
+        return $this->purchasableModelId;
     }
 
     public function getQty(): int

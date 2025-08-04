@@ -11,8 +11,8 @@ use PictaStudio\VenditioCore\Pipelines\Pipeline;
  */
 class CartLineUpdatePipeline extends Pipeline
 {
-    public function __construct()
+    public function getPipes(): array
     {
-        $this->pipes = config('venditio-core.cart_lines.pipelines.update.pipes');
+        return config('venditio-core.cart_line.pipelines.update.pipes');
     }
 }

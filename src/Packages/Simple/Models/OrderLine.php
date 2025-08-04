@@ -23,16 +23,19 @@ class OrderLine extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'unit_price' => 'decimal:2',
-        'unit_discount' => 'decimal:2',
-        'unit_final_price' => 'decimal:2',
-        'unit_final_price_tax' => 'decimal:2',
-        'unit_final_price_taxable' => 'decimal:2',
-        'total_final_price' => 'decimal:2',
-        'tax_rate' => 'decimal:2',
-        'product_data' => 'json',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'unit_price' => 'decimal:2',
+            'unit_discount' => 'decimal:2',
+            'unit_final_price' => 'decimal:2',
+            'unit_final_price_tax' => 'decimal:2',
+            'unit_final_price_taxable' => 'decimal:2',
+            'total_final_price' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'product_data' => 'json',
+        ];
+    }
 
     public function order(): BelongsTo
     {

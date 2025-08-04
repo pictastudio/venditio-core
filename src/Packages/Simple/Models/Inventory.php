@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,9 +26,21 @@ class Inventory extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+        ];
+    }
+
+    // protected function stockAvailable(): Attribute
+    // {
+    //     return Attribute::make(
+    //         set: fn (int $value) => (
+    //             $this->getAttribute('stock') - $this->getAttribute('stock_reserved')
+    //         ),
+    //     );
+    // }
 
     /**
      * the simple version doesn't have the ProductItem model, instead it relates directly to the Product model for simplicity

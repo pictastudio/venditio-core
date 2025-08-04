@@ -318,6 +318,14 @@ public function boot(): void
 ```
 
 
+### Dto
+The package uses Dtos inside the pipelines and you can modify the class it uses inside the the config file
+The important thing is that those classes need to implement the provided interfaces
+
+for Order dto: PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract
+for Cart dto: PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract
+
+
 ### Helper functions
 Utility functions used across the package to simplify resolving the correct namespaced classes
 ```php
@@ -447,6 +455,14 @@ class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
     }
 }
 ```
+
+### Commands
+the package provides some console commands to deal with common use cases
+
+#### Carts
+- UpdateAbandonedCarts
+    checks all carts with a pending status which by default are `processing` and `active`
+    pending statuses are customizable by changing the `getPendingStatuses()` function in `CartStatus` enum which is located in the config file under `carts.status_enum`
 
 ## Structure
 ```

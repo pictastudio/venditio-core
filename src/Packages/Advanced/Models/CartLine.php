@@ -23,17 +23,20 @@ class CartLine extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'discount_amount' => 'decimal:2',
-        'unit_price' => 'decimal:2',
-        'unit_discount' => 'decimal:2',
-        'unit_final_price' => 'decimal:2',
-        'unit_final_price_tax' => 'decimal:2',
-        'unit_final_price_taxable' => 'decimal:2',
-        'total_final_price' => 'decimal:2',
-        'tax_rate' => 'decimal:2',
-        'product_item' => 'json',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'discount_amount' => 'decimal:2',
+            'unit_price' => 'decimal:2',
+            'unit_discount' => 'decimal:2',
+            'unit_final_price' => 'decimal:2',
+            'unit_final_price_tax' => 'decimal:2',
+            'unit_final_price_taxable' => 'decimal:2',
+            'total_final_price' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'product_item' => 'json',
+        ];
+    }
 
     public function cart(): BelongsTo
     {

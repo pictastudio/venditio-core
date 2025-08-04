@@ -12,5 +12,11 @@ interface CartStatus
 
     public static function getCancelledStatus(): self;
 
+    public static function getAbandonedStatus(): self;
+
+    public static function getPendingStatuses(): array;
+
+    public static function getCompletedStatuses(): array;
+
     public static function getInactiveStatuses(): array;
 }

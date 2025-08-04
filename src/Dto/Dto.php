@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use JsonSerializable;
 use PictaStudio\VenditioCore\Dto\Contracts\Dto as DtoContract;
 
@@ -19,7 +20,7 @@ class Dto implements DtoContract, Arrayable, Jsonable, JsonSerializable
     public function fill(array $data): static
     {
         foreach ($data as $key => $value) {
-            $key = str($key)->camel()->toString();
+            $key = Str::camel($key);
 
             if (property_exists($this, $key)) {
                 $this->{$key} = $value;
@@ -38,7 +39,7 @@ class Dto implements DtoContract, Arrayable, Jsonable, JsonSerializable
                 continue;
             }
 
-            $key = str($key)->snake()->toString();
+            $key = Str::snake($key);
 
             $data[$key] = $value;
         }

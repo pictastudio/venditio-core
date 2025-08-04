@@ -15,9 +15,12 @@ class CountryTaxClass extends Pivot
         'updated_at',
     ];
 
-    protected $casts = [
-        'rate' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'rate' => 'decimal:2',
+        ];
+    }
 
     public function country(): BelongsTo
     {

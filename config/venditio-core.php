@@ -134,7 +134,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Addresses
+    | Address
     |--------------------------------------------------------------------------
     |
     */
@@ -146,13 +146,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Carts
+    | Cart
     |--------------------------------------------------------------------------
     |
     | Pipeline tasks are executed in the order they are defined
     |
     */
-    'carts' => [
+    'cart' => [
         'status_enum' => Enums\CartStatus::class,
 
         'dto' => Dto\CartDto::class,
@@ -161,7 +161,7 @@ return [
         'pipelines' => [
             'create' => [
                 'pipes' => [
-                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\GenerateIdentifier::class,
                     Cart\Pipes\CalculateLines::class,
                     Cart\Pipes\CalculateTotals::class,
@@ -169,7 +169,7 @@ return [
             ],
             'update' => [
                 'pipes' => [
-                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\UpdateLines::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
@@ -179,11 +179,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Cart Lines
+    | Cart Line
     |--------------------------------------------------------------------------
     |
     */
-    'cart_lines' => [
+    'cart_line' => [
         'dto' => Dto\CartLineDto::class,
 
         // pipeline tasks are executed in the order they are defined
@@ -209,11 +209,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Orders
+    | Order
     |--------------------------------------------------------------------------
     |
     */
-    'orders' => [
+    'order' => [
         'status_enum' => Enums\OrderStatus::class,
 
         'dto' => Dto\OrderDto::class,
@@ -240,11 +240,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Products
+    | Product
     |--------------------------------------------------------------------------
     |
     */
-    'products' => [
+    'product' => [
         'status_enum' => Enums\ProductStatus::class,
         'measuring_unit_enum' => Enums\ProductMeasuringUnit::class,
     ],

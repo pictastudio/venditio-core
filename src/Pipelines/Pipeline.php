@@ -14,7 +14,7 @@ abstract class Pipeline
 
     protected array $pipes = [];
 
-    public function run(object|array $payload): mixed
+    public function run(mixed $payload): mixed
     {
         return DB::transaction(fn () => (
             PipelineFacade::send($payload)
@@ -34,6 +34,16 @@ abstract class Pipeline
         return $this;
     }
 
+    public function prependPipe(string $pipe): static
+    {
+        return $this->addPipe($pipe, 0);
+    }
+
+    public function appendPipe(string $pipe): static
+    {
+        return $this->addPipe($pipe, null);
+    }
+
     public function removePipe(string $pipe): static
     {
         $this->pipes = array_filter($this->pipes, fn (string $p) => $p !== $pipe);
@@ -41,8 +51,5 @@ abstract class Pipeline
         return $this;
     }
 
-    public function getPipes(): array
-    {
-        return $this->pipes;
-    }
+    abstract public function getPipes(): array;
 }

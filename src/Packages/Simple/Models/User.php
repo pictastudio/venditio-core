@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasAddresses;
@@ -24,6 +25,15 @@ class User extends Authenticatable
         'updated_at',
         'deleted_at',
     ];
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => (
+                $this->getAttribute('first_name') . ' ' . $this->getAttribute('last_name')
+            ),
+        );
+    }
 
     public function carts(): HasMany
     {

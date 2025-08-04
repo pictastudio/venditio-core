@@ -34,7 +34,7 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'status' => config('venditio-core.products.status_enum'),
+            'status' => config('venditio-core.product.status_enum'),
             'active' => 'boolean',
             'new' => 'boolean',
             'in_evidence' => 'boolean',
@@ -42,7 +42,7 @@ class Product extends Model
             'visible_until' => 'datetime',
             'images' => 'json',
             'files' => 'json',
-            'measuring_unit' => config('venditio-core.products.measuring_unit_enum'),
+            'measuring_unit' => config('venditio-core.product.measuring_unit_enum'),
             'length' => 'decimal:2',
             'width' => 'decimal:2',
             'height' => 'decimal:2',
