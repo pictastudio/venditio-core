@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,42 +68,50 @@ class Cart extends Model
         return $this->hasMany(resolve_model('cart_line'));
     }
 
-    public function scopeProcessing(Builder $builder): Builder
+    #[Scope]
+    public function processing(Builder $builder): Builder
     {
         return $builder->where('status', resolve_enum('cart_status')::getProcessingStatus());
     }
 
-    public function scopeActive(Builder $builder): Builder
+    #[Scope]
+    public function active(Builder $builder): Builder
     {
         return $builder->where('status', resolve_enum('cart_status')::getActiveStatus());
     }
 
-    public function scopeConverted(Builder $builder): Builder
+    #[Scope]
+    public function converted(Builder $builder): Builder
     {
         return $builder->where('status', resolve_enum('cart_status')::getConvertedStatus());
     }
 
-    public function scopeCancelled(Builder $builder): Builder
+    #[Scope]
+    public function cancelled(Builder $builder): Builder
     {
         return $builder->where('status', resolve_enum('cart_status')::getCancelledStatus());
     }
 
-    public function scopeAbandoned(Builder $builder): Builder
+    #[Scope]
+    public function abandoned(Builder $builder): Builder
     {
         return $builder->where('status', resolve_enum('cart_status')::getAbandonedStatus());
     }
 
-    public function scopePending(Builder $builder): Builder
+    #[Scope]
+    public function pending(Builder $builder): Builder
     {
         return $builder->whereIn('status', resolve_enum('cart_status')::getPendingStatuses());
     }
 
-    public function scopeCompleted(Builder $builder): Builder
+    #[Scope]
+    public function completed(Builder $builder): Builder
     {
         return $builder->whereIn('status', resolve_enum('cart_status')::getCompletedStatuses());
     }
 
-    public function scopeInactive(Builder $builder): Builder
+    #[Scope]
+    public function inactive(Builder $builder): Builder
     {
         return $builder->whereIn('status', resolve_enum('cart_status')::getInactiveStatuses());
     }

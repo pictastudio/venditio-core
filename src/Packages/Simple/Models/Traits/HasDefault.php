@@ -2,13 +2,15 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models\Traits;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 
 trait HasDefault
 {
-    public function scopeDefault(): Builder
+    #[Scope]
+    public function default(Builder $builder): Builder
     {
-        return $this->where('is_default', true);
+        return $builder->where('is_default', true);
     }
 
     public static function getDefault(): static

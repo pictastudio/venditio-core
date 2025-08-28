@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models\Traits;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,7 +24,8 @@ trait HasTreeStructure
             ->with('parent');
     }
 
-    public function scopeParentless(Builder $builder): Builder
+    #[Scope]
+    public function parentless(Builder $builder): Builder
     {
         // more efficient than $builder->doesntHave('parent')
         return $builder->whereNull('parent_id');
@@ -43,7 +45,8 @@ trait HasTreeStructure
             ->with('children');
     }
 
-    public function scopeChildless(Builder $builder): Builder
+    #[Scope]
+    public function childless(Builder $builder): Builder
     {
         return $builder->doesntHave('children');
     }
@@ -68,7 +71,8 @@ trait HasTreeStructure
     /**
      * The complete tree structure
      */
-    public function scopeTree(Builder $builder): Builder
+    #[Scope]
+    public function tree(Builder $builder): Builder
     {
         return $builder->parentless()
             ->with('descendants');

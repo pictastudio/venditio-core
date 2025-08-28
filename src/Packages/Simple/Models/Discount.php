@@ -3,6 +3,7 @@
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -52,13 +53,15 @@ class Discount extends Model
         return $this->morphTo();
     }
 
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    public function active(Builder $query): Builder
     {
         return $query->where('active', true)
             ->where('starts_at', '<=', now());
     }
 
-    public function scopeInDateRange(Builder $query, CarbonInterface $startsAt, ?CarbonInterface $endsAt = null): Builder
+    #[Scope]
+    public function inDateRange(Builder $query, CarbonInterface $startsAt, ?CarbonInterface $endsAt = null): Builder
     {
         return $query->where('starts_at', '<=', $startsAt)
             ->when(
