@@ -39,7 +39,7 @@ class AddressDto extends Dto implements AddressDtoContract
     public static function fromArray(array $data): static
     {
         $data['address'] ??= static::getFreshInstance();
-        $data['addressable'] ??= auth()->user();
+        $data['addressable'] ??= auth()->guard()->user();
 
         return parent::fromArray($data);
     }
@@ -72,7 +72,7 @@ class AddressDto extends Dto implements AddressDtoContract
 
     public function getIsDefault(): bool
     {
-        return $this->default;
+        return $this->isDefault;
     }
 
     public function getFirstName(): ?string

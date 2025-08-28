@@ -87,7 +87,7 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
         $this->registerMorphMap();
 
         $this->app->singleton(AuthManagerContract::class, fn () => (
-            AuthManager::make(fn () => auth()->user())
+            AuthManager::make(fn () => auth()->guard()->user())
         ));
 
         $this->app->singleton(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);

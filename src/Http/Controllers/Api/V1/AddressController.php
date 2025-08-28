@@ -13,27 +13,16 @@ use PictaStudio\VenditioCore\Http\Requests\V1\Address\UpdateAddressRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\AddressResource;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Address;
 
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class AddressController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
-        $this->authorize('viewAny', Address::class);
+        $this->authorize('viewAny', resolve_model('address'));
 
         $filters = request()->all();
-
-        // $this->validateData($filters, [
-        //     'all' => [
-        //         'boolean',
-        //     ],
-        //     'id' => [
-        //         'array',
-        //     ],
-        //     'id.*' => [
-        //         Rule::exists('addresses', 'id'),
-        //     ],
-        // ]);
 
         return AddressResource::collection(
             $this->applyBaseFilters(query('address'), $filters, 'address')
@@ -42,7 +31,7 @@ class AddressController extends Controller
 
     public function store(StoreAddressRequest $request): JsonResource
     {
-        $this->authorize('create', Address::class);
+        $this->authorize('create', resolve_model('address'));
 
         return AddressResource::make(
             AddressDto::fromArray($request->validated())->create()

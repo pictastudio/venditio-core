@@ -67,7 +67,7 @@ class Controller extends BaseController
         return $this->jsonResponse($data, $message, $status);
     }
 
-    public function jsonResponse(array|string $data = [], ?string $message = null, int $status = 200): JsonResponse
+    public function jsonResponse(array|string $data = [], ?string $message = null, int $status = Response::HTTP_OK): JsonResponse
     {
         $response = [
             'status' => true,
