@@ -8,6 +8,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\Order;
 class OrderFactory extends Factory
 {
     protected $model = Order::class;
+
     public function definition(): array
     {
         return [

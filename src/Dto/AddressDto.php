@@ -32,9 +32,7 @@ class AddressDto extends Dto implements AddressDtoContract
         private ?string $birthDate,
         private ?string $birthPlace,
         private ?string $notes,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {
@@ -44,15 +42,15 @@ class AddressDto extends Dto implements AddressDtoContract
         return parent::fromArray($data);
     }
 
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('address');
+    }
+
     public function toModel(): Model
     {
         return $this->getFreshInstance()
             ->fill($this->toArray());
-    }
-
-    public static function getFreshInstance(): Model
-    {
-        return get_fresh_model_instance('address');
     }
 
     public function getAddress(): Address|Model

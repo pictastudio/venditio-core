@@ -3,12 +3,10 @@
 namespace PictaStudio\VenditioCore\Dto;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
+use PictaStudio\VenditioCore\Dto\Contracts\{CartLineDtoContract};
 use PictaStudio\VenditioCore\Packages\Simple\Models\CartLine;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+use function PictaStudio\VenditioCore\Helpers\Functions\{get_fresh_model_instance, resolve_dto};
 
 class CartLineDto extends Dto implements CartLineDtoContract
 {
@@ -17,9 +15,7 @@ class CartLineDto extends Dto implements CartLineDtoContract
         private Model $cartLine,
         private ?int $purchasableModelId,
         private int $qty,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {
@@ -36,15 +32,15 @@ class CartLineDto extends Dto implements CartLineDtoContract
         );
     }
 
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('cart_line');
+    }
+
     public function toModel(): Model
     {
         return $this->getFreshInstance()
             ->fill($this->toArray());
-    }
-
-    public static function getFreshInstance(): Model
-    {
-        return get_fresh_model_instance('cart_line');
     }
 
     // public function getCart(): Model

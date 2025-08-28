@@ -2,12 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\AddressController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\BrandController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\CartController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\OrderController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductCategoryController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductController;
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\{AddressController, BrandController, CartController, OrderController, ProductCategoryController, ProductController};
 use PictaStudio\VenditioCore\Packages\Advanced\Http\Controllers\Api\V1\ProductItemController;
 
 /*

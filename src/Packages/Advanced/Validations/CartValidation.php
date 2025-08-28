@@ -2,7 +2,6 @@
 
 namespace PictaStudio\VenditioCore\Packages\Advanced\Validations;
 
-use BackedEnum;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\CartValidation as CartValidationSimple;
 use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
 

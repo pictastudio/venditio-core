@@ -2,14 +2,12 @@
 
 namespace PictaStudio\VenditioCore\Packages\Tools;
 
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
+use Carbon\{Carbon, CarbonImmutable};
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Spatie\LaravelPackageTools\Exceptions\InvalidPackage;
-use Spatie\LaravelPackageTools\Package as SpatiePackage;
-use Spatie\LaravelPackageTools\PackageServiceProvider as LaravelPackageToolsPackageServiceProvider;
+use Spatie\LaravelPackageTools\{Package as SpatiePackage, PackageServiceProvider as LaravelPackageToolsPackageServiceProvider};
 
 abstract class PackageServiceProvider extends LaravelPackageToolsPackageServiceProvider
 {
@@ -45,7 +43,7 @@ abstract class PackageServiceProvider extends LaravelPackageToolsPackageServiceP
 
     public function newPackage(): SpatiePackage
     {
-        return new SpatiePackage();
+        return new SpatiePackage;
     }
 
     public function boot()
@@ -183,6 +181,21 @@ abstract class PackageServiceProvider extends LaravelPackageToolsPackageServiceP
         return $this;
     }
 
+    public function registeringPackage() {}
+
+    public function packageRegistered() {}
+
+    public function bootingPackage() {}
+
+    public function packageBooted() {}
+
+    public function packageView(?string $namespace): ?string
+    {
+        return $namespace === null
+            ? $this->package->shortName()
+            : $this->package->viewNamespace;
+    }
+
     protected function generateMigrationName(string $migrationFileName, Carbon|CarbonImmutable $now): string
     {
         $migrationsPath = dirname($migrationFileName) . '/';
@@ -218,33 +231,10 @@ abstract class PackageServiceProvider extends LaravelPackageToolsPackageServiceP
         return database_path($migrationsPath . $now->format('Y_m_d_His') . '_' . Str::of($migrationFileName)->snake()->finish('.php'));
     }
 
-    public function registeringPackage()
-    {
-    }
-
-    public function packageRegistered()
-    {
-    }
-
-    public function bootingPackage()
-    {
-    }
-
-    public function packageBooted()
-    {
-    }
-
     protected function getPackageBaseDir(): string
     {
         $reflector = new ReflectionClass(get_class($this));
 
         return dirname($reflector->getFileName());
-    }
-
-    public function packageView(?string $namespace): ?string
-    {
-        return is_null($namespace)
-            ? $this->package->shortName()
-            : $this->package->viewNamespace;
     }
 }

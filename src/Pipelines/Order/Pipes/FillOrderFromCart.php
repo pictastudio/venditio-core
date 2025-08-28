@@ -10,9 +10,7 @@ use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
 use PictaStudio\VenditioCore\Dto\OrderDto;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
-use function PictaStudio\VenditioCore\Helpers\Functions\getFreshModelInstance;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\{get_fresh_model_instance, query};
 
 class FillOrderFromCart
 {

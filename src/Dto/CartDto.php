@@ -3,8 +3,7 @@
 namespace PictaStudio\VenditioCore\Dto;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\{Collection, Str};
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
 
@@ -21,9 +20,7 @@ class CartDto extends Dto implements CartDtoContract
         private ?string $discountRef,
         private ?array $addresses,
         private ?Collection $lines = null,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {
@@ -38,6 +35,11 @@ class CartDto extends Dto implements CartDtoContract
             lines: collect($data['lines'] ?? [])
                 ->map(fn (array $line) => CartLineDto::fromArray($line)),
         );
+    }
+
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('cart');
     }
 
     public function toArray(): array
@@ -61,11 +63,6 @@ class CartDto extends Dto implements CartDtoContract
     {
         return $this->getCart()
             ->fill($this->toArray());
-    }
-
-    public static function getFreshInstance(): Model
-    {
-        return get_fresh_model_instance('cart');
     }
 
     public function getCart(): Cart|Model

@@ -9,13 +9,9 @@ use Illuminate\Support\Arr;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Packages\Simple\Models\CartLine;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\ProductItem;
 use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
-use function PictaStudio\VenditioCore\Helpers\Functions\query_purchasable_product_model;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_purchasable_product_model;
+use function PictaStudio\VenditioCore\Helpers\Functions\{get_fresh_model_instance, query, query_purchasable_product_model, resolve_purchasable_product_model};
 
 class FillProductInformations
 {

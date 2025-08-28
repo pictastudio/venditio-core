@@ -4,13 +4,11 @@ namespace PictaStudio\VenditioCore\Packages\Simple\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\{Hash};
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use Spatie\Permission\Models\Role;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\auth_manager;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query};
 
 class UserSeeder extends Seeder
 {
@@ -35,7 +33,7 @@ class UserSeeder extends Seeder
     private function assignRoles(User $rootUser): void
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        
+
         $rootRole = Role::findByName(AuthManager::ROLE_ROOT);
 
         if ($rootUser && $rootRole) {

@@ -8,6 +8,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\Currency;
 class CurrencyFactory extends Factory
 {
     protected $model = Currency::class;
+
     public function definition(): array
     {
         $code = fake()->currencyCode();

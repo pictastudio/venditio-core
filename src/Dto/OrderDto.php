@@ -4,10 +4,8 @@ namespace PictaStudio\VenditioCore\Dto;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Cart;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Order;
+use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, OrderDtoContract};
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\{Cart, Order};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 
@@ -33,9 +31,7 @@ class OrderDto extends Dto implements OrderDtoContract
         private ?string $discountCode = null,
         private ?float $discountAmount = null,
         private ?float $totalFinal = null,
-    ) {
-
-    }
+    ) {}
 
     public static function fromCart(Model $cart): static
     {
@@ -69,6 +65,11 @@ class OrderDto extends Dto implements OrderDtoContract
         );
     }
 
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('order');
+    }
+
     // public function toArray(): array
     // {
     //     return [
@@ -94,11 +95,6 @@ class OrderDto extends Dto implements OrderDtoContract
     {
         return $this->getFreshInstance()
             ->fill($this->toArray());
-    }
-
-    public static function getFreshInstance(): Model
-    {
-        return get_fresh_model_instance('order');
     }
 
     public function getModel(): Model

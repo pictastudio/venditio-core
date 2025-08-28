@@ -40,7 +40,7 @@ class ProductItemFactory extends Factory
                 [
                     'name' => fake()->word(),
                     'src' => fake()->url(),
-                ]
+                ],
             ],
             'length' => fake()->randomNumber(3),
             'width' => fake()->randomNumber(3),

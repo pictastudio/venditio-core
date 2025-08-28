@@ -272,7 +272,7 @@ class Package extends SpatiePackage
             return $this->basePath;
         }
 
-        return $this->basePath . DIRECTORY_SEPARATOR . ltrim($directory, DIRECTORY_SEPARATOR);
+        return $this->basePath . DIRECTORY_SEPARATOR . mb_ltrim($directory, DIRECTORY_SEPARATOR);
     }
 
     public function viewNamespace(): string

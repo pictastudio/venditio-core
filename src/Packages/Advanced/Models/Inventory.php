@@ -4,11 +4,9 @@ namespace PictaStudio\VenditioCore\Packages\Advanced\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\{HasHelperMethods, LogsActivity};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 

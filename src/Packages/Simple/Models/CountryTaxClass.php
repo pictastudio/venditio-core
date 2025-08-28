@@ -2,8 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, Pivot};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 

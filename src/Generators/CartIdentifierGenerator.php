@@ -3,11 +3,10 @@
 namespace PictaStudio\VenditioCore\Generators;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\CartIdentifierGeneratorInterface;
 use Illuminate\Support\Str;
+use PictaStudio\VenditioCore\Contracts\CartIdentifierGeneratorInterface;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query};
 
 class CartIdentifierGenerator implements CartIdentifierGeneratorInterface
 {
@@ -18,7 +17,7 @@ class CartIdentifierGenerator implements CartIdentifierGeneratorInterface
             ->substr(-7)
             ->toFloat();
 
-        $random = strtoupper(Str::random(6));
+        $random = mb_strtoupper(Str::random(6));
         $increment = 0;
 
         while (

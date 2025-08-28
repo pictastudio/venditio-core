@@ -3,41 +3,24 @@
 namespace PictaStudio\VenditioCore;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Contracts\CartIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Contracts\OrderIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Dto\CartDto;
-use PictaStudio\VenditioCore\Dto\CartLineDto;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Dto\OrderDto;
+use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, OrderIdentifierGeneratorInterface};
+use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
+use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
 use PictaStudio\VenditioCore\Facades\VenditioCore as VenditioCoreFacade;
-use PictaStudio\VenditioCore\Generators\CartIdentifierGenerator;
-use PictaStudio\VenditioCore\Generators\OrderIdentifierGenerator;
+use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator};
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\CartLineValidation as CartLineValidationAdvanced;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\CartValidation as CartValidationAdvanced;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product as SimpleProduct;
 use PictaStudio\VenditioCore\Packages\Advanced\Models\Product as AdvancedProduct;
-use PictaStudio\VenditioCore\Packages\Simple\Models\User;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\AddressValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\CartLineValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\CartValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\OrderValidation;
+use PictaStudio\VenditioCore\Packages\Advanced\Validations\{CartLineValidation as CartLineValidationAdvanced, CartValidation as CartValidationAdvanced};
+use PictaStudio\VenditioCore\Packages\Simple\Models\{Product as SimpleProduct, User};
+use PictaStudio\VenditioCore\Packages\Simple\Validations\{AddressValidation, CartLineValidation, CartValidation, OrderValidation};
 use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
-use PictaStudio\VenditioCore\Packages\Tools\Package;
-use PictaStudio\VenditioCore\Packages\Tools\PackageServiceProvider as ToolsPackageServiceProvider;
-use PictaStudio\VenditioCore\Packages\Tools\PackageType;
-use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\OrderValidationRules;
+use PictaStudio\VenditioCore\Packages\Tools\{Package, PackageServiceProvider as ToolsPackageServiceProvider, PackageType};
+use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules};
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 
 class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
@@ -142,7 +125,7 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
 
         Route::middleware(config('venditio-core.routes.api.v1.middleware'))
             ->prefix($prefix)
-            ->name(rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
+            ->name(mb_rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
             ->group(fn () => (
                 $this->loadRoutesFrom($this->package->basePath('/../routes/v1/api.php'))
             ));

@@ -2,19 +2,17 @@
 
 namespace PictaStudio\VenditioCore\Dto;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\{Arrayable, Jsonable};
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\{Collection, Str};
 use JsonSerializable;
 use PictaStudio\VenditioCore\Dto\Contracts\Dto as DtoContract;
 
-class Dto implements DtoContract, Arrayable, Jsonable, JsonSerializable
+class Dto implements Arrayable, DtoContract, Jsonable, JsonSerializable
 {
     public static function fromArray(array $data): static
     {
-        return (new static())->fill($data);
+        return (new static)->fill($data);
     }
 
     public function fill(array $data): static

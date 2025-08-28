@@ -3,16 +3,14 @@
 namespace PictaStudio\VenditioCore\Http\Controllers\Api;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\{Builder, Collection};
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use PictaStudio\VenditioCore\Traits\ValidatesData;
 use Illuminate\Http\{JsonResponse, Response};
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Traits\ValidatesData;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
@@ -45,9 +43,9 @@ class Controller extends BaseController
         ]);
 
         return $query->when(
-                isset($filters['id']),
-                fn (Builder $query) => $query->whereKey($filters['id']),
-            )
+            isset($filters['id']),
+            fn (Builder $query) => $query->whereKey($filters['id']),
+        )
             ->when(
                 isset($filters['all']),
                 fn (Builder $query) => $query->get(),

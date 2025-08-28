@@ -2,8 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Helpers\Functions;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
@@ -24,13 +23,13 @@ if (!function_exists('resolve_model')) {
      * Tries to resolve the model for the configured package type: simple or advanced,
      * if the model is not found for the configured package type, it will try to resolve it from the simple package
      *
-     * @param string $model Can be one of the following values:
-     *                      'address', 'brand', 'cart', 'cart_line', 'country', 
-     *                      'country_tax_class', 'currency', 'discount', 'inventory', 
-     *                      'order', 'order_line', 'product', 'product_category', 
-     *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_item', 'product_type',
-     *                      'product_variant', 'product_variant_option'
+     * @param  string  $model  Can be one of the following values:
+     *                         'address', 'brand', 'cart', 'cart_line', 'country',
+     *                         'country_tax_class', 'currency', 'discount', 'inventory',
+     *                         'order', 'order_line', 'product', 'product_category',
+     *                         'shipping_status', 'tax_class', 'user'.
+     *                         'product_custom_field', 'product_item', 'product_type',
+     *                         'product_variant', 'product_variant_option'
      */
     function resolve_model(string $model): string
     {
@@ -46,14 +45,14 @@ if (!function_exists('resolve_model')) {
 if (!function_exists('query')) {
     /**
      * Initialize a query builder for the given model
-     * 
-     * @param string $model Can be one of the following values:
-     *                      'address', 'brand', 'cart', 'cart_line', 'country', 
-     *                      'country_tax_class', 'currency', 'discount', 'inventory', 
-     *                      'order', 'order_line', 'product', 'product_category', 
-     *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_item', 'product_type',
-     *                      'product_variant', 'product_variant_option'
+     *
+     * @param  string  $model  Can be one of the following values:
+     *                         'address', 'brand', 'cart', 'cart_line', 'country',
+     *                         'country_tax_class', 'currency', 'discount', 'inventory',
+     *                         'order', 'order_line', 'product', 'product_category',
+     *                         'shipping_status', 'tax_class', 'user'.
+     *                         'product_custom_field', 'product_item', 'product_type',
+     *                         'product_variant', 'product_variant_option'
      */
     function query(string $model): Builder
     {
@@ -65,13 +64,13 @@ if (!function_exists('get_fresh_model_instance')) {
     /**
      * Get a fresh instance of the given model
      *
-     * @param string $model Can be one of the following values:
-     *                      'address', 'brand', 'cart', 'cart_line', 'country', 
-     *                      'country_tax_class', 'currency', 'discount', 'inventory', 
-     *                      'order', 'order_line', 'product', 'product_category', 
-     *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_item', 'product_type',
-     *                      'product_variant', 'product_variant_option'
+     * @param  string  $model  Can be one of the following values:
+     *                         'address', 'brand', 'cart', 'cart_line', 'country',
+     *                         'country_tax_class', 'currency', 'discount', 'inventory',
+     *                         'order', 'order_line', 'product', 'product_category',
+     *                         'shipping_status', 'tax_class', 'user'.
+     *                         'product_custom_field', 'product_item', 'product_type',
+     *                         'product_variant', 'product_variant_option'
      */
     function get_fresh_model_instance(string $model): Model
     {
@@ -82,7 +81,7 @@ if (!function_exists('get_fresh_model_instance')) {
 if (!function_exists('resolve_purchasable_product_model')) {
     /**
      * Resolve the product model for the current package
-     * 
+     *
      * - if simple package is used -> PictaStudio\VenditioCore\Packages\Simple\Models\Product
      * - if advanced package is used -> PictaStudio\VenditioCore\Packages\Advanced\Models\ProductItem
      */
@@ -91,7 +90,7 @@ if (!function_exists('resolve_purchasable_product_model')) {
         if (VenditioCore::isSimple()) {
             return resolve_model('product');
         }
-    
+
         return resolve_model('product_item');
     }
 }
@@ -106,14 +105,14 @@ if (!function_exists('query_purchasable_product_model')) {
 if (!function_exists('resolve_dto')) {
     /**
      * Resolve the DTO class for the given model/type, returns the fully qualified class name
-     * 
-     * @param string $dto Can be one of the following values:
-     *                     'order', 'cart', 'cart_line', 'address'
+     *
+     * @param  string  $dto  Can be one of the following values:
+     *                       'order', 'cart', 'cart_line', 'address'
      */
     function resolve_dto(string $dto): string
     {
         // $packageType = VenditioCore::getPackageType();
-    
+
         return match ($dto) {
             'order' => config('venditio-core.order.dto'),
             'cart' => config('venditio-core.cart.dto'),
@@ -126,16 +125,15 @@ if (!function_exists('resolve_dto')) {
 if (!function_exists('resolve_enum')) {
     /**
      * Resolve the enum class for the given model/type, returns the fully qualified class name
-     * 
-     * @param string $enum Can be one of the following values:
-     *                     'order_status', 'cart_status', 'cart_line_status', 'address_type'
-     * 
+     *
+     * @param  string  $enum  Can be one of the following values:
+     *                        'order_status', 'cart_status', 'cart_line_status', 'address_type'
      * @return \PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\OrderStatus|\PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\CartStatus|\PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\CartLineStatus|\PictaStudio\VenditioCore\Packages\Simple\Enums\Contracts\AddressType
      */
     function resolve_enum(string $enum): string
     {
         // $packageType = VenditioCore::getPackageType();
-    
+
         return match ($enum) {
             'order_status' => config('venditio-core.order.status_enum'),
             'cart_status' => config('venditio-core.cart.status_enum'),

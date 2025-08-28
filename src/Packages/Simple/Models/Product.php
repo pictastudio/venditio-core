@@ -3,17 +3,10 @@
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Packages\Simple\Enums\ProductMeasuringUnit;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\Active;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\InDateRange;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasOne, MorphMany};
+use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\{Active, InDateRange};
+use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\{HasHelperMethods, LogsActivity};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 

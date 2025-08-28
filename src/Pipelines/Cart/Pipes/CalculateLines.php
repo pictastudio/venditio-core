@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\CartLine;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\ProductItem;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\{CartLine, ProductItem};
 use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineCreationPipeline;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_dto};
 
 class CalculateLines
 {
@@ -25,7 +23,7 @@ class CalculateLines
         // dump(
         //     $cart->toArray(),
         // );
-        
+
         // // $lines = self::calculateLines($cart->getRelation('lines'));
         // $lines = $cart->getAttribute('lines');
         // unset($cart->lines); // remove the 'lines' attribute from the model (it's not a relation yet)
@@ -42,7 +40,6 @@ class CalculateLines
         // }
 
         // $cart->setRelation('lines', $finalLines);
-
 
         $cart->setRelation(
             'lines',
@@ -79,11 +76,9 @@ class CalculateLines
         //     ->whereIn('id', $lines->pluck('id'))
         //     ->get();
 
-        return $lines->map(function (array $line) {
-            return CartLineCreationPipeline::make()->run(
-                resolve_dto('cart_line')::fromArray($line)
-            );
-        });
+        return $lines->map(fn (array $line) => CartLineCreationPipeline::make()->run(
+            resolve_dto('cart_line')::fromArray($line)
+        ));
     }
 
     // public static function calculateLines(Collection $lines): Collection

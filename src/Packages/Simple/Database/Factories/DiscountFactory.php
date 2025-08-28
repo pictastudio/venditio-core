@@ -9,6 +9,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\Discount;
 class DiscountFactory extends Factory
 {
     protected $model = Discount::class;
+
     public function definition(): array
     {
         return [

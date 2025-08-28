@@ -4,16 +4,12 @@ namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Packages\Simple\Enums\DiscountType;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\Active;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\InDateRange;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\{Active, InDateRange};
+use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\{HasHelperMethods, LogsActivity};
 
 class Discount extends Model
 {

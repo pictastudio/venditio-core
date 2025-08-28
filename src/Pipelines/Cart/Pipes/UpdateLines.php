@@ -5,9 +5,7 @@ namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\CartLine;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\ProductItem;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\{CartLine, ProductItem};
 use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineUpdatePipeline;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;

@@ -4,10 +4,7 @@ namespace PictaStudio\VenditioCore\Packages\Advanced\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use PictaStudio\VenditioCore\Packages\Simple\Enums\ProductMeasuringUnit;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
-use PictaStudio\VenditioCore\Packages\Simple\Models\ProductType;
-use PictaStudio\VenditioCore\Packages\Simple\Models\TaxClass;
+use PictaStudio\VenditioCore\Packages\Simple\Models\{Brand, Product, ProductType, TaxClass};
 
 class ProductFactory extends Factory
 {

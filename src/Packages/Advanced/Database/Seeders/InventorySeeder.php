@@ -6,8 +6,5 @@ use Illuminate\Database\Seeder;
 
 class InventorySeeder extends Seeder
 {
-    public function run(): void
-    {
-
-    }
+    public function run(): void {}
 }

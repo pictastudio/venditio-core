@@ -8,6 +8,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
 class ProductCategoryFactory extends Factory
 {
     protected $model = ProductCategory::class;
+
     public function definition(): array
     {
         return [

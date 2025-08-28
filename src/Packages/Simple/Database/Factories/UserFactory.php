@@ -8,6 +8,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\User;
 class UserFactory extends Factory
 {
     protected $model = User::class;
+
     public function definition(): array
     {
         return [

@@ -8,6 +8,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
 class CartFactory extends Factory
 {
     protected $model = Cart::class;
+
     public function definition(): array
     {
         return [

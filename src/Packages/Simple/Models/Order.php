@@ -4,13 +4,10 @@ namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Support\Fluent;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\{HasHelperMethods, LogsActivity};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
@@ -45,13 +42,6 @@ class Order extends Model
         ];
     }
 
-    protected function addresses(): Attribute
-    {
-        return Attribute::make(
-            get: fn (array $value) => new Fluent($value),
-        );
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(resolve_model('user'));
@@ -65,5 +55,12 @@ class Order extends Model
     public function lines(): HasMany
     {
         return $this->hasMany(resolve_model('order_line'));
+    }
+
+    protected function addresses(): Attribute
+    {
+        return Attribute::make(
+            get: fn (array $value) => new Fluent($value),
+        );
     }
 }

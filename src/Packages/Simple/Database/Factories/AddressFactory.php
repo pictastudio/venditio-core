@@ -3,7 +3,6 @@
 namespace PictaStudio\VenditioCore\Packages\Simple\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Packages\Simple\Enums\AddressType;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Address;
 
 class AddressFactory extends Factory

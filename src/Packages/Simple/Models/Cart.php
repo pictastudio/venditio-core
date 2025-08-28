@@ -3,19 +3,14 @@
 namespace PictaStudio\VenditioCore\Packages\Simple\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Support\Fluent;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\{HasHelperMethods, LogsActivity};
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_enum;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\VenditioCore\Helpers\Functions\{resolve_enum, resolve_model};
 
 class Cart extends Model
 {
@@ -44,13 +39,6 @@ class Cart extends Model
             'total_final' => 'decimal:2',
             'addresses' => 'json',
         ];
-    }
-
-    protected function addresses(): Attribute
-    {
-        return Attribute::make(
-            get: fn (array $value) => new Fluent($value),
-        );
     }
 
     public function user(): BelongsTo
@@ -123,5 +111,12 @@ class Cart extends Model
             'status' => resolve_enum('cart_status')::getCancelledStatus(),
         ]);
         $this->delete();
+    }
+
+    protected function addresses(): Attribute
+    {
+        return Attribute::make(
+            get: fn (array $value) => new Fluent($value),
+        );
     }
 }

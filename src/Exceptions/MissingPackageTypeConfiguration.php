@@ -4,6 +4,4 @@ namespace PictaStudio\VenditioCore\Exceptions;
 
 use Exception;
 
-class MissingPackageTypeConfiguration extends Exception
-{
-}
+class MissingPackageTypeConfiguration extends Exception {}

@@ -6,11 +6,6 @@ use Illuminate\Support\Arr;
 
 trait CanTransformAttributes
 {
-    protected function transformAttributes(): array
-    {
-        return [];
-    }
-
     public function applyAttributesTransformation(array $attributes): array
     {
         $transformedAttributes = $this->transformAttributes();
@@ -24,6 +19,11 @@ trait CanTransformAttributes
         }
 
         return $attributes;
+    }
+
+    protected function transformAttributes(): array
+    {
+        return [];
     }
 
     private function mutateAttributeBasedOnCast(string $key, mixed $value): mixed

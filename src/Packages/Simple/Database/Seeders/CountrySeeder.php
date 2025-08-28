@@ -13,12 +13,10 @@ class CountrySeeder extends Seeder
         $countries = File::json(__DIR__ . '/data/countries.json');
 
         $countries = collect($countries)
-            ->map(function (array $country) {
-                return array_merge($country, [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            })
+            ->map(fn (array $country) => array_merge($country, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]))
             ->toArray();
 
         Country::unguard();

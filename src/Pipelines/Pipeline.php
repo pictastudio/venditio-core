@@ -2,17 +2,18 @@
 
 namespace PictaStudio\VenditioCore\Pipelines;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Pipeline as PipelineFacade;
+use Illuminate\Support\Facades\{DB, Pipeline as PipelineFacade};
 use Illuminate\Support\Traits\Conditionable;
 use PictaStudio\VenditioCore\Traits\HasMakeConstructor;
 
 abstract class Pipeline
 {
-    use HasMakeConstructor;
     use Conditionable;
+    use HasMakeConstructor;
 
     protected array $pipes = [];
+
+    abstract public function getPipes(): array;
 
     public function run(mixed $payload): mixed
     {
@@ -50,6 +51,4 @@ abstract class Pipeline
 
         return $this;
     }
-
-    abstract public function getPipes(): array;
 }

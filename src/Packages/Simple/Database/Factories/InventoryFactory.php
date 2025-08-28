@@ -4,12 +4,12 @@ namespace PictaStudio\VenditioCore\Packages\Simple\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use PictaStudio\VenditioCore\Packages\Simple\Enums\DiscountType;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Discount;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Inventory;
+use PictaStudio\VenditioCore\Packages\Simple\Models\{Inventory};
 
 class InventoryFactory extends Factory
 {
     protected $model = Inventory::class;
+
     public function definition(): array
     {
         return [

@@ -15,9 +15,7 @@ class AuthManager implements AuthManagerContract
 
     const ROLE_USER = 'User';
 
-    public function __construct(public User|Authenticatable|null $user = null)
-    {
-    }
+    public function __construct(public User|Authenticatable|null $user = null) {}
 
     public static function make(Closure|User|Authenticatable|null $user = null): static
     {
@@ -29,23 +27,6 @@ class AuthManager implements AuthManagerContract
         };
 
         return new static($user);
-    }
-
-    public function user(User|Authenticatable $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    public function getUser(): User|Authenticatable|null
-    {
-        return $this->user;
-    }
-
-    public function can(string $resource, string $action): bool
-    {
-        return $this->user?->can($this->generatePermissionName($resource, $action));
     }
 
     public static function generatePermissionName(string $resource, string $action): string
@@ -82,5 +63,22 @@ class AuthManager implements AuthManagerContract
         return collect($actions)
             ->map(fn (string $action) => static::generatePermissionName($resource, $action))
             ->toArray();
+    }
+
+    public function user(User|Authenticatable $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getUser(): User|Authenticatable|null
+    {
+        return $this->user;
+    }
+
+    public function can(string $resource, string $action): bool
+    {
+        return $this->user?->can($this->generatePermissionName($resource, $action));
     }
 }

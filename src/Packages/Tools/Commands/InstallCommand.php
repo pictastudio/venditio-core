@@ -4,22 +4,24 @@ namespace PictaStudio\VenditioCore\Packages\Tools\Commands;
 
 use Closure;
 use Illuminate\Support\Str;
-use PictaStudio\VenditioCore\Packages\Tools\Package;
-use PictaStudio\VenditioCore\Packages\Tools\PackageType;
+use PictaStudio\VenditioCore\Packages\Tools\{Package, PackageType};
 use Spatie\LaravelPackageTools\Commands\InstallCommand as SpatieInstallCommand;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\select;
+use function Laravel\Prompts\{confirm, select};
 
 class InstallCommand extends SpatieInstallCommand
 {
+    public ?Closure $startWith = null;
+
+    public ?Closure $endWith = null;
+
+    public $hidden = true;
+
     /**
      * @var Package the variable type definition must remain the SpatiePackage, the docblock serves to provide autocomplete inside IDE
      */
     protected SpatiePackage $package;
-
-    public ?Closure $startWith = null;
 
     protected array $publishes = [];
 
@@ -28,10 +30,6 @@ class InstallCommand extends SpatieInstallCommand
     protected bool $copyServiceProviderInApp = false;
 
     protected ?string $starRepo = null;
-
-    public ?Closure $endWith = null;
-
-    public $hidden = true;
 
     public function __construct(SpatiePackage $package)
     {
@@ -76,7 +74,7 @@ class InstallCommand extends SpatieInstallCommand
 
         if ($this->copyServiceProviderInApp) {
             $this->components->info('Publishing service provider...');
-            
+
             $this->copyServiceProviderInApp();
         }
 

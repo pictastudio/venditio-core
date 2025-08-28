@@ -4,14 +4,14 @@ namespace PictaStudio\VenditioCore\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Cart;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Order;
 
 interface OrderDtoContract extends Dto
 {
     public static function fromCart(Model $cart): static;
 
     public static function fromArray(array $data): static;
+
+    public static function getFreshInstance(): Model;
 
     public function getModel(): Model;
 
@@ -34,8 +34,6 @@ interface OrderDtoContract extends Dto
     public function getCustomerNotes(): ?string;
 
     public function getLines(): Collection;
-
-    public static function getFreshInstance(): Model;
 
     public function toModel(): Model;
 }

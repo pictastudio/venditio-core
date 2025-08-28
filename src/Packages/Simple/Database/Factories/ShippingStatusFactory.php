@@ -8,6 +8,7 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\ShippingStatus;
 class ShippingStatusFactory extends Factory
 {
     protected $model = ShippingStatus::class;
+
     public function definition(): array
     {
         return [

@@ -3,9 +3,8 @@
 namespace PictaStudio\VenditioCore\Packages\Advanced\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
 
