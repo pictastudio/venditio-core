@@ -13,6 +13,12 @@ use PictaStudio\VenditioCore\Pipelines\Order;
 
 return [
 
+    'activity_log' => [
+        'enabled' => env('VENDITIO_CORE_ACTIVITY_LOG_ENABLED', false),
+        'log_name' => env('VENDITIO_CORE_ACTIVITY_LOG_NAME', 'venditio-core'),
+        'log_except' => env('VENDITIO_CORE_ACTIVITY_LOG_EXCEPT', ['updated_at']),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Auth
