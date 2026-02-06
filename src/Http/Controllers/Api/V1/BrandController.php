@@ -20,7 +20,7 @@ class BrandController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
-        $this->authorize('viewAny', resolve_model('brand'));
+        $this->authorizeIfConfigured('viewAny', resolve_model('brand'));
 
         $filters = request()->all();
 
@@ -31,7 +31,7 @@ class BrandController extends Controller
 
     public function store(StoreBrandRequest $request): JsonResource
     {
-        $this->authorize('create', resolve_model('brand'));
+        $this->authorizeIfConfigured('create', resolve_model('brand'));
 
         return BrandResource::make(
             BrandDto::fromArray($request->validated())->create()
@@ -40,14 +40,14 @@ class BrandController extends Controller
 
     public function show(Brand $brand): JsonResource
     {
-        $this->authorize('view', $brand);
+        $this->authorizeIfConfigured('view', $brand);
 
         return BrandResource::make($brand);
     }
 
     public function update(UpdateBrandRequest $request, Brand $brand): JsonResource
     {
-        $this->authorize('update', $brand);
+        $this->authorizeIfConfigured('update', $brand);
 
         return BrandResource::make(
             BrandDto::fromArray(array_merge(
@@ -58,7 +58,7 @@ class BrandController extends Controller
 
     public function destroy(Brand $brand)
     {
-        $this->authorize('delete', $brand);
+        $this->authorizeIfConfigured('delete', $brand);
 
         $brand->delete();
 

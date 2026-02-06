@@ -24,14 +24,14 @@ return new class extends Migration
             $table->string('courier_code', 50)->nullable();
 
             // totals
-            $table->decimal('sub_total_taxable', 10, 2, unsigned: true)->comment('somma dei totali dei prodotti senza tasse');
-            $table->decimal('sub_total_tax', 10, 2, unsigned: true)->comment('somma delle tasse dei prodotti');
-            $table->decimal('sub_total', 10, 2, unsigned: true)->comment('somma dei totali dei prodotti');
-            $table->decimal('shipping_fee', 10, 2, unsigned: true)->default(0)->comment('costo spese di spedizione');
-            $table->decimal('payment_fee', 10, 2, unsigned: true)->default(0)->comment('costo spese di pagamento');
+            $table->decimal('sub_total_taxable', 10, 2)->unsigned()->comment('somma dei totali dei prodotti senza tasse');
+            $table->decimal('sub_total_tax', 10, 2)->unsigned()->comment('somma delle tasse dei prodotti');
+            $table->decimal('sub_total', 10, 2)->unsigned()->comment('somma dei totali dei prodotti');
+            $table->decimal('shipping_fee', 10, 2)->unsigned()->default(0)->comment('costo spese di spedizione');
+            $table->decimal('payment_fee', 10, 2)->unsigned()->default(0)->comment('costo spese di pagamento');
             $table->string('discount_code')->nullable()->comment('codice sconto');
-            $table->decimal('discount_amount', 10, 2, unsigned: true)->default(0)->comment('valore assoluto dello sconto sull\'ordine');
-            $table->decimal('total_final', 10, 2, unsigned: true)->comment('totale finale ordine');
+            $table->decimal('discount_amount', 10, 2)->unsigned()->default(0)->comment('valore assoluto dello sconto sull\'ordine');
+            $table->decimal('total_final', 10, 2)->unsigned()->comment('totale finale ordine');
 
             // user
             $table->string('user_first_name');

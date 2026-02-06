@@ -9,7 +9,7 @@ class UpdateBrandRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('brand:update');
+        return $this->user()?->can('brand:update') ?? true;
     }
 
     public function rules(BrandValidationRules $brandValidationRules): array

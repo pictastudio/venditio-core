@@ -57,6 +57,19 @@ class Controller extends BaseController
             );
     }
 
+    protected function authorizeIfConfigured(string $ability, mixed $arguments): void
+    {
+        if (!config('venditio-core.policies.register')) {
+            return;
+        }
+
+        if (!auth()->check()) {
+            return;
+        }
+
+        $this->authorize($ability, $arguments);
+    }
+
     public function successJsonResponse(array|string $data = [], ?string $message = null, int $status = Response::HTTP_OK): JsonResponse
     {
         return $this->jsonResponse($data, $message, $status);

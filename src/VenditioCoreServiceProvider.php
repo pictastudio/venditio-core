@@ -26,6 +26,8 @@ use PictaStudio\VenditioCore\Packages\Simple\Validations\AddressValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\CartLineValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\CartValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\OrderValidation;
+use PictaStudio\VenditioCore\Packages\Simple\Validations\ProductCategoryValidation;
+use PictaStudio\VenditioCore\Packages\Simple\Validations\ProductValidation;
 use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
 use PictaStudio\VenditioCore\Packages\Tools\Package;
 use PictaStudio\VenditioCore\Packages\Tools\PackageServiceProvider as ToolsPackageServiceProvider;
@@ -33,6 +35,8 @@ use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\OrderValidationRules;
+use PictaStudio\VenditioCore\Validations\Contracts\ProductCategoryValidationRules;
+use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
@@ -97,6 +101,8 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
             CartValidationRules::class => CartValidation::class,
             CartLineValidationRules::class => CartLineValidation::class,
             OrderValidationRules::class => OrderValidation::class,
+            ProductValidationRules::class => ProductValidation::class,
+            ProductCategoryValidationRules::class => ProductCategoryValidation::class,
         ];
 
         foreach ($validations as $contract => $implementation) {

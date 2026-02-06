@@ -9,7 +9,7 @@ class UpdateAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('address:update');
+        return $this->user()?->can('address:update') ?? true;
     }
 
     public function rules(AddressValidationRules $addressValidationRules): array

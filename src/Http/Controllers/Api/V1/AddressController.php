@@ -20,7 +20,7 @@ class AddressController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
-        $this->authorize('viewAny', resolve_model('address'));
+        $this->authorizeIfConfigured('viewAny', resolve_model('address'));
 
         $filters = request()->all();
 
@@ -31,7 +31,7 @@ class AddressController extends Controller
 
     public function store(StoreAddressRequest $request): JsonResource
     {
-        $this->authorize('create', resolve_model('address'));
+        $this->authorizeIfConfigured('create', resolve_model('address'));
 
         return AddressResource::make(
             AddressDto::fromArray($request->validated())->create()
@@ -40,14 +40,14 @@ class AddressController extends Controller
 
     public function show(Address $address): JsonResource
     {
-        $this->authorize('view', $address);
+        $this->authorizeIfConfigured('view', $address);
 
         return AddressResource::make($address);
     }
 
     public function update(UpdateAddressRequest $request, Address $address): JsonResource
     {
-        $this->authorize('update', $address);
+        $this->authorizeIfConfigured('update', $address);
 
         return AddressResource::make(
             AddressDto::fromArray(array_merge(
@@ -59,7 +59,7 @@ class AddressController extends Controller
 
     public function destroy(Address $address)
     {
-        $this->authorize('delete', $address);
+        $this->authorizeIfConfigured('delete', $address);
 
         $address->delete();
 

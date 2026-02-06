@@ -9,7 +9,7 @@ class StoreCartRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('cart:create');
+        return $this->user()?->can('cart:create') ?? true;
     }
 
     public function rules(CartValidationRules $cartValidationRules): array
