@@ -4,12 +4,12 @@ namespace PictaStudio\VenditioCore\Packages\Advanced\Actions\Products;
 
 use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
 
-class CreateProductItemForVariants
+class CreateProductVariants
 {
     /**
-     * Create product items for the variants of the product
+     * Create variant products for the given product
      *
-     * from productVariants and productVariantOptions compute the matrix of productVariantOptions to create productItems
+     * from productVariants and productVariantOptions compute the matrix of productVariantOptions to create variants
      *
      * @param  array  $productVariants  associative array where the key is the productVariant id and the value is the array of productVariantOptions
      */

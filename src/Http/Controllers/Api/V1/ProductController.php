@@ -5,16 +5,11 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductItem\StoreProductItemRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductItem\UpdateProductItemRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Product\StoreProductRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Product\UpdateProductRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductResource;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductItem;
-use PictaStudio\VenditioCore\Packages\Simple\Http\Controllers\Api\V1\ProductController as SimpleProductController;
-use PictaStudio\VenditioCore\Packages\Advanced\Http\Controllers\Api\V1\ProductController as AdvancedProductController;
-use PictaStudio\VenditioCore\Packages\Tools\PackageType;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
@@ -22,33 +17,33 @@ class ProductController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
-        if (VenditioCore::isSimple()) {
-            return app(SimpleProductController::class)->index();
-        }
+        $filters = request()->all();
 
-        return app(AdvancedProductController::class)->index();
+        return ProductResource::collection(
+            $this->applyBaseFilters(query('product'), $filters, 'product')
+        );
     }
 
-    public function store(StoreProductItemRequest $request)
+    public function store(StoreProductRequest $request)
     {
-        // $this->authorize('create', ProductItem::class);
+        // $this->authorize('create', Product::class);
 
-        // $productItem = ProductItem::create($request->all());
+        // $product = Product::create($request->all());
 
-        // return ProductResource::make($productItem);
+        // return ProductResource::make($product);
     }
 
-    public function show(ProductItem $productItem): JsonResource
+    public function show(Product $product): JsonResource
     {
-        return ProductResource::make($productItem);
+        return ProductResource::make($product);
     }
 
-    public function update(UpdateProductItemRequest $request, ProductItem $productItem)
+    public function update(UpdateProductRequest $request, Product $product)
     {
 
     }
 
-    public function destroy(ProductItem $productItem)
+    public function destroy(Product $product)
     {
 
     }

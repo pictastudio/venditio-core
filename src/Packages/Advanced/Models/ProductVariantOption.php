@@ -39,8 +39,8 @@ class ProductVariantOption extends Model
         return $this->belongsTo(resolve_model('product_variant'));
     }
 
-    public function productItems(): BelongsToMany
+    public function products(): BelongsToMany
     {
-        return $this->belongsToMany(resolve_model('product_item'), 'product_configuration');
+        return $this->belongsToMany(resolve_model('product'), 'product_configuration');
     }
 }

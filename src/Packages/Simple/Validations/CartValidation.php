@@ -18,7 +18,6 @@ class CartValidation implements CartValidationRules
             'addresses' => 'nullable|array',
             ...$this->getAddressValidationRulesFromEnum(),
             'lines' => 'sometimes|array',
-            'lines.*.product_item_id' => 'missing',
             'lines.*.product_id' => 'sometimes|integer|exists:products,id',
             'lines.*.qty' => 'sometimes|integer|min:1',
 
@@ -36,7 +35,6 @@ class CartValidation implements CartValidationRules
             'discount_code' => 'nullable|string',
             ...$this->getAddressValidationRulesFromEnum(),
             'lines' => 'nullable|array',
-            'lines.*.product_item_id' => 'missing',
             'lines.*.product_id' => 'nullable|integer|exists:products,id',
             'lines.*.qty' => 'nullable|integer|min:1|required_with:lines.*.product_id',
         ];

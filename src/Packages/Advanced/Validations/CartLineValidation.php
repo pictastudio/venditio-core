@@ -10,7 +10,7 @@ class CartLineValidation implements CartLineValidationRules
     {
         return [
             'lines' => 'required|array',
-            'lines.*.product_item_id' => 'required|integer|exists:product_items,id',
+            'lines.*.product_id' => 'required|integer|exists:products,id',
             'lines.*.qty' => 'required|integer|min:1',
         ];
     }
@@ -20,7 +20,7 @@ class CartLineValidation implements CartLineValidationRules
         return [
             'lines' => 'required|array',
             'lines.*.id' => 'required|integer|exists:cart_lines,id',
-            // 'lines.*.product_item_id' => 'required|integer|exists:product_items,id',
+            // 'lines.*.product_id' => 'required|integer|exists:products,id',
             'lines.*.qty' => 'required|integer|min:1',
         ];
     }

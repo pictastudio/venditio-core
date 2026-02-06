@@ -152,7 +152,7 @@ class OrderDto extends Dto implements OrderDtoContract
     }
 
     /**
-     * @return Collection<[['product_item_id' => int, 'qty' => int]]>
+     * @return Collection<[['product_id' => int, 'qty' => int]]>
      */
     public function getLines(): Collection
     {

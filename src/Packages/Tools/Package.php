@@ -3,14 +3,11 @@
 namespace PictaStudio\VenditioCore\Packages\Tools;
 
 use Illuminate\Support\Str;
-use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 
 class Package extends SpatiePackage
 {
-    public ?PackageType $packageType = null;
-
     public string $name;
 
     public array $configFileNames = [];
@@ -45,33 +42,13 @@ class Package extends SpatiePackage
 
     public ?string $publishableProviderName = null;
 
-    public function packageType(PackageType $packageType): static
-    {
-        $this->packageType = $packageType;
-        VenditioCore::packageType($packageType);
-
-        return $this;
-    }
-
-    public function getPackageType(): PackageType
-    {
-        return $this->packageType ?? PackageType::Simple;
-    }
-
-    public function getPackageTypeBasePath(?string $subFolder = null, ?string $path = null): string
-    {
-        return $this->basePath(
-            $this->getPackageType()->getPath($subFolder, $path)
-        );
-    }
-
-    public function registerMigrationsForType(bool $isFromInstallCommand = false): static
+    public function registerMigrations(bool $isFromInstallCommand = false): static
     {
         if ($isFromInstallCommand) {
             $this->migrationFileNames = [];
         }
 
-        $migrationsBasePath = $this->getPackageTypeBasePath('migrations');
+        $migrationsBasePath = $this->basePath('/../database/migrations');
 
         $this->hasMigrations(
             collect(scandir($migrationsBasePath))

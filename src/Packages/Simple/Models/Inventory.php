@@ -42,9 +42,6 @@ class Inventory extends Model
     //     );
     // }
 
-    /**
-     * the simple version doesn't have the ProductItem model, instead it relates directly to the Product model for simplicity
-     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(resolve_model('product'));

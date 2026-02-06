@@ -3,8 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductItem;
 use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductVariantOption;
+use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
 
 return new class extends Migration
 {
@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('product_configuration', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(ProductItem::class);
+            $table->foreignIdFor(Product::class);
             $table->foreignIdFor(ProductVariantOption::class);
             $table->datetimes();
         });

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,8 @@ use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\Active;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Scopes\InDateRange;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\HasHelperMethods;
 use PictaStudio\VenditioCore\Packages\Simple\Models\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
@@ -21,6 +24,7 @@ class Product extends Model
 {
     use HasFactory;
     use HasHelperMethods;
+    use HasSlug;
     use LogsActivity;
     use SoftDeletes;
 
@@ -64,9 +68,24 @@ class Product extends Model
         return $this->belongsTo(resolve_model('brand'));
     }
 
+    public function productType(): BelongsTo
+    {
+        return $this->belongsTo(resolve_model('product_type'));
+    }
+
     public function taxClass(): BelongsTo
     {
         return $this->belongsTo(resolve_model('tax_class'));
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function categories(): BelongsToMany
@@ -83,5 +102,17 @@ class Product extends Model
     public function inventory(): HasOne
     {
         return $this->hasOne(resolve_model('inventory'));
+    }
+
+    public function variantOptions(): BelongsToMany
+    {
+        return $this->belongsToMany(resolve_model('product_variant_option'), 'product_configuration');
+    }
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug');
     }
 }

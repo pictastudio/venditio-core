@@ -5,7 +5,6 @@ namespace PictaStudio\VenditioCore\Helpers\Functions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Packages\Simple\Models\User;
 
@@ -21,25 +20,19 @@ if (!function_exists('auth_manager')) {
 
 if (!function_exists('resolve_model')) {
     /**
-     * Tries to resolve the model for the configured package type: simple or advanced,
-     * if the model is not found for the configured package type, it will try to resolve it from the simple package
+     * Resolve the configured model class
      *
      * @param string $model Can be one of the following values:
      *                      'address', 'brand', 'cart', 'cart_line', 'country', 
      *                      'country_tax_class', 'currency', 'discount', 'inventory', 
      *                      'order', 'order_line', 'product', 'product_category', 
      *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_item', 'product_type',
+     *                      'product_custom_field', 'product_type',
      *                      'product_variant', 'product_variant_option'
      */
     function resolve_model(string $model): string
     {
-        $packageType = VenditioCore::getPackageType();
-
-        return config(
-            'venditio-core.models.' . $packageType->value . '.' . $model,
-            config('venditio-core.models.simple.' . $model)
-        );
+        return config('venditio-core.models.' . $model);
     }
 }
 
@@ -52,7 +45,7 @@ if (!function_exists('query')) {
      *                      'country_tax_class', 'currency', 'discount', 'inventory', 
      *                      'order', 'order_line', 'product', 'product_category', 
      *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_item', 'product_type',
+     *                      'product_custom_field', 'product_type',
      *                      'product_variant', 'product_variant_option'
      */
     function query(string $model): Builder
@@ -70,36 +63,12 @@ if (!function_exists('get_fresh_model_instance')) {
      *                      'country_tax_class', 'currency', 'discount', 'inventory', 
      *                      'order', 'order_line', 'product', 'product_category', 
      *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_item', 'product_type',
+     *                      'product_custom_field', 'product_type',
      *                      'product_variant', 'product_variant_option'
      */
     function get_fresh_model_instance(string $model): Model
     {
         return (new (resolve_model($model)))->updateTimestamps();
-    }
-}
-
-if (!function_exists('resolve_purchasable_product_model')) {
-    /**
-     * Resolve the product model for the current package
-     * 
-     * - if simple package is used -> PictaStudio\VenditioCore\Packages\Simple\Models\Product
-     * - if advanced package is used -> PictaStudio\VenditioCore\Packages\Advanced\Models\ProductItem
-     */
-    function resolve_purchasable_product_model(): string
-    {
-        if (VenditioCore::isSimple()) {
-            return resolve_model('product');
-        }
-    
-        return resolve_model('product_item');
-    }
-}
-
-if (!function_exists('query_purchasable_product_model')) {
-    function query_purchasable_product_model(): Builder
-    {
-        return resolve_purchasable_product_model()::query();
     }
 }
 

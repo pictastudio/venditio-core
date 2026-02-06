@@ -40,8 +40,7 @@ Considering these variants:
 | M    | white |
 | L    | red   |
 
-All this variants are computed using a `product_variant` and `product_variant_options` table and then for each possible combination of these variations a `ProductItem` is created (with a `product_id` field to keep the reference to the original product)\
-`ProductItem` as written above is the final purchasable item and is the one that should be assigned a unique [sku](https://corporatefinanceinstitute.com/resources/accounting/stock-keeping-unit-sku/#:~:text=A%20stock%20keeping%20unit%20or,and%20more%20efficient%20record%2Dkeeping)
+All the variants are computed using `product_variants` and `product_variant_options`. Each concrete variant is stored as a `products` row with a `parent_id` that points to the base product. The variant row is the purchasable item and is the one that should be assigned a unique [sku](https://corporatefinanceinstitute.com/resources/accounting/stock-keeping-unit-sku/#:~:text=A%20stock%20keeping%20unit%20or,and%20more%20efficient%20record%2Dkeeping).
 
 | product_id | size | color |
 |------------|------|-------|
@@ -58,26 +57,7 @@ All this variants are computed using a `product_variant` and `product_variant_op
 ## Usage
 
 ## Configuration
-The first thing to do before using this package is to configure the type you want to use: `Simple` or `Advanced` inside the `AppServiceProvider`
-
-By default the package will use simple but it's always better to explicitate it in your `AppServiceProvider` for clarity
-```php
-use Illuminate\Support\ServiceProvider;
-use PictaStudio\VenditioCore\Facades\VenditioCore;
-use PictaStudio\VenditioCore\Packages\Tools\PackageType;
-
-class AppServiceProvider extends ServiceProvider
-{
-    public function boot(): void
-    {
-        VenditioCore::packageType(PackageType::Simple);
-
-        // or
-
-        VenditioCore::packageType(PackageType::Advanced);
-    }
-}
-```
+No package type configuration is required. All behavior is configured via the `venditio-core` config file.
 
 ### Seeding Data
 Add the following seeders to your `DatabaseSeeder` to seed the initial data used by the package, this will seed the countries data as well as a root user, then it will create all the roles and permissions based on the [auth section of the config](#auth)
@@ -341,12 +321,7 @@ function auth_manager(User|Authenticatable|null $user = null): AuthManagerContra
  */
 function resolve_model(string $model): string
 {
-    $packageType = VenditioCore::getPackageType();
-
-    return config(
-        'venditio-core.models.' . $packageType->value . '.' . $model,
-        config('venditio-core.models.simple.' . $model)
-    );
+    return config('venditio-core.models.' . $model);
 }
 
 function query(string $model): Builder
@@ -358,47 +333,17 @@ function get_fresh_model_instance(string $model): Model
 {
     return new (resolve_model($model));
 }
-
-/**
- * if package type is simple the product_item model it's not used
- * so this will resolve product model
- */
-function resolve_purchasable_product_model(): string
-{
-    if (VenditioCore::isSimple()) {
-        return resolve_model('product');
-    }
-
-    return resolve_model('product_item');
-}
 ```
 
 ### Api
 #### Routes
-Routes are dynamically registered based on the package type configuration
+Routes are registered once, without package type branching
 ```php
-if (VenditioCore::isAdvanced()) {
-    Route::apiResource('product_items', ProductItemController::class)->only(['index', 'show']);
-}
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 ```
 
 #### Controllers
-Controllers that are present both in the simple and advanced version are placed inside `Http\Controllers\Api` then inside the function there's an if statement to determine which controller to hit: the simple (`Packages\Simple\Http\Controllers\Api`) or the advanced one (`Packages\Advanced\Http\Controllers\Api`)
-```php
-// example of an index method
-if (VenditioCore::isSimple()) {
-    return app(SimpleProductController::class)->index();
-}
-
-return app(AdvancedProductController::class)->index();
-```
-
-Controllers that exists only in one version such as `ProductItemController` (which exists only in the advanced version) are hit directly from the `routes/api` file
-```php
-if (VenditioCore::isAdvanced()) {
-    Route::apiResource('product_items', ProductItemController::class)->only(['index', 'show']);
-}
-```
+Controllers live directly under `Http\Controllers\Api` and do not switch at runtime.
 
 #### Http Resources
 Example of an http resource, with the array key (`product_item.images`) we are telling which attribute we want to mutate and then the closure accepts as a parameter the value of that attribute
@@ -407,7 +352,7 @@ You can use dot notation to access attributes because under the hood it uses `Ar
 protected function transformAttributes(): array
 {
     return [
-        'product_item.images' => fn (?array $images) => (
+        'product.images' => fn (?array $images) => (
             collect($images)
                 ->map(fn (array $image) => [
                     'alt' => $image['alt'],
@@ -415,7 +360,7 @@ protected function transformAttributes(): array
                 ])
                 ->toArray()
         ),
-        'product_item.files' => fn (?array $files) => (
+        'product.files' => fn (?array $files) => (
             collect($files)
                 ->map(fn (array $file) => [
                     'name' => $file['name'],

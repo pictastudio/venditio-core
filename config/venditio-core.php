@@ -74,40 +74,32 @@ return [
     | Models
     |--------------------------------------------------------------------------
     |
-    | Specify the models to use for simple and advanced packages
+    | Specify the models to use
     |
-    | Some models are present only in the simple package and some only in the advanced package,
-    | like for example the Address model is present only in the simple package beacause it would be
-    | redundant to have it in the advanced package since nothing changes
+    | Host applications can override any model class to extend behavior.
     |
     */
     'models' => [
-        'simple' => [
-            'address' => Simple\Models\Address::class,
-            'brand' => Simple\Models\Brand::class,
-            'cart' => Simple\Models\Cart::class,
-            'cart_line' => Simple\Models\CartLine::class,
-            'country' => Simple\Models\Country::class,
-            'country_tax_class' => Simple\Models\CountryTaxClass::class,
-            'currency' => Simple\Models\Currency::class,
-            'discount' => Simple\Models\Discount::class,
-            'inventory' => Simple\Models\Inventory::class,
-            'order' => Simple\Models\Order::class,
-            'order_line' => Simple\Models\OrderLine::class,
-            'product' => Simple\Models\Product::class,
-            'product_category' => Simple\Models\ProductCategory::class,
-            'shipping_status' => Simple\Models\ShippingStatus::class,
-            'tax_class' => Simple\Models\TaxClass::class,
-            'user' => Simple\Models\User::class,
-        ],
-        'advanced' => [
-            'product' => Advanced\Models\Product::class,
-            'product_custom_field' => Advanced\Models\ProductCustomField::class,
-            'product_item' => Advanced\Models\ProductItem::class,
-            'product_type' => Advanced\Models\ProductType::class,
-            'product_variant' => Advanced\Models\ProductVariant::class,
-            'product_variant_option' => Advanced\Models\ProductVariantOption::class,
-        ],
+        'address' => Simple\Models\Address::class,
+        'brand' => Simple\Models\Brand::class,
+        'cart' => Simple\Models\Cart::class,
+        'cart_line' => Simple\Models\CartLine::class,
+        'country' => Simple\Models\Country::class,
+        'country_tax_class' => Simple\Models\CountryTaxClass::class,
+        'currency' => Simple\Models\Currency::class,
+        'discount' => Simple\Models\Discount::class,
+        'inventory' => Simple\Models\Inventory::class,
+        'order' => Simple\Models\Order::class,
+        'order_line' => Simple\Models\OrderLine::class,
+        'product' => Simple\Models\Product::class,
+        'product_category' => Simple\Models\ProductCategory::class,
+        'shipping_status' => Simple\Models\ShippingStatus::class,
+        'tax_class' => Simple\Models\TaxClass::class,
+        'user' => Simple\Models\User::class,
+        'product_custom_field' => Advanced\Models\ProductCustomField::class,
+        'product_type' => Advanced\Models\ProductType::class,
+        'product_variant' => Advanced\Models\ProductVariant::class,
+        'product_variant_option' => Advanced\Models\ProductVariantOption::class,
     ],
 
     /*

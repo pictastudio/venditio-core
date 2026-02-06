@@ -21,10 +21,6 @@ use PictaStudio\VenditioCore\Generators\CartIdentifierGenerator;
 use PictaStudio\VenditioCore\Generators\OrderIdentifierGenerator;
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\CartLineValidation as CartLineValidationAdvanced;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\CartValidation as CartValidationAdvanced;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product as SimpleProduct;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\Product as AdvancedProduct;
 use PictaStudio\VenditioCore\Packages\Simple\Models\User;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\AddressValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\CartLineValidation;
@@ -33,12 +29,12 @@ use PictaStudio\VenditioCore\Packages\Simple\Validations\OrderValidation;
 use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
 use PictaStudio\VenditioCore\Packages\Tools\Package;
 use PictaStudio\VenditioCore\Packages\Tools\PackageServiceProvider as ToolsPackageServiceProvider;
-use PictaStudio\VenditioCore\Packages\Tools\PackageType;
 use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\OrderValidationRules;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
 {
@@ -96,18 +92,12 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
 
     private function bindValidationClasses(): void
     {
-        // defaults to simple package but can be overridden by the advanced package
         $validations = [
             AddressValidationRules::class => AddressValidation::class,
             CartValidationRules::class => CartValidation::class,
             CartLineValidationRules::class => CartLineValidation::class,
             OrderValidationRules::class => OrderValidation::class,
         ];
-
-        if (VenditioCoreFacade::isAdvanced()) {
-            $validations[CartValidationRules::class] = CartValidationAdvanced::class;
-            $validations[CartLineValidationRules::class] = CartLineValidationAdvanced::class;
-        }
 
         foreach ($validations as $contract => $implementation) {
             $this->app->singleton($contract, $implementation);
@@ -152,13 +142,11 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
 
     private function registerFactoriesGuessing(): void
     {
-        $baseNamespace = match (VenditioCoreFacade::getPackageType()) {
-            PackageType::Simple => 'PictaStudio\\VenditioCore\\Packages\\Simple\\Database\\Factories',
-            PackageType::Advanced => 'PictaStudio\\VenditioCore\\Packages\\Advanced\\Database\\Factories',
-        };
-
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => $baseNamespace . '\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => str($modelName)
+                ->replace('Models', 'Database\\Factories')
+                ->append('Factory')
+                ->toString()
         );
     }
 
@@ -168,13 +156,8 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
             'user' => User::class,
         ];
 
-        if (VenditioCoreFacade::isSimple()) {
-            $morphMap['product'] = SimpleProduct::class;
-            $morphMap['product_item'] = SimpleProduct::class;
-        } else {
-            $morphMap['product'] = AdvancedProduct::class;
-            $morphMap['product_item'] = AdvancedProduct::class;
-        }
+        $productModel = resolve_model('product');
+        $morphMap['product'] = $productModel;
 
         Relation::morphMap($morphMap);
     }

@@ -5,7 +5,6 @@ namespace PictaStudio\VenditioCore\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\URL;
-use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
 
@@ -34,10 +33,8 @@ class CartLineResource extends JsonResource
 
     protected function transformAttributes(): array
     {
-        $key = VenditioCore::isSimple() ? 'product' : 'product_item';
-
         return [
-            $key . '.images' => fn (?array $images) => (
+            'product.images' => fn (?array $images) => (
                 collect($images)
                     ->map(fn (array $image) => [
                         'alt' => $image['alt'],
@@ -45,7 +42,7 @@ class CartLineResource extends JsonResource
                     ])
                     ->toArray()
             ),
-            $key . '.files' => fn (?array $files) => (
+            'product.files' => fn (?array $files) => (
                 collect($files)
                     ->map(fn (array $file) => [
                         'name' => $file['name'],

@@ -69,7 +69,7 @@ class FillOrderFromCart
             $orderLine = get_fresh_model_instance('order_line');
 
             return $orderLine->fill([
-                'product_item_id' => $cartLine->product_item_id,
+                'product_id' => $cartLine->product_id,
                 'product_name' => $cartLine->product_name,
                 'product_sku' => $cartLine->product_sku,
                 'unit_price' => $cartLine->unit_price,
@@ -80,7 +80,7 @@ class FillOrderFromCart
                 'qty' => $cartLine->qty,
                 'total_final_price' => $cartLine->total_final_price,
                 'tax_rate' => $cartLine->tax_rate,
-                'product_item' => $cartLine->product_item,
+                'product_data' => $cartLine->product,
             ]);
         });
     }

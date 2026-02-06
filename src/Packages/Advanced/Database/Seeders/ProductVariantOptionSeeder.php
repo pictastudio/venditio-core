@@ -3,7 +3,7 @@
 namespace PictaStudio\VenditioCore\Packages\Advanced\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Packages\Simple\Models\ProductVariantOption;
+use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductVariantOption;
 
 class ProductVariantOptionSeeder extends Seeder
 {

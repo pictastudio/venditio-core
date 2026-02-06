@@ -5,12 +5,10 @@ namespace PictaStudio\VenditioCore\Packages\Tools\Commands;
 use Closure;
 use Illuminate\Support\Str;
 use PictaStudio\VenditioCore\Packages\Tools\Package;
-use PictaStudio\VenditioCore\Packages\Tools\PackageType;
 use Spatie\LaravelPackageTools\Commands\InstallCommand as SpatieInstallCommand;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\select;
 
 class InstallCommand extends SpatieInstallCommand
 {
@@ -40,16 +38,7 @@ class InstallCommand extends SpatieInstallCommand
 
     public function handle()
     {
-        $type = select(
-            'What type of package do you want to install?',
-            [PackageType::Simple->value, PackageType::Advanced->value]
-        );
-
-        $this->components->info("Installing {$type} version");
-
-        $this->package->packageType(PackageType::from($type));
-
-        $this->package->registerMigrationsForType(true);
+        $this->package->registerMigrations(true);
 
         $this->copyMigrationsToApp();
 

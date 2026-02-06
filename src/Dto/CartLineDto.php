@@ -31,7 +31,9 @@ class CartLineDto extends Dto implements CartLineDtoContract
         return new static(
             // cart: resolve_dto('cart')::fromArray($data['cart']),
             cartLine: $data['cart_line'] ?? static::getFreshInstance(),
-            purchasableModelId: $data['purchasable_model_id'] ?? null,
+            purchasableModelId: $data['purchasable_model_id']
+                ?? $data['product_id']
+                ?? null,
             qty: $data['qty'] ?? 0,
         );
     }
