@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('city', 100);
             $table->string('state', 10);
             $table->string('zip', 10);
+            $table->string('country', 100);
             $table->date('birth_date')->nullable();
             $table->string('birth_place', 100)->nullable();
             $table->text('notes')->nullable();

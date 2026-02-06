@@ -29,6 +29,7 @@ class AddressDto extends Dto implements AddressDtoContract
         private ?string $city,
         private ?string $state,
         private ?string $zip,
+        private ?string $country,
         private ?string $birthDate,
         private ?string $birthPlace,
         private ?string $notes,
@@ -140,6 +141,11 @@ class AddressDto extends Dto implements AddressDtoContract
         return $this->zip;
     }
 
+    public function getCountry(): ?string
+    {
+        return $this->country;
+    }
+
     public function getBirthDate(): null|string|Date
     {
         return $this->birthDate;
@@ -157,28 +163,38 @@ class AddressDto extends Dto implements AddressDtoContract
 
     public function create(): Model
     {
-        return $this->getAddressable()
-            ?->addresses()
-            ?->create([
-                'type' => config('venditio-core.addresses.type_enum')::tryFrom($this->getType()),
-                'is_default' => $this->getIsDefault(),
-                'first_name' => $this->getFirstName(),
-                'last_name' => $this->getLastName(),
-                'email' => $this->getEmail(),
-                'sex' => $this->getSex(),
-                'phone' => $this->getPhone(),
-                'vat_number' => $this->getVatNumber(),
-                'fiscal_code' => $this->getFiscalCode(),
-                'company_name' => $this->getCompanyName(),
-                'address_line_1' => $this->getAddressLine1(),
-                'address_line_2' => $this->getAddressLine2(),
-                'city' => $this->getCity(),
-                'state' => $this->getState(),
-                'zip' => $this->getZip(),
-                'birth_date' => $this->getBirthDate(),
-                'birth_place' => $this->getBirthPlace(),
-                'notes' => $this->getNotes(),
-            ]);
+        $addressable = $this->getAddressable();
+
+        if (!$addressable) {
+            throw new \RuntimeException('No addressable entity found to attach address to.');
+        }
+
+        $addressData = [
+            'type' => config('venditio-core.addresses.type_enum')::tryFrom($this->getType()),
+            'is_default' => $this->getIsDefault(),
+            'first_name' => $this->getFirstName(),
+            'last_name' => $this->getLastName(),
+            'email' => $this->getEmail(),
+            'sex' => $this->getSex(),
+            'phone' => $this->getPhone(),
+            'vat_number' => $this->getVatNumber(),
+            'fiscal_code' => $this->getFiscalCode(),
+            'company_name' => $this->getCompanyName(),
+            'address_line_1' => $this->getAddressLine1(),
+            'address_line_2' => $this->getAddressLine2(),
+            'city' => $this->getCity(),
+            'state' => $this->getState(),
+            'zip' => $this->getZip(),
+            'country' => $this->getCountry(),
+            'birth_date' => $this->getBirthDate(),
+            'birth_place' => $this->getBirthPlace(),
+            'notes' => $this->getNotes(),
+        ];
+
+        // Remove null values to prevent overwriting defaults with null
+        $addressData = array_filter($addressData, fn($value) => $value !== null);
+
+        return $addressable->addresses()->create($addressData);
     }
 
     public function update(): Model
@@ -201,6 +217,7 @@ class AddressDto extends Dto implements AddressDtoContract
             'city' => $this->getCity(),
             'state' => $this->getState(),
             'zip' => $this->getZip(),
+            'country' => $this->getCountry(),
             'birth_date' => $this->getBirthDate(),
             'birth_place' => $this->getBirthPlace(),
             'notes' => $this->getNotes(),

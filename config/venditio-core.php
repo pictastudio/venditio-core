@@ -19,6 +19,10 @@ return [
         'log_except' => env('VENDITIO_CORE_ACTIVITY_LOG_EXCEPT', ['updated_at']),
     ],
 
+    'policies' => [
+        'register' => env('VENDITIO_CORE_POLICIES_REGISTER', true),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Auth

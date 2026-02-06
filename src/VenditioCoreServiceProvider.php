@@ -131,7 +131,9 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
             JsonResource::withoutWrapping();
         }
 
-        VenditioCoreFacade::registerPolicies();
+        if (config('venditio-core.policies.register')) {
+            VenditioCoreFacade::registerPolicies();
+        }
 
         $prefix = config('venditio-core.routes.api.v1.prefix');
 
