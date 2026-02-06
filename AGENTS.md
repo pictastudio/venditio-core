@@ -28,7 +28,6 @@ Think in terms of **stable APIs, extensibility, and zero frontend assumptions**.
 - Clear, versioned public APIs
 - Convention + configuration
 - Opt-in behavior with safe defaults
-- Backwards compatibility is critical
 
 ## Package Architecture
 
@@ -98,6 +97,7 @@ Think in terms of **stable APIs, extensibility, and zero frontend assumptions**.
 - Table names must be configurable
 - Avoid hard-coded relationships to host app models
 - Assume a `User` model exists
+- When getting the primary key of a model (like the id) use the ->getKey() method on the model instance
 
 ## Authorization & Security
 
@@ -129,7 +129,7 @@ Think in terms of **stable APIs, extensibility, and zero frontend assumptions**.
 
 ## Testing
 
-- Use Orchestra Testbench
+- Use Orchestra Testbench and pest php
 - Test:
   - Service provider boot
   - Route registration

@@ -47,6 +47,9 @@ return [
             'product',
             'product-category',
             'brand',
+            'product-type',
+            'product-variant',
+            'product-variant-option',
         ],
         'actions' => [
             'view-any',
@@ -249,6 +252,27 @@ return [
     'product' => [
         'status_enum' => Enums\ProductStatus::class,
         'measuring_unit_enum' => Enums\ProductMeasuringUnit::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Product Variants
+    |--------------------------------------------------------------------------
+    |
+    */
+    'product_variants' => [
+        'name_separator' => ' / ',
+        'name_suffix_separator' => ' - ',
+        'copy_categories' => true,
+        'copy_attributes_exclude' => [
+            'id',
+            'slug',
+            'sku',
+            'ean',
+            'created_at',
+            'updated_at',
+            'deleted_at',
+        ],
     ],
 
     /*

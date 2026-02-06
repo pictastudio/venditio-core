@@ -11,11 +11,6 @@ trait HasHelperMethods
         return app(static::class)->getTable();
     }
 
-    public static function getKeyName(): string
-    {
-        return app(static::class)->getKeyName();
-    }
-
     public static function getResourceLabel(): string
     {
         return str(static::class)

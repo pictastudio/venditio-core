@@ -41,6 +41,7 @@ class ProductVariantOption extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(resolve_model('product'), 'product_configuration');
+        return $this->belongsToMany(resolve_model('product'), 'product_configuration')
+            ->withTimestamps();
     }
 }

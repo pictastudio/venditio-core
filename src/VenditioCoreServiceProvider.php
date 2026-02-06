@@ -28,6 +28,9 @@ use PictaStudio\VenditioCore\Packages\Simple\Validations\CartValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\OrderValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\ProductCategoryValidation;
 use PictaStudio\VenditioCore\Packages\Simple\Validations\ProductValidation;
+use PictaStudio\VenditioCore\Packages\Advanced\Validations\ProductTypeValidation;
+use PictaStudio\VenditioCore\Packages\Advanced\Validations\ProductVariantValidation;
+use PictaStudio\VenditioCore\Packages\Advanced\Validations\ProductVariantOptionValidation;
 use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
 use PictaStudio\VenditioCore\Packages\Tools\Package;
 use PictaStudio\VenditioCore\Packages\Tools\PackageServiceProvider as ToolsPackageServiceProvider;
@@ -37,6 +40,9 @@ use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\OrderValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\ProductCategoryValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
+use PictaStudio\VenditioCore\Validations\Contracts\ProductTypeValidationRules;
+use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantValidationRules;
+use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantOptionValidationRules;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
@@ -103,6 +109,9 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
             OrderValidationRules::class => OrderValidation::class,
             ProductValidationRules::class => ProductValidation::class,
             ProductCategoryValidationRules::class => ProductCategoryValidation::class,
+            ProductTypeValidationRules::class => ProductTypeValidation::class,
+            ProductVariantValidationRules::class => ProductVariantValidation::class,
+            ProductVariantOptionValidationRules::class => ProductVariantOptionValidation::class,
         ];
 
         foreach ($validations as $contract => $implementation) {

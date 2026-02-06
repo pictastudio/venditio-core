@@ -7,6 +7,9 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\V1\CartController;
 use PictaStudio\VenditioCore\Http\Controllers\Api\V1\OrderController;
 use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductCategoryController;
 use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductController;
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductTypeController;
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductVariantController;
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductVariantOptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +23,13 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductController;
 */
 
 Route::apiResource('products', ProductController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::get('products/{product}/variants', [ProductController::class, 'variants']);
+Route::post('products/{product}/variants', [ProductController::class, 'createVariants']);
 
 Route::apiResource('product_categories', ProductCategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::apiResource('product_types', ProductTypeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::apiResource('product_variants', ProductVariantController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::apiResource('product_variant_options', ProductVariantOptionController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 Route::apiResource('carts', CartController::class);
 Route::post('carts/{cart}/add_lines', [CartController::class, 'addLines']);
 Route::patch('carts/{cart}/update_lines', [CartController::class, 'updateLines']);

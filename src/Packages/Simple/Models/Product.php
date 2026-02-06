@@ -106,7 +106,8 @@ class Product extends Model
 
     public function variantOptions(): BelongsToMany
     {
-        return $this->belongsToMany(resolve_model('product_variant_option'), 'product_configuration');
+        return $this->belongsToMany(resolve_model('product_variant_option'), 'product_configuration')
+            ->withTimestamps();
     }
 
     public function getSlugOptions(): SlugOptions

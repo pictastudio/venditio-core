@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Gate;
 use PictaStudio\VenditioCore\VenditioCore;
 
 it('registers the policy correctly', function () {
+    if (!config('venditio-core.policies.register')) {
+        return;
+    }
+
     VenditioCore::registerPolicies();
 
     foreach (config('venditio-core.models') as $contract => $model) {

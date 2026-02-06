@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\URL;
 use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
+use PictaStudio\VenditioCore\Http\Resources\V1\ProductVariantOptionResource;
 
 class ProductResource extends JsonResource
 {
@@ -29,29 +30,45 @@ class ProductResource extends JsonResource
     protected function getRelationshipsToInclude(): array
     {
         return [
-            // 'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+            'variant_options' => ProductVariantOptionResource::collection($this->whenLoaded('variantOptions')),
         ];
     }
 
     protected function transformAttributes(): array
     {
         return [
-            'images' => fn (?array $images) => (
-                collect($images)
+            'images' => function (mixed $images) {
+                if (is_string($images)) {
+                    $images = json_decode($images, true) ?: [];
+                }
+
+                if (!is_array($images)) {
+                    return [];
+                }
+
+                return collect($images)
                     ->map(fn (array $image) => [
                         'alt' => $image['alt'],
                         'src' => URL::isValidUrl($image['src']) ? $image['src'] : asset('storage/' . $image['src']),
                     ])
-                    ->toArray()
-            ),
-            'files' => fn (?array $files) => (
-                collect($files)
+                    ->toArray();
+            },
+            'files' => function (mixed $files) {
+                if (is_string($files)) {
+                    $files = json_decode($files, true) ?: [];
+                }
+
+                if (!is_array($files)) {
+                    return [];
+                }
+
+                return collect($files)
                     ->map(fn (array $file) => [
                         'name' => $file['name'],
                         'src' => URL::isValidUrl($file['src']) ? $file['src'] : asset('storage/' . $file['src']),
                     ])
-                    ->toArray()
-            ),
+                    ->toArray();
+            },
         ];
     }
 }
