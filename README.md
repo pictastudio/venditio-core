@@ -56,6 +56,10 @@ All the variants are computed using `product_variants` and `product_variant_opti
 
 ## Usage
 
+## Documentation
+- Architecture and package design: `docs/ARCHITECTURE.md`
+- API reference and examples: `docs/API.md`
+
 ## Configuration
 No package type configuration is required. All behavior is configured via the `venditio-core` config file.
 
