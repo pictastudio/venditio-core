@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/pictastudio/venditio-core.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio-core)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio-core/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/pictastudio/venditio-core/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio-core/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/pictastudio/venditio-core/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio-core/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/pictastudio/venditio-core/actions?query=workflow%3A)
 [![Total Downloads](https://img.shields.io/packagist/dt/pictastudio/venditio-core.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio-core)
 
 **Venditio core** it's a headless e-commerce tool.
@@ -18,13 +18,8 @@ You can install the package via composer:
 composer require pictastudio/venditio-core
 ```
 
-You can initialize the package with the command below
-
-```bash
-php artisan venditio-core:install
-```
-
 ## Product Variants
+
 Venditio Core models product variants by treating a base `Product` as the parent and variant products as the purchasable items.
 This allows you to represent multiple option combinations while keeping a single product identity.
 
@@ -33,7 +28,7 @@ We have a t-shirt `Product` with id 1 that could have variants in both color and
 Considering these variants:
 
 | size | color |
-|------|-------|
+| ---- | ----- |
 | S    | black |
 | M    | white |
 | L    | red   |
@@ -41,7 +36,7 @@ Considering these variants:
 All the variants are computed using `product_variants` and `product_variant_options`. Each concrete variant is stored as a `products` row with a `parent_id` that points to the base product. The variant row is the purchasable item and is the one that should be assigned a unique [sku](https://corporatefinanceinstitute.com/resources/accounting/stock-keeping-unit-sku/#:~:text=A%20stock%20keeping%20unit%20or,and%20more%20efficient%20record%2Dkeeping).
 
 | product_id | size | color |
-|------------|------|-------|
+| ---------- | ---- | ----- |
 | 1          | S    | black |
 | 1          | M    | black |
 | 1          | L    | black |
@@ -55,13 +50,16 @@ All the variants are computed using `product_variants` and `product_variant_opti
 ## Usage
 
 ## Documentation
+
 - Architecture and package design: `docs/ARCHITECTURE.md`
 - API reference and examples: `docs/API.md`
 
 ## Configuration
+
 No edition or mode selection is required. All behavior is configured via the `venditio-core` config file.
 
 ### Seeding Data
+
 Add the following seeders to your `DatabaseSeeder` to seed the initial data used by the package, this will seed the countries data as well as a root user, then it will create all the roles and permissions based on the [auth section of the config](#auth)
 
 ```php
@@ -91,8 +89,10 @@ class DatabaseSeeder extends Seeder
 ```
 
 ### Auth
+
 Add the `HasApiTokens` trait to your user model if not already present and then update the model in the config so the package can use the correct one
 Also extend the User model from VenditioCore
+
 ```php
 namespace App\Models;
 
@@ -107,6 +107,7 @@ class User extends VenditioCoreUser
 ```
 
 then update the class in `config/venditio-core`
+
 ```php
 'models' => [
     // ...
@@ -115,6 +116,7 @@ then update the class in `config/venditio-core`
 ```
 
 If you want the package to create a root user then provide inside the `.env` file the following variables
+
 ```env
 VENDITIO_CORE_ROOT_USER_EMAIL=mail_here
 VENDITIO_CORE_ROOT_USER_PASSWORD=password_here
@@ -169,7 +171,9 @@ VENDITIO_CORE_ROOT_USER_PASSWORD=password_here
 ```
 
 ### Models
+
 Inside the config you will find a section dedicated to models configuration
+
 ```php
 /*
 |--------------------------------------------------------------------------
@@ -204,7 +208,9 @@ Inside the config you will find a section dedicated to models configuration
 ```
 
 #### Relations
+
 Relations inside models are defined dynamically by resolving the configured model class from the config.
+
 ```php
 // brand relation from Simple\Models\Product model
 public function brand(): BelongsTo
@@ -214,7 +220,9 @@ public function brand(): BelongsTo
 ```
 
 ### Validation rules
+
 Validation rules are managed inside separate classes than FormRequests
+
 ```php
 namespace PictaStudio\VenditioCore\Validations;
 
@@ -256,6 +264,7 @@ class AddressValidation implements AddressValidationRules
     }
 }
 ```
+
 this classes are then resolved out of the container when needed
 
 ```php
@@ -279,6 +288,7 @@ class StoreAddressRequest extends FormRequest
 ```
 
 Customize validation rules by modifying the class bind in laravel container
+
 ```php
 use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
 use App\Validations\AddressValidation;
@@ -290,17 +300,18 @@ public function boot(): void
 }
 ```
 
-
 ### Dto
+
 The package uses Dtos inside the pipelines and you can modify the class it uses inside the the config file
 The important thing is that those classes need to implement the provided interfaces
 
 for Order dto: PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract
 for Cart dto: PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract
 
-
 ### Helper functions
+
 Utility functions used across the package to simplify resolving the correct namespaced classes
+
 ```php
 function auth_manager(User|Authenticatable|null $user = null): AuthManagerContract
 {
@@ -327,18 +338,24 @@ function get_fresh_model_instance(string $model): Model
 ```
 
 ### Api
+
 #### Routes
+
 Routes are registered once, without runtime branching
+
 ```php
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 ```
 
 #### Controllers
+
 Controllers live directly under `Http\Controllers\Api` and do not switch at runtime.
 
 #### Http Resources
+
 Example of an http resource, with the array key (`product.images`) we are telling which attribute we want to mutate and then the closure accepts as a parameter the value of that attribute
 You can use dot notation to access attributes because under the hood it uses `Arr::get` and `Arr::set` methods
+
 ```php
 protected function transformAttributes(): array
 {
@@ -364,19 +381,27 @@ protected function transformAttributes(): array
 ```
 
 ### Cart
+
 #### Generator
+
 Customize cart identifier generator by modifying the binding in laravel container
+
 ```php
 $this->app->singleton(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
 ```
 
 ### Order
+
 #### Generator
+
 Customize order identifier generator by modifying the binding in laravel container
+
 ```php
 $this->app->singleton(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
 ```
+
 Example of custom generator class
+
 ```php
 namespace App\Generators;
 
@@ -393,14 +418,17 @@ class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 ```
 
 ### Commands
+
 the package provides some console commands to deal with common use cases
 
 #### Carts
+
 - UpdateAbandonedCarts
-    checks all carts with a pending status which by default are `processing` and `active`
-    pending statuses are customizable by changing the `getPendingStatuses()` function in `CartStatus` enum which is located in the config file under `carts.status_enum`
+  checks all carts with a pending status which by default are `processing` and `active`
+  pending statuses are customizable by changing the `getPendingStatuses()` function in `CartStatus` enum which is located in the config file under `carts.status_enum`
 
 ## Structure
+
 ```
 // folder structure (high level)
 
@@ -415,6 +443,7 @@ src/
 ```
 
 TODO:
+
 - [ ] update outdated docs
 - [ ] docs on global available helpers
 - [ ] pipelines docs

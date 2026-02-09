@@ -56,7 +56,29 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
-            ->hasMigrations();
+            ->hasMigrations([
+                'create_addresses_table',
+                'create_countries_table',
+                'create_country_tax_class_table',
+                'create_tax_classes_table',
+                'create_currencies_table',
+                'create_orders_table',
+                'create_order_lines_table',
+                'create_shipping_statuses_table',
+                'create_brands_table',
+                'create_product_categories_table',
+                'create_discounts_table',
+                'create_products_table',
+                'create_product_types_table',
+                'create_product_category_product_table',
+                'create_product_variants_table',
+                'create_product_custom_fields_table',
+                'create_product_variant_options_table',
+                'create_product_configuration_table',
+                'create_inventories_table',
+                'create_carts_table',
+                'create_cart_lines_table',
+            ]);
             // ->hasRoute('api');
     }
 
