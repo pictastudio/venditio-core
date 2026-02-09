@@ -60,11 +60,6 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
             // ->hasRoute('api');
     }
 
-    public function newPackage(): Package
-    {
-        return new Package;
-    }
-
     public function registeringPackage()
     {
         $this->app->bind('venditio-core', fn (Application $app) => (
