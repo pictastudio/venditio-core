@@ -12,7 +12,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;

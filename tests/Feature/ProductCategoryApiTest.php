@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
+use PictaStudio\VenditioCore\Models\ProductCategory;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
@@ -16,7 +16,7 @@ it('creates a product category', function () {
         'sort_order' => 1,
     ];
 
-    $response = postJson('/venditio/api/v1/product_categories', $payload)
+    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/product_categories', $payload)
         ->assertCreated()
         ->assertJsonFragment([
             'name' => 'Shoes',
@@ -36,7 +36,7 @@ it('updates a product category', function () {
         'sort_order' => 1,
     ]);
 
-    patchJson("/venditio/api/v1/product_categories/{$category->id}", [
+    patchJson(config('venditio-core.routes.api.v1.prefix') . "/product_categories/{$category->getKey()}", [
         'name' => 'New Name',
         'sort_order' => 2,
     ])->assertOk()
@@ -46,7 +46,7 @@ it('updates a product category', function () {
         ]);
 
     assertDatabaseHas('product_categories', [
-        'id' => $category->id,
+        'id' => $category->getKey(),
         'name' => 'New Name',
         'sort_order' => 2,
     ]);

@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Managers;
 use Closure;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\User;
+use PictaStudio\VenditioCore\Models\User;
 
 class AuthManager implements AuthManagerContract
 {

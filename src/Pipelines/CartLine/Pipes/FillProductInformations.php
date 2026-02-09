@@ -7,9 +7,6 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
-
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class FillProductInformations
@@ -20,17 +17,6 @@ class FillProductInformations
      */
     public function __invoke(CartLineDtoContract $cartLineDto, Closure $next): Model
     {
-        // dd($line);
-
-        // dd(
-        //     $isSimple,
-        //     app(CartValidationRules::class)->getStoreValidationRules(),
-        // );
-        // dd(
-        //     resolve_purchasable_product_model()::query()->get()
-        // );
-
-        // $cartLine = get_fresh_model_instance('cart_line');
         $cartLine = $cartLineDto->getCartLine();
 
         $product = $this->fetchProduct($cartLineDto);
@@ -44,10 +30,6 @@ class FillProductInformations
             'qty' => $cartLineDto->getQty(),
             'product' => $product->toArray(),
         ]);
-
-        // dd(
-        //     $cartLine->toArray(),
-        // );
 
         return $next($cartLine);
     }

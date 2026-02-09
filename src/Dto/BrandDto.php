@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Dto;
 
 use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Dto\Contracts\BrandDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
+use PictaStudio\VenditioCore\Models\Brand;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 

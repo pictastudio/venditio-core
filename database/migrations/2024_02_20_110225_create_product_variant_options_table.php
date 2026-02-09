@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductVariant;
+use PictaStudio\VenditioCore\Models\ProductVariant;
 
 return new class extends Migration
 {

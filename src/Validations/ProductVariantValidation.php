@@ -1,0 +1,42 @@
+<?php
+
+namespace PictaStudio\VenditioCore\Validations;
+
+use Illuminate\Validation\Rule;
+use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantValidationRules;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+
+class ProductVariantValidation implements ProductVariantValidationRules
+{
+    public function getStoreValidationRules(): array
+    {
+        return [
+            'product_type_id' => [
+                'required',
+                'integer',
+                Rule::exists($this->tableFor('product_type'), 'id'),
+            ],
+            'name' => 'required|string|max:255',
+            'sort_order' => 'required|integer|min:0',
+        ];
+    }
+
+    public function getUpdateValidationRules(): array
+    {
+        return [
+            'product_type_id' => [
+                'sometimes',
+                'integer',
+                Rule::exists($this->tableFor('product_type'), 'id'),
+            ],
+            'name' => 'sometimes|string|max:255',
+            'sort_order' => 'sometimes|integer|min:0',
+        ];
+    }
+
+    private function tableFor(string $model): string
+    {
+        return (new (resolve_model($model)))->getTable();
+    }
+}

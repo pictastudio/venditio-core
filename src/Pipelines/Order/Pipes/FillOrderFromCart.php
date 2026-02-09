@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
 use PictaStudio\VenditioCore\Dto\OrderDto;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
-use function PictaStudio\VenditioCore\Helpers\Functions\getFreshModelInstance;
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class FillOrderFromCart
@@ -33,7 +32,7 @@ class FillOrderFromCart
 
         // // move this inside the OrderDto toArray method
         // $order->fill([
-        //     'user_id' => auth()->id(),
+        //     'user_id' => auth()->guard()->id(),
         //     'status' => config('venditio-core.order.status_enum')::getProcessingStatus(),
         //     // 'tracking_code' => null,
         //     // 'tracking_date' => null,

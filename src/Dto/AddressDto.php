@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Dto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use PictaStudio\VenditioCore\Dto\Contracts\AddressDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Address;
+use PictaStudio\VenditioCore\Models\Address;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 

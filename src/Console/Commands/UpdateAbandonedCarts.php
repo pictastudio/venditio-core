@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;

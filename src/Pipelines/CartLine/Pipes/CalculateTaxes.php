@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use PictaStudio\VenditioCore\Packages\Simple\Models\CountryTaxClass;
+use PictaStudio\VenditioCore\Models\CountryTaxClass;
 
 class CalculateTaxes
 {

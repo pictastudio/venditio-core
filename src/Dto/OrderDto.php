@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Cart;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Order;
+use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 
@@ -113,7 +113,7 @@ class OrderDto extends Dto implements OrderDtoContract
 
     public function getUserId(): ?int
     {
-        return $this->userId ?? auth()->id();
+        return $this->userId ?? auth()->guard()->id();
     }
 
     public function getUserFirstName(): ?string

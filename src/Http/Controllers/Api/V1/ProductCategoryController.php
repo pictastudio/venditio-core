@@ -12,7 +12,7 @@ use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\UpdateProductCateg
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductCategoryResource;
 use PictaStudio\VenditioCore\Actions\ProductCategories\CreateProductCategory;
 use PictaStudio\VenditioCore\Actions\ProductCategories\UpdateProductCategory;
-use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
+use PictaStudio\VenditioCore\Models\ProductCategory;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 

@@ -20,15 +20,13 @@ composer require pictastudio/venditio-core
 
 You can initialize the package with the command below
 
-The command will ask you if you want to use the simple or advanced version, for more information about the differences about the two versions see this [section](#simple-vs-advanced)
-
 ```bash
 php artisan venditio-core:install
 ```
 
-## Simple vs Advanced
-Advanced has the concept of a `Product` which you can consider as the parent and `ProductItem` which is the final purchasable product.
-this difference is useful to accomodate the need for product variants, consider this example:
+## Product Variants
+Venditio Core models product variants by treating a base `Product` as the parent and variant products as the purchasable items.
+This allows you to represent multiple option combinations while keeping a single product identity.
 
 We have a t-shirt `Product` with id 1 that could have variants in both color and size
 
@@ -61,7 +59,7 @@ All the variants are computed using `product_variants` and `product_variant_opti
 - API reference and examples: `docs/API.md`
 
 ## Configuration
-No package type configuration is required. All behavior is configured via the `venditio-core` config file.
+No edition or mode selection is required. All behavior is configured via the `venditio-core` config file.
 
 ### Seeding Data
 Add the following seeders to your `DatabaseSeeder` to seed the initial data used by the package, this will seed the countries data as well as a root user, then it will create all the roles and permissions based on the [auth section of the config](#auth)
@@ -71,11 +69,11 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Packages\Simple\Database\Seeders\CountrySeeder;
-use PictaStudio\VenditioCore\Packages\Simple\Database\Seeders\CurrencySeeder;
-use PictaStudio\VenditioCore\Packages\Simple\Database\Seeders\RoleSeeder;
-use PictaStudio\VenditioCore\Packages\Simple\Database\Seeders\TaxClassSeeder;
-use PictaStudio\VenditioCore\Packages\Simple\Database\Seeders\UserSeeder;
+use PictaStudio\VenditioCore\Database\Seeders\CountrySeeder;
+use PictaStudio\VenditioCore\Database\Seeders\CurrencySeeder;
+use PictaStudio\VenditioCore\Database\Seeders\RoleSeeder;
+use PictaStudio\VenditioCore\Database\Seeders\TaxClassSeeder;
+use PictaStudio\VenditioCore\Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -99,7 +97,7 @@ Also extend the User model from VenditioCore
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
-use PictaStudio\VenditioCore\Packages\Simple\Models\User as VenditioCoreUser;
+use PictaStudio\VenditioCore\Models\User as VenditioCoreUser;
 
 class User extends VenditioCoreUser
 {
@@ -111,11 +109,8 @@ class User extends VenditioCoreUser
 then update the class in `config/venditio-core`
 ```php
 'models' => [
-    'simple' => [
-        // ...
-        'user' => App\Models\User::class,
-    ],
     // ...
+    'user' => App\Models\User::class,
 ],
 ```
 
@@ -185,37 +180,31 @@ Inside the config you will find a section dedicated to models configuration
 |
 */
 'models' => [
-    'simple' => [
-        'address' => Simple\Models\Address::class,
-        'brand' => Simple\Models\Brand::class,
-        'cart' => Simple\Models\Cart::class,
-        'cart_line' => Simple\Models\CartLine::class,
-        'country' => Simple\Models\Country::class,
-        'country_tax_class' => Simple\Models\CountryTaxClass::class,
-        'currency' => Simple\Models\Currency::class,
-        'discount' => Simple\Models\Discount::class,
-        'inventory' => Simple\Models\Inventory::class,
-        'order' => Simple\Models\Order::class,
-        'order_line' => Simple\Models\OrderLine::class,
-        'product' => Simple\Models\Product::class,
-        'product_category' => Simple\Models\ProductCategory::class,
-        'shipping_status' => Simple\Models\ShippingStatus::class,
-        'tax_class' => Simple\Models\TaxClass::class,
-        'user' => Simple\Models\User::class,
-    ],
-    'advanced' => [
-        'product' => Advanced\Models\Product::class,
-        'product_custom_field' => Advanced\Models\ProductCustomField::class,
-        'product_item' => Advanced\Models\ProductItem::class,
-        'product_type' => Advanced\Models\ProductType::class,
-        'product_variant' => Advanced\Models\ProductVariant::class,
-        'product_variant_option' => Advanced\Models\ProductVariantOption::class,
-    ],
+    'address' => Simple\Models\Address::class,
+    'brand' => Simple\Models\Brand::class,
+    'cart' => Simple\Models\Cart::class,
+    'cart_line' => Simple\Models\CartLine::class,
+    'country' => Simple\Models\Country::class,
+    'country_tax_class' => Simple\Models\CountryTaxClass::class,
+    'currency' => Simple\Models\Currency::class,
+    'discount' => Simple\Models\Discount::class,
+    'inventory' => Simple\Models\Inventory::class,
+    'order' => Simple\Models\Order::class,
+    'order_line' => Simple\Models\OrderLine::class,
+    'product' => Simple\Models\Product::class,
+    'product_category' => Simple\Models\ProductCategory::class,
+    'shipping_status' => Simple\Models\ShippingStatus::class,
+    'tax_class' => Simple\Models\TaxClass::class,
+    'user' => Simple\Models\User::class,
+    'product_custom_field' => Advanced\Models\ProductCustomField::class,
+    'product_type' => Advanced\Models\ProductType::class,
+    'product_variant' => Advanced\Models\ProductVariant::class,
+    'product_variant_option' => Advanced\Models\ProductVariantOption::class,
 ],
 ```
 
 #### Relations
-relations inside models are defined dinamically resolving the correct model namespace from the config, depending if the app is set to use the simple or advanced configuration
+Relations inside models are defined dynamically by resolving the configured model class from the config.
 ```php
 // brand relation from Simple\Models\Product model
 public function brand(): BelongsTo
@@ -227,7 +216,7 @@ public function brand(): BelongsTo
 ### Validation rules
 Validation rules are managed inside separate classes than FormRequests
 ```php
-namespace PictaStudio\VenditioCore\Packages\Simple\Validations;
+namespace PictaStudio\VenditioCore\Validations;
 
 use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
@@ -319,8 +308,6 @@ function auth_manager(User|Authenticatable|null $user = null): AuthManagerContra
 }
 
 /**
- * if the model is not found inside the advanced package, it will fallback to the simple package
- *
  * @param  string  $model  String that identifies the model (one of the keys from config('venditio-core.models'))
  */
 function resolve_model(string $model): string
@@ -341,7 +328,7 @@ function get_fresh_model_instance(string $model): Model
 
 ### Api
 #### Routes
-Routes are registered once, without package type branching
+Routes are registered once, without runtime branching
 ```php
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 ```
@@ -350,7 +337,7 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 Controllers live directly under `Http\Controllers\Api` and do not switch at runtime.
 
 #### Http Resources
-Example of an http resource, with the array key (`product_item.images`) we are telling which attribute we want to mutate and then the closure accepts as a parameter the value of that attribute
+Example of an http resource, with the array key (`product.images`) we are telling which attribute we want to mutate and then the closure accepts as a parameter the value of that attribute
 You can use dot notation to access attributes because under the hood it uses `Arr::get` and `Arr::set` methods
 ```php
 protected function transformAttributes(): array
@@ -393,7 +380,7 @@ Example of custom generator class
 ```php
 namespace App\Generators;
 
-use PictaStudio\VenditioCore\Packages\Simple\Models\Order;
+use PictaStudio\VenditioCore\Models\Order;
 use PictaStudio\VenditioCore\Orders\Contracts\OrderIdentifierGeneratorInterface;
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
@@ -415,31 +402,16 @@ the package provides some console commands to deal with common use cases
 
 ## Structure
 ```
-// folder structure
+// folder structure (high level)
 
-Helpers
-    |--- Functions
-packages/
-|--- simple // business logic specific for simple ecommerce
-    |--- Actions
-    |--- Models
-        |--- Scopes
-        |--- Traits
-    |--- Pipelines
-    |--- Services
-    |--- Database
-        |--- Migrations
-    |--- ...
-|--- advanced // business logic specific for advanced ecommerce
-    |--- Actions
-    |--- Models
-        |--- Scopes
-        |--- Traits
-    |--- Pipelines
-    |--- Services
-    |--- Database
-        |--- Migrations
-    |--- ...
+src/
+|--- Actions
+|--- Contracts
+|--- Helpers
+|--- Http
+|--- Packages
+    |--- Simple   // core models, enums, validations, factories (internal module)
+    |--- Advanced // variant system models, validations, factories (internal module)
 ```
 
 TODO:

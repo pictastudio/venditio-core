@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductVariantOption;
+use PictaStudio\VenditioCore\Models\ProductVariantOption;
 use PictaStudio\VenditioCore\Policies\Traits\VenditioPolicyPermissions;
 
 class ProductVariantOptionPolicy

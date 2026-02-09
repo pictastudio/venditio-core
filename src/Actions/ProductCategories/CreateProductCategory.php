@@ -2,7 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Actions\ProductCategories;
 
-use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
+use PictaStudio\VenditioCore\Models\ProductCategory;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 

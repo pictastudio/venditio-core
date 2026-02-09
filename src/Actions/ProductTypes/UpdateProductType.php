@@ -2,7 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Actions\ProductTypes;
 
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductType;
+use PictaStudio\VenditioCore\Models\ProductType;
 
 class UpdateProductType
 {

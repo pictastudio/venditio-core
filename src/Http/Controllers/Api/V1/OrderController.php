@@ -11,7 +11,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Order\StoreOrderRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Order\UpdateOrderRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\OrderResource;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Order;
+use PictaStudio\VenditioCore\Models\Order;
 use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;

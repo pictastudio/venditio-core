@@ -2,7 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Actions\ProductVariantOptions;
 
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductVariantOption;
+use PictaStudio\VenditioCore\Models\ProductVariantOption;
 
 class UpdateProductVariantOption
 {

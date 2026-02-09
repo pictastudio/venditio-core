@@ -4,8 +4,8 @@ namespace PictaStudio\VenditioCore\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Cart;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Contracts\Order;
+use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Models\Contracts\Order;
 
 interface OrderDtoContract extends Dto
 {

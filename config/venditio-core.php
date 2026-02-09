@@ -3,10 +3,8 @@
 use PictaStudio\VenditioCore\Dto;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Managers;
-use PictaStudio\VenditioCore\Packages\Advanced;
-use PictaStudio\VenditioCore\Packages\Simple;
-use PictaStudio\VenditioCore\Packages\Simple\Enums;
-use PictaStudio\VenditioCore\Packages\Simple\Validations;
+use PictaStudio\VenditioCore\Enums;
+use PictaStudio\VenditioCore\Models;
 use PictaStudio\VenditioCore\Pipelines\Cart;
 use PictaStudio\VenditioCore\Pipelines\CartLine;
 use PictaStudio\VenditioCore\Pipelines\Order;
@@ -83,26 +81,26 @@ return [
     |
     */
     'models' => [
-        'address' => Simple\Models\Address::class,
-        'brand' => Simple\Models\Brand::class,
-        'cart' => Simple\Models\Cart::class,
-        'cart_line' => Simple\Models\CartLine::class,
-        'country' => Simple\Models\Country::class,
-        'country_tax_class' => Simple\Models\CountryTaxClass::class,
-        'currency' => Simple\Models\Currency::class,
-        'discount' => Simple\Models\Discount::class,
-        'inventory' => Simple\Models\Inventory::class,
-        'order' => Simple\Models\Order::class,
-        'order_line' => Simple\Models\OrderLine::class,
-        'product' => Simple\Models\Product::class,
-        'product_category' => Simple\Models\ProductCategory::class,
-        'shipping_status' => Simple\Models\ShippingStatus::class,
-        'tax_class' => Simple\Models\TaxClass::class,
-        'user' => Simple\Models\User::class,
-        'product_custom_field' => Advanced\Models\ProductCustomField::class,
-        'product_type' => Advanced\Models\ProductType::class,
-        'product_variant' => Advanced\Models\ProductVariant::class,
-        'product_variant_option' => Advanced\Models\ProductVariantOption::class,
+        'address' => Models\Address::class,
+        'brand' => Models\Brand::class,
+        'cart' => Models\Cart::class,
+        'cart_line' => Models\CartLine::class,
+        'country' => Models\Country::class,
+        'country_tax_class' => Models\CountryTaxClass::class,
+        'currency' => Models\Currency::class,
+        'discount' => Models\Discount::class,
+        'inventory' => Models\Inventory::class,
+        'order' => Models\Order::class,
+        'order_line' => Models\OrderLine::class,
+        'product' => Models\Product::class,
+        'product_category' => Models\ProductCategory::class,
+        'shipping_status' => Models\ShippingStatus::class,
+        'tax_class' => Models\TaxClass::class,
+        'user' => Models\User::class,
+        'product_custom_field' => Models\ProductCustomField::class,
+        'product_type' => Models\ProductType::class,
+        'product_variant' => Models\ProductVariant::class,
+        'product_variant_option' => Models\ProductVariantOption::class,
     ],
 
     /*
@@ -307,8 +305,8 @@ return [
     'routes' => [
         'api' => [
             'v1' => [
-                'prefix' => 'venditio/api/v1',
-                'name' => 'venditio.api.v1',
+                'prefix' => 'api/venditio/v1',
+                'name' => 'api.venditio.v1',
                 'middleware' => [
                     'api',
                     // 'auth:sanctum',

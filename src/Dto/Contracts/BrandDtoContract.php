@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
+use PictaStudio\VenditioCore\Models\Brand;
 
 interface BrandDtoContract extends Dto
 {

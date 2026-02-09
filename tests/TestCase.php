@@ -16,10 +16,7 @@ class TestCase extends Orchestra
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => str($modelName)
-                ->replace('Models', 'Database\\Factories')
-                ->append('Factory')
-                ->toString()
+            fn (string $modelName) => 'PictaStudio\\Contento\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 
@@ -75,7 +75,7 @@ class CartDto extends Dto implements CartDtoContract
 
     public function getUserId(): ?int
     {
-        return $this->userId ?? auth()->id();
+        return $this->userId ?? auth()->guard()->id();
     }
 
     public function getUserFirstName(): ?string

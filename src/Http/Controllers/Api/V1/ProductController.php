@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Packages\Advanced\Actions\Products\CreateProductVariants;
+use PictaStudio\VenditioCore\Actions\Products\CreateProductVariants;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Product\GenerateProductVariantsRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Product\StoreProductRequest;
@@ -13,7 +13,7 @@ use PictaStudio\VenditioCore\Http\Requests\V1\Product\UpdateProductRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductResource;
 use PictaStudio\VenditioCore\Actions\Products\CreateProduct;
 use PictaStudio\VenditioCore\Actions\Products\UpdateProduct;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
+use PictaStudio\VenditioCore\Models\Product;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 

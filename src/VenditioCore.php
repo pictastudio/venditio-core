@@ -31,7 +31,7 @@ class VenditioCore
             $policyPath = str($modelClass)->replace('Models', 'Policies')->append('Policy')->toString();
 
             if (!class_exists($policyPath)) {
-                $policyPath = "PictaStudio\VenditioCore\\Policies\\{$model}Policy";
+                $policyPath = "PictaStudio\VenditioCore\Policies\\{$model}Policy";
 
                 if (!class_exists($policyPath)) {
                     continue;

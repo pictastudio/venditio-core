@@ -21,19 +21,18 @@ use PictaStudio\VenditioCore\Generators\CartIdentifierGenerator;
 use PictaStudio\VenditioCore\Generators\OrderIdentifierGenerator;
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\User;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\AddressValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\CartLineValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\CartValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\OrderValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\ProductCategoryValidation;
-use PictaStudio\VenditioCore\Packages\Simple\Validations\ProductValidation;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\ProductTypeValidation;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\ProductVariantValidation;
-use PictaStudio\VenditioCore\Packages\Advanced\Validations\ProductVariantOptionValidation;
+use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\VenditioCore\Validations\AddressValidation;
+use PictaStudio\VenditioCore\Validations\CartLineValidation;
+use PictaStudio\VenditioCore\Validations\CartValidation;
+use PictaStudio\VenditioCore\Validations\OrderValidation;
+use PictaStudio\VenditioCore\Validations\ProductCategoryValidation;
+use PictaStudio\VenditioCore\Validations\ProductValidation;
+use PictaStudio\VenditioCore\Validations\ProductTypeValidation;
+use PictaStudio\VenditioCore\Validations\ProductVariantValidation;
+use PictaStudio\VenditioCore\Validations\ProductVariantOptionValidation;
 use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
-use PictaStudio\VenditioCore\Packages\Tools\Package;
-use PictaStudio\VenditioCore\Packages\Tools\PackageServiceProvider as ToolsPackageServiceProvider;
+use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
 use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
@@ -43,15 +42,11 @@ use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\ProductTypeValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantValidationRules;
 use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantOptionValidationRules;
-use Spatie\LaravelPackageTools\Package as SpatiePackage;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
-class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
+class VenditioCoreServiceProvider extends PackageServiceProvider
 {
-    /**
-     * @param  Package  $package  the variable type definition must remain the SpatiePackage, the docblock serves to provide autocomplete inside IDE
-     */
-    public function configurePackage(SpatiePackage $package): void
+    public function configurePackage(Package $package): void
     {
         /*
          * This class is a Package Service Provider
@@ -61,15 +56,8 @@ class VenditioCoreServiceProvider extends ToolsPackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
-            // ->registerMigrationsForType()
-            // ->hasMigrations([])
-            ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->publishConfigFile()
-                    // ->publishMigrations()
-                    ->copyAndRegisterServiceProviderInApp()
-                    ->askToRunMigrations();
-            });
+            ->hasMigrations();
+            // ->hasRoute('api');
     }
 
     public function newPackage(): Package

@@ -12,7 +12,7 @@ use Illuminate\Routing\Controller as BaseController;
 use PictaStudio\VenditioCore\Traits\ValidatesData;
 use Illuminate\Http\{JsonResponse, Response};
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 

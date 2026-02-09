@@ -13,11 +13,11 @@ it('registers the policy correctly', function () {
     foreach (config('venditio-core.models') as $contract => $model) {
         $model = class_basename($model);
 
-        if (!class_exists("PictaStudio\VenditioCore\\Policies\\{$model}Policy")) {
+        if (!class_exists("PictaStudio\VenditioCore\Policies\\{$model}Policy")) {
             continue;
         }
 
-        expect(Gate::getPolicyFor("PictaStudio\VenditioCore\Packages\Simple\Models\\{$model}")::class)
+        expect(Gate::getPolicyFor("PictaStudio\VenditioCore\Models\\{$model}")::class)
             ->toBe("PictaStudio\VenditioCore\Policies\\{$model}Policy");
     }
 })->group('policy');

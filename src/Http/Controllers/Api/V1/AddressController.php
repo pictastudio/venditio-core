@@ -11,7 +11,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Address\StoreAddressRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Address\UpdateAddressRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\AddressResource;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Address;
+use PictaStudio\VenditioCore\Models\Address;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 use function PictaStudio\VenditioCore\Helpers\Functions\query;

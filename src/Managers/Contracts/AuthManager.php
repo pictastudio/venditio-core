@@ -3,7 +3,7 @@
 namespace PictaStudio\VenditioCore\Managers\Contracts;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Packages\Simple\Models\User;
+use PictaStudio\VenditioCore\Models\User;
 
 interface AuthManager
 {

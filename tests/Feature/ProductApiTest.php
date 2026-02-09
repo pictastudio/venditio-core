@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Packages\Simple\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
-use PictaStudio\VenditioCore\Packages\Simple\Models\ProductCategory;
-use PictaStudio\VenditioCore\Packages\Simple\Models\TaxClass;
+use PictaStudio\VenditioCore\Enums\ProductStatus;
+use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\VenditioCore\Models\ProductCategory;
+use PictaStudio\VenditioCore\Models\TaxClass;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -20,14 +20,14 @@ it('creates a product with categories', function () {
     $category = ProductCategory::factory()->create();
 
     $payload = [
-        'brand_id' => $brand->id,
-        'tax_class_id' => $taxClass->id,
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
         'name' => 'Sample Product',
         'status' => ProductStatus::Published->value,
-        'category_ids' => [$category->id],
+        'category_ids' => [$category->getKey()],
     ];
 
-    $response = postJson('/venditio/api/v1/products', $payload)
+    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/products', $payload)
         ->assertCreated()
         ->assertJsonFragment([
             'name' => 'Sample Product',
@@ -40,12 +40,12 @@ it('creates a product with categories', function () {
     assertDatabaseHas('products', ['id' => $productId, 'name' => 'Sample Product']);
     assertDatabaseHas('product_category_product', [
         'product_id' => $productId,
-        'product_category_id' => $category->id,
+        'product_category_id' => $category->getKey(),
     ]);
 });
 
 it('validates product creation', function () {
-    postJson('/venditio/api/v1/products', [])
+    postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['brand_id', 'tax_class_id', 'name', 'status']);
 });
@@ -57,25 +57,25 @@ it('updates product categories when provided', function () {
     $otherCategory = ProductCategory::factory()->create();
 
     $product = Product::factory()->create([
-        'brand_id' => $brand->id,
-        'tax_class_id' => $taxClass->id,
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
         'active' => true,
         'visible_from' => null,
         'visible_until' => null,
     ]);
 
-    $product->categories()->sync([$category->id]);
+    $product->categories()->sync([$category->getKey()]);
 
-    patchJson("/venditio/api/v1/products/{$product->id}", [
-        'category_ids' => [$otherCategory->id],
+    patchJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+        'category_ids' => [$otherCategory->getKey()],
     ])->assertOk();
 
     assertDatabaseMissing('product_category_product', [
-        'product_id' => $product->id,
-        'product_category_id' => $category->id,
+        'product_id' => $product->getKey(),
+        'product_category_id' => $category->getKey(),
     ]);
     assertDatabaseHas('product_category_product', [
-        'product_id' => $product->id,
-        'product_category_id' => $otherCategory->id,
+        'product_id' => $product->getKey(),
+        'product_category_id' => $otherCategory->getKey(),
     ]);
 });

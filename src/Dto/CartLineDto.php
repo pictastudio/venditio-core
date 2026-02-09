@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Dto;
 use Illuminate\Database\Eloquent\Model;
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Packages\Simple\Models\CartLine;
+use PictaStudio\VenditioCore\Models\CartLine;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;

@@ -2,7 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Actions\ProductTypes;
 
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductType;
+use PictaStudio\VenditioCore\Models\ProductType;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 

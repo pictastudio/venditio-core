@@ -3,8 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Packages\Simple\Models\ShippingStatus;
-use PictaStudio\VenditioCore\Packages\Simple\Models\User;
+use PictaStudio\VenditioCore\Models\ShippingStatus;
+use PictaStudio\VenditioCore\Models\User;
 
 return new class extends Migration
 {

@@ -11,7 +11,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Brand\StoreBrandRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Brand\UpdateBrandRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\BrandResource;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
+use PictaStudio\VenditioCore\Models\Brand;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 use function PictaStudio\VenditioCore\Helpers\Functions\query;

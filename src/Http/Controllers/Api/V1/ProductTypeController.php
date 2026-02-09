@@ -10,7 +10,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductType\StoreProductTypeRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductType\UpdateProductTypeRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductTypeResource;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductType;
+use PictaStudio\VenditioCore\Models\ProductType;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 

@@ -3,7 +3,7 @@
 namespace PictaStudio\VenditioCore\Actions\Products;
 
 use Illuminate\Support\Arr;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
+use PictaStudio\VenditioCore\Models\Product;
 
 class UpdateProduct
 {

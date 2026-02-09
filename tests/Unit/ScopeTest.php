@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
+use PictaStudio\VenditioCore\Models\Product;
 
 use function Pest\Laravel\getJson;
 

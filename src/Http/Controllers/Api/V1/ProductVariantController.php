@@ -11,7 +11,7 @@ use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductVariant\StoreProductVariantRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductVariant\UpdateProductVariantRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductVariantResource;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductVariant;
+use PictaStudio\VenditioCore\Models\ProductVariant;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;

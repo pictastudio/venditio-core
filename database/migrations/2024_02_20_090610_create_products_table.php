@@ -3,10 +3,10 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Packages\Advanced\Models\ProductType;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Brand;
-use PictaStudio\VenditioCore\Packages\Simple\Models\Product;
-use PictaStudio\VenditioCore\Packages\Simple\Models\TaxClass;
+use PictaStudio\VenditioCore\Models\ProductType;
+use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\VenditioCore\Models\TaxClass;
 
 return new class extends Migration
 {
