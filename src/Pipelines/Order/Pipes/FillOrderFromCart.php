@@ -39,6 +39,7 @@ class FillOrderFromCart
                 'product_name' => $cartLine->product_name,
                 'product_sku' => $cartLine->product_sku,
                 'unit_price' => $cartLine->unit_price,
+                'purchase_price' => $cartLine->purchase_price,
                 'unit_discount' => $cartLine->unit_discount,
                 'unit_final_price' => $cartLine->unit_final_price,
                 'unit_final_price_tax' => $cartLine->unit_final_price_tax,

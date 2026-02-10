@@ -29,6 +29,7 @@ class OrderLine extends Model
             'discount_id' => 'integer',
             'discount_amount' => 'decimal:2',
             'unit_price' => 'decimal:2',
+            'purchase_price' => 'decimal:2',
             'unit_discount' => 'decimal:2',
             'unit_final_price' => 'decimal:2',
             'unit_final_price_tax' => 'decimal:2',

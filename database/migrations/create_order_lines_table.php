@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('discount_code', 30)->nullable()->comment('discount code');
             $table->decimal('discount_amount', 10, 2)->default(0.00)->comment('absolute line discount amount');
             $table->decimal('unit_price', 10, 2)->comment('prezzo unitario di listino');
+            $table->decimal('purchase_price', 10, 2)->nullable()->comment('prezzo di acquisto');
             $table->decimal('unit_discount', 10, 2)->default(0)->comment('sconto unitario');
             $table->decimal('unit_final_price', 10, 2)->comment('prezzo finale prodotto inclusi sconti');
             $table->decimal('unit_final_price_tax', 10, 2)->comment('tassa unitaria calcolata su unit_final_price');

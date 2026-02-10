@@ -25,6 +25,7 @@ class FillProductInformations
 
         $cartLine->fill([
             'unit_price' => $product->inventory->price,
+            'purchase_price' => $product->inventory->purchase_price,
             'product_name' => $product->name,
             'product_sku' => $product->sku,
             'qty' => $cartLineDto->getQty(),
