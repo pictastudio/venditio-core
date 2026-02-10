@@ -52,6 +52,7 @@ class ProductFactory extends Factory
                 ]
             ],
             'measuring_unit' => fake()->randomElement(ProductMeasuringUnit::cases())->value,
+            'qty_for_unit' => fake()->optional(0.7)->numberBetween(1, 100),
             'length' => fake()->randomNumber(3),
             'width' => fake()->randomNumber(3),
             'height' => fake()->randomNumber(3),

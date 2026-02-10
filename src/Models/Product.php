@@ -39,6 +39,7 @@ class Product extends Model
             'images' => 'json',
             'files' => 'json',
             'measuring_unit' => config('venditio-core.product.measuring_unit_enum'),
+            'qty_for_unit' => 'integer',
             'length' => 'decimal:2',
             'width' => 'decimal:2',
             'height' => 'decimal:2',

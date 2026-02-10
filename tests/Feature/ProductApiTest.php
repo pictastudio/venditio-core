@@ -74,6 +74,42 @@ it('updates product categories when provided', function () {
     ]);
 });
 
+it('creates a product with qty_for_unit', function () {
+    $brand = Brand::factory()->create();
+    $taxClass = TaxClass::factory()->create();
+
+    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'name' => 'Product with unit qty',
+        'status' => ProductStatus::Published->value,
+        'qty_for_unit' => 6,
+    ])->assertCreated()
+        ->assertJsonFragment([
+            'name' => 'Product with unit qty',
+            'qty_for_unit' => 6,
+        ]);
+
+    $productId = $response->json('id');
+    assertDatabaseHas('products', ['id' => $productId, 'qty_for_unit' => 6]);
+});
+
+it('updates a product qty_for_unit', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+        'qty_for_unit' => null,
+    ]);
+
+    patchJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+        'qty_for_unit' => 12,
+    ])->assertOk()
+        ->assertJsonFragment(['qty_for_unit' => 12]);
+
+    assertDatabaseHas('products', ['id' => $product->getKey(), 'qty_for_unit' => 12]);
+});
+
 it('creates a product with nested inventory fields', function () {
     $brand = Brand::factory()->create();
     $taxClass = TaxClass::factory()->create();

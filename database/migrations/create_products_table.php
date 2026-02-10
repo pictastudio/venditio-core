@@ -33,6 +33,7 @@ return new class extends Migration
             $table->json('images')->nullable();
             $table->json('files')->nullable();
             $table->string('measuring_unit', 50)->nullable()->comment('kg, g, l, ml, pz, etc...');
+            $table->unsignedSmallInteger('qty_for_unit')->nullable()->comment('quantità per unità di misura');
             $table->decimal('length', 8, 2)->nullable();
             $table->decimal('width', 8, 2)->nullable();
             $table->decimal('height', 8, 2)->nullable();

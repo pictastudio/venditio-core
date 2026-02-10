@@ -40,6 +40,7 @@ Some endpoints add extra filters.
 Payload notes:
 - `category_ids` can be used to attach categories on create or update.
 - `product_type_id` is required for variant generation.
+- `measuring_unit` and `qty_for_unit` (optional) define unit of measure and quantity per unit (e.g. box of 6).
 
 ### Product Categories
 - `GET /product_categories`
