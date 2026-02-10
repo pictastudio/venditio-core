@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create('product_categories', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(ProductCategory::class, 'parent_id')->nullable();
+            $table->string('path')->nullable()->index()->comment('path of the category in the tree');
             $table->string('name');
             $table->boolean('active')->default(true);
             $table->smallInteger('sort_order');

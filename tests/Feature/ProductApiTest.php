@@ -246,8 +246,6 @@ it('includes variants and variants options table when requested', function () {
     ]);
     $variantB->variantOptions()->sync([$medium->getKey(), $blue->getKey()]);
 
-    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")->ddJson();
-
     getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")
         ->assertOk()
         ->assertJsonCount(2, 'variants')

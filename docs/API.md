@@ -23,6 +23,7 @@ The following filters apply to most index endpoints via `applyBaseFilters`.
 Some endpoints add extra filters.
 - `product_type_id` for `/product_variants`
 - `product_variant_id` for `/product_variant_options`
+- `as_tree` boolean for `/product_categories` (returns nested categories with `children`; forces full, non-paginated result)
 
 ## Response Shape
 - JSON responses use API Resources.

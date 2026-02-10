@@ -2,16 +2,14 @@
 
 namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
+use PictaStudio\VenditioCore\Actions\ProductCategories\CreateProductCategory;
+use PictaStudio\VenditioCore\Actions\ProductCategories\UpdateProductCategory;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\StoreProductCategoryRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory\UpdateProductCategoryRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductCategoryResource;
-use PictaStudio\VenditioCore\Actions\ProductCategories\CreateProductCategory;
-use PictaStudio\VenditioCore\Actions\ProductCategories\UpdateProductCategory;
 use PictaStudio\VenditioCore\Models\ProductCategory;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
@@ -23,18 +21,27 @@ class ProductCategoryController extends Controller
         $this->authorizeIfConfigured('viewAny', ProductCategory::class);
 
         $filters = request()->all();
+        $this->validateData($filters, [
+            'as_tree' => [
+                'boolean',
+            ],
+        ]);
 
-        // $this->validateData($filters, [
-        //     'all' => [
-        //         'boolean',
-        //     ],
-        //     'id' => [
-        //         'array',
-        //     ],
-        //     'id.*' => [
-        //         Rule::exists('product_categories', 'id'),
-        //     ],
-        // ]);
+        $asTree = request()->boolean('as_tree');
+        unset($filters['as_tree']);
+
+        if ($asTree) {
+            return ProductCategoryResource::collection(
+                $this->applyBaseFilters(
+                    query('product_category'),
+                    [
+                        ...$filters,
+                        'all' => true,
+                    ],
+                    'product_category'
+                )->tree()
+            );
+        }
 
         return ProductCategoryResource::collection(
             $this->applyBaseFilters(query('product_category'), $filters, 'product_category')

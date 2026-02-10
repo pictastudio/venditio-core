@@ -5,6 +5,7 @@ namespace PictaStudio\VenditioCore\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
+use Nevadskiy\Tree\AsTree;
 use PictaStudio\VenditioCore\Models\Scopes\{Active, Ordered};
 use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 
@@ -12,6 +13,7 @@ use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class ProductCategory extends Model
 {
+    use AsTree;
     use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
@@ -38,16 +40,6 @@ class ProductCategory extends Model
             Ordered::class,
             Active::class,
         ]);
-    }
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(resolve_model('product_category'), 'parent_id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(resolve_model('product_category'), 'parent_id');
     }
 
     public function products(): BelongsToMany
