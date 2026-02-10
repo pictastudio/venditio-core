@@ -5,6 +5,7 @@ namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use PictaStudio\VenditioCore\Actions\Taxes\ExtractTaxFromGrossPrice;
 use PictaStudio\VenditioCore\Contracts\{CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface};
 use PictaStudio\VenditioCore\Discounts\DiscountContext;
 
@@ -15,6 +16,7 @@ class ApplyDiscounts
     public function __construct(
         private readonly DiscountCalculatorInterface $discountCalculator,
         private readonly CartTotalDiscountCalculatorInterface $cartTotalDiscountCalculator,
+        private readonly ExtractTaxFromGrossPrice $extractTaxFromGrossPrice,
     ) {}
 
     /**
@@ -61,12 +63,22 @@ class ApplyDiscounts
         $unitFinalPrice = (float) $line->getAttribute('unit_final_price');
         $taxRate = (float) ($line->getAttribute('tax_rate') ?? 0);
         $qty = max(1, (int) ($line->getAttribute('qty') ?? 1));
-        $unitFinalPriceTax = round($unitFinalPrice * ($taxRate / 100), 2);
+        $productData = $line->getAttribute('product_data') ?? [];
+        $priceIncludesTax = (bool) data_get($productData, 'inventory.price_includes_tax', false);
+
+        if ($priceIncludesTax) {
+            $taxBreakdown = $this->extractTaxFromGrossPrice->handle($unitFinalPrice, $taxRate);
+            $unitFinalPriceTaxable = $taxBreakdown['taxable'];
+            $unitFinalPriceTax = $taxBreakdown['tax'];
+        } else {
+            $unitFinalPriceTaxable = $unitFinalPrice;
+            $unitFinalPriceTax = round($unitFinalPrice * ($taxRate / 100), 2);
+        }
 
         $line->fill([
-            'unit_final_price_taxable' => $unitFinalPrice,
+            'unit_final_price_taxable' => $unitFinalPriceTaxable,
             'unit_final_price_tax' => $unitFinalPriceTax,
-            'total_final_price' => round(($unitFinalPrice + $unitFinalPriceTax) * $qty, 2),
+            'total_final_price' => round(($unitFinalPriceTaxable + $unitFinalPriceTax) * $qty, 2),
         ]);
     }
 }

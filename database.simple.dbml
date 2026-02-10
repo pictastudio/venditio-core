@@ -177,6 +177,8 @@ Table inventories {
     stock mediumint [not null]
     stock_min mediumint [null, note: 'quantità minima di stock (per allerta sottoscorta)']
     price decimal(10,2) [not null]
+    purchase_price decimal(10,2) [null, note: 'costo di acquisto del prodotto']
+    price_includes_tax bool [not null, default: false, note: 'se true il prezzo e` comprensivo di IVA']
 }
 
 Table carts {

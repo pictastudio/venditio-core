@@ -46,7 +46,7 @@ function setupTaxEnvironment(TaxClass $taxClass): void
     ]);
 }
 
-function createProduct(float $price, TaxClass $taxClass): Product
+function createProduct(float $price, TaxClass $taxClass, bool $priceIncludesTax = false): Product
 {
     /** @var Product $product */
     $product = Product::factory()->create([
@@ -63,6 +63,8 @@ function createProduct(float $price, TaxClass $taxClass): Product
         'stock_available' => 100,
         'stock_min' => 0,
         'price' => $price,
+        'price_includes_tax' => $priceIncludesTax,
+        'purchase_price' => null,
     ]);
 
     return $product->refresh();
@@ -237,4 +239,62 @@ it('applies cart total discount code at checkout', function () {
         ->and((float) $cart->sub_total)->toBe(244.0)
         ->and((float) $cart->discount_amount)->toBe(24.4)
         ->and((float) $cart->total_final)->toBe(219.6);
+});
+
+it('removes tax from VAT-inclusive inventory price when calculating cart line totals', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(122, $taxClass, true);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $line = $cart->lines->first();
+
+    expect((float) $line->unit_final_price)->toBe(122.0)
+        ->and((float) $line->unit_final_price_taxable)->toBe(100.0)
+        ->and((float) $line->unit_final_price_tax)->toBe(22.0)
+        ->and((float) $line->total_final_price)->toBe(122.0);
+});
+
+it('recalculates tax correctly for VAT-inclusive prices after discounts', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(122, $taxClass, true);
+    $product->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 10,
+        'code' => 'GROSS10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+    ]);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $line = $cart->lines->first();
+
+    expect((float) $line->unit_final_price)->toBe(112.0)
+        ->and((float) $line->unit_final_price_taxable)->toBe(91.8)
+        ->and((float) $line->unit_final_price_tax)->toBe(20.2)
+        ->and((float) $line->total_final_price)->toBe(112.0);
 });

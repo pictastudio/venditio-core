@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PictaStudio\VenditioCore\Models\Product;
 
@@ -18,6 +17,8 @@ return new class extends Migration
             $table->mediumInteger('stock_available')->default(0)->comment('quantity of stock available for sale');
             $table->mediumInteger('stock_min')->nullable()->comment('minimum stock quantity (for low stock alert)');
             $table->decimal('price', 10, 2);
+            $table->boolean('price_includes_tax')->default(false)->comment('when true, price is VAT/tax inclusive');
+            $table->decimal('purchase_price', 10, 2)->nullable()->comment('purchase cost of the product');
             $table->datetimes();
             $table->softDeletesDatetime();
         });

@@ -3,8 +3,6 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Enums\DiscountType;
-use PictaStudio\VenditioCore\Models\Discount;
 use PictaStudio\VenditioCore\Models\Inventory;
 
 class InventoryFactory extends Factory
@@ -17,20 +15,8 @@ class InventoryFactory extends Factory
             'stock' => fake()->numberBetween(1, 1000),
             'stock_min' => fake()->numberBetween(1, 1000),
             'price' => fake()->randomFloat(2, 1, 1000),
+            'price_includes_tax' => false,
+            'purchase_price' => fake()->optional()->randomFloat(2, 1, 1000),
         ];
-    }
-
-    public function percentage(): self
-    {
-        return $this->state([
-            'type' => DiscountType::Percentage,
-        ]);
-    }
-
-    public function fixed(): self
-    {
-        return $this->state([
-            'type' => DiscountType::Fixed,
-        ]);
     }
 }
