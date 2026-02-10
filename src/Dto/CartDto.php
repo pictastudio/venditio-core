@@ -20,6 +20,7 @@ class CartDto extends Dto implements CartDtoContract
         private ?string $discountRef,
         private ?array $addresses,
         private ?Collection $lines = null,
+        private bool $linesProvided = false,
     ) {}
 
     public static function fromArray(array $data): static
@@ -34,6 +35,7 @@ class CartDto extends Dto implements CartDtoContract
             addresses: $data['addresses'] ?? null,
             lines: collect($data['lines'] ?? [])
                 ->map(fn (array $line) => CartLineDto::fromArray($line)),
+            linesProvided: array_key_exists('lines', $data),
         );
     }
 
@@ -107,5 +109,10 @@ class CartDto extends Dto implements CartDtoContract
     public function getLines(): Collection
     {
         return $this->lines;
+    }
+
+    public function hasLinesProvided(): bool
+    {
+        return $this->linesProvided;
     }
 }

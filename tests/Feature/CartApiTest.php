@@ -1,0 +1,362 @@
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
+use PictaStudio\VenditioCore\Enums\DiscountType;
+use PictaStudio\VenditioCore\Enums\ProductStatus;
+use PictaStudio\VenditioCore\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
+
+use function Pest\Laravel\{assertSoftDeleted, deleteJson, getJson, postJson};
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    if (Schema::hasTable('users')) {
+        return;
+    }
+
+    Schema::create('users', function (Blueprint $table) {
+        $table->id();
+        $table->string('first_name');
+        $table->string('last_name');
+        $table->string('email')->unique();
+        $table->string('phone')->nullable();
+        $table->timestamps();
+    });
+});
+
+function setupCartTaxEnvironment(TaxClass $taxClass): void
+{
+    $country = Country::query()->create([
+        'name' => 'Italy',
+        'iso_2' => 'IT',
+        'iso_3' => 'ITA',
+        'phone_code' => '+39',
+        'currency_code' => 'EUR',
+        'flag_emoji' => 'it',
+        'capital' => 'Rome',
+        'native' => 'Italia',
+    ]);
+
+    CountryTaxClass::query()->create([
+        'country_id' => $country->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'rate' => 22,
+    ]);
+}
+
+function createCartProduct(TaxClass $taxClass, float $price = 100): Product
+{
+    $product = Product::factory()->create([
+        'tax_class_id' => $taxClass->getKey(),
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => now()->subDay(),
+        'visible_until' => now()->addDay(),
+    ]);
+
+    $product->inventory()->create([
+        'stock' => 100,
+        'stock_reserved' => 0,
+        'stock_available' => 100,
+        'stock_min' => 0,
+        'price' => $price,
+        'price_includes_tax' => false,
+        'purchase_price' => null,
+    ]);
+
+    return $product->refresh();
+}
+
+function createUserForCart(string $email): User
+{
+    return User::query()->create([
+        'first_name' => 'Test',
+        'last_name' => 'User',
+        'email' => $email,
+        'phone' => '123456789',
+    ]);
+}
+
+it('creates a cart through api with lines', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-create-cart@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $response = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 2],
+        ],
+    ])->assertCreated();
+
+    $cartId = $response->json('id');
+
+    expect($cartId)->not->toBeNull()
+        ->and((float) $response->json('total_final'))->toBe(244.0);
+
+    getJson($prefix . '/carts/' . $cartId)
+        ->assertOk()
+        ->assertJsonPath('lines.0.product_id', $product->getKey())
+        ->assertJsonPath('lines.0.qty', 2);
+});
+
+it('filters carts by user_id', function () {
+    $userA = createUserForCart('user-a@example.test');
+    $userB = createUserForCart('user-b@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartA = Cart::query()->create([
+        'user_id' => $userA->getKey(),
+        'identifier' => 'cart-user-a',
+        'user_first_name' => $userA->first_name,
+        'user_last_name' => $userA->last_name,
+        'user_email' => $userA->email,
+        'status' => config('venditio-core.cart.status_enum')::getActiveStatus(),
+        'sub_total_taxable' => 0,
+        'sub_total_tax' => 0,
+        'sub_total' => 0,
+        'shipping_fee' => 0,
+        'payment_fee' => 0,
+        'discount_amount' => 0,
+        'total_final' => 0,
+        'addresses' => null,
+    ])->getKey();
+
+    $cartB = Cart::query()->create([
+        'user_id' => $userB->getKey(),
+        'identifier' => 'cart-user-b',
+        'user_first_name' => $userB->first_name,
+        'user_last_name' => $userB->last_name,
+        'user_email' => $userB->email,
+        'status' => config('venditio-core.cart.status_enum')::getActiveStatus(),
+        'sub_total_taxable' => 0,
+        'sub_total_tax' => 0,
+        'sub_total' => 0,
+        'shipping_fee' => 0,
+        'payment_fee' => 0,
+        'discount_amount' => 0,
+        'total_final' => 0,
+        'addresses' => null,
+    ])->getKey();
+
+    $response = getJson($prefix . '/carts?all=1&user_id=' . $userA->getKey())
+        ->assertOk();
+
+    $json = $response->json();
+    $ids = collect($json)->pluck('id')->filter()->values();
+
+    if ($ids->isEmpty() && is_array(data_get($json, 'data'))) {
+        $ids = collect(data_get($json, 'data'))->pluck('id')->filter()->values();
+    }
+
+    expect($ids)->toContain($cartA)
+        ->not->toContain($cartB);
+});
+
+it('returns cart detail with lines loaded', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-lines@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 2],
+        ],
+    ])->assertCreated()->json('id');
+
+    getJson($prefix . '/carts/' . $cartId)
+        ->assertOk()
+        ->assertJsonPath('id', $cartId)
+        ->assertJsonPath('lines.0.product_id', $product->getKey())
+        ->assertJsonPath('lines.0.qty', 2);
+});
+
+it('deletes a cart through api', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-delete@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()->json('id');
+
+    deleteJson($prefix . '/carts/' . $cartId)
+        ->assertOk();
+
+    assertSoftDeleted('carts', ['id' => $cartId]);
+    assertSoftDeleted('cart_lines', ['cart_id' => $cartId]);
+});
+
+it('adds lines and recalculates cart totals through pipeline', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-add-lines@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()->json('id');
+
+    postJson($prefix . '/carts/' . $cartId . '/add_lines', [
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 2],
+        ],
+    ])->assertOk()
+        ->assertJsonPath('lines.0.qty', 3);
+
+    $cart = config('venditio-core.models.cart')::query()->with('lines')->findOrFail($cartId);
+    $product->inventory->refresh();
+
+    expect($cart->lines)->toHaveCount(1)
+        ->and($cart->lines->first()->qty)->toBe(3)
+        ->and((float) $cart->total_final)->toBe(366.0)
+        ->and($product->inventory->stock_reserved)->toBe(3);
+});
+
+it('adds a line for a product already in the cart and updates the existing line correctly', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass, 100);
+    $user = createUserForCart('user-same-product@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 2],
+        ],
+    ])->assertCreated()->json('id');
+
+    $initialTotal = (float) getJson($prefix . '/carts/' . $cartId)->json('total_final');
+    expect($initialTotal)->toBe(244.0);
+
+    $response = postJson($prefix . '/carts/' . $cartId . '/add_lines', [
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 3],
+        ],
+    ])->assertOk();
+
+    $response->assertJsonPath('lines.0.product_id', $product->getKey())
+        ->assertJsonPath('lines.0.qty', 5);
+
+    $cart = config('venditio-core.models.cart')::query()->with('lines')->findOrFail($cartId);
+    $product->inventory->refresh();
+
+    expect($cart->lines)->toHaveCount(1)
+        ->and($cart->lines->first()->product_id)->toBe($product->getKey())
+        ->and($cart->lines->first()->qty)->toBe(5)
+        ->and((float) $cart->total_final)->toBe(610.0)
+        ->and($product->inventory->stock_reserved)->toBe(5);
+});
+
+it('removes lines and recalculates cart totals through pipeline', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-remove-lines@example.test');
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 2],
+        ],
+    ])->assertCreated()->json('id');
+
+    $lineId = config('venditio-core.models.cart_line')::query()
+        ->where('cart_id', $cartId)
+        ->value('id');
+
+    postJson($prefix . '/carts/' . $cartId . '/remove_lines', [
+        'line_ids' => [$lineId],
+    ])->assertOk();
+
+    $cart = config('venditio-core.models.cart')::query()->with('lines')->findOrFail($cartId);
+    $product->inventory->refresh();
+
+    expect($cart->lines)->toHaveCount(0)
+        ->and((float) $cart->total_final)->toBe(0.0)
+        ->and($product->inventory->stock_reserved)->toBe(0);
+});
+
+it('adds a discount code to an existing cart through api and recalculates totals', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-discount@example.test');
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'discountable_type' => null,
+        'discountable_id' => null,
+        'type' => DiscountType::Percentage,
+        'value' => 10,
+        'code' => 'CHECKOUT10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'rules' => [
+            'apply_to_cart_total' => true,
+        ],
+    ]);
+
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 2],
+        ],
+    ])->assertCreated()->json('id');
+
+    postJson($prefix . '/carts/' . $cartId . '/add_discount', [
+        'discount_code' => 'CHECKOUT10',
+    ])->assertOk()
+        ->assertJsonPath('discount_code', 'CHECKOUT10')
+        ->assertJsonPath('discount_amount', 24.4)
+        ->assertJsonPath('total_final', 219.6);
+});

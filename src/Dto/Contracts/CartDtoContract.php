@@ -28,5 +28,7 @@ interface CartDtoContract extends Dto
 
     public function getLines(): Collection;
 
+    public function hasLinesProvided(): bool;
+
     public function toModel(): Model;
 }

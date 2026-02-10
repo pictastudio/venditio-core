@@ -31,7 +31,18 @@ class CalculateTotals
             'total_final' => $totalFinal,
         ]);
 
+        $linesToDelete = collect($cart->getAttribute('lines_to_delete') ?? [])
+            ->filter()
+            ->values()
+            ->all();
+        $cart->offsetUnset('lines_to_delete');
+        $cart->offsetUnset('lines_payload_provided');
+
         $cart->save();
+
+        if (!empty($linesToDelete)) {
+            $cart->lines()->whereKey($linesToDelete)->delete();
+        }
 
         $cart->lines()->saveMany($lines);
 

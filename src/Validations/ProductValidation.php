@@ -68,6 +68,13 @@ class ProductValidation implements ProductValidationRules
                 'integer',
                 Rule::exists($this->tableFor('product_category'), 'id'),
             ],
+            'inventory' => 'sometimes|array',
+            'inventory.stock' => 'sometimes|integer|min:0',
+            'inventory.stock_reserved' => 'sometimes|integer|min:0',
+            'inventory.stock_min' => 'nullable|integer|min:0',
+            'inventory.price' => 'sometimes|numeric|min:0',
+            'inventory.price_includes_tax' => 'sometimes|boolean',
+            'inventory.purchase_price' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -133,6 +140,13 @@ class ProductValidation implements ProductValidationRules
                 'integer',
                 Rule::exists($this->tableFor('product_category'), 'id'),
             ],
+            'inventory' => 'sometimes|array',
+            'inventory.stock' => 'sometimes|integer|min:0',
+            'inventory.stock_reserved' => 'sometimes|integer|min:0',
+            'inventory.stock_min' => 'nullable|integer|min:0',
+            'inventory.price' => 'sometimes|numeric|min:0',
+            'inventory.price_includes_tax' => 'sometimes|boolean',
+            'inventory.purchase_price' => 'nullable|numeric|min:0',
         ];
     }
 

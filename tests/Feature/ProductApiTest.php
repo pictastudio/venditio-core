@@ -2,15 +2,9 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Models\Brand;
-use PictaStudio\VenditioCore\Models\Product;
-use PictaStudio\VenditioCore\Models\ProductCategory;
-use PictaStudio\VenditioCore\Models\TaxClass;
+use PictaStudio\VenditioCore\Models\{Brand, Inventory, Product, ProductCategory, TaxClass};
 
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseMissing;
-use function Pest\Laravel\postJson;
-use function Pest\Laravel\patchJson;
+use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, patchJson, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -77,5 +71,73 @@ it('updates product categories when provided', function () {
     assertDatabaseHas('product_category_product', [
         'product_id' => $product->getKey(),
         'product_category_id' => $otherCategory->getKey(),
+    ]);
+});
+
+it('creates a product with nested inventory fields', function () {
+    $brand = Brand::factory()->create();
+    $taxClass = TaxClass::factory()->create();
+
+    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'name' => 'Inventory Product',
+        'status' => ProductStatus::Published->value,
+        'inventory' => [
+            'stock' => 120,
+            'stock_reserved' => 15,
+            'stock_min' => 10,
+            'price' => 99.50,
+            'price_includes_tax' => true,
+            'purchase_price' => 65.10,
+        ],
+    ])->assertCreated();
+
+    $productId = $response->json('id');
+
+    assertDatabaseHas('inventories', [
+        'product_id' => $productId,
+        'stock' => 120,
+        'stock_reserved' => 15,
+        'stock_min' => 10,
+        'price' => 99.50,
+        'price_includes_tax' => true,
+        'purchase_price' => 65.10,
+        'stock_available' => 105,
+    ]);
+});
+
+it('updates nested inventory fields via product api', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    Inventory::factory()->create([
+        'product_id' => $product->getKey(),
+        'stock' => 10,
+        'stock_reserved' => 2,
+        'price' => 30,
+    ]);
+
+    patchJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+        'inventory' => [
+            'stock' => 75,
+            'stock_reserved' => 5,
+            'stock_min' => 8,
+            'price' => 120.00,
+            'purchase_price' => 70.00,
+        ],
+    ])->assertOk();
+
+    assertDatabaseHas('inventories', [
+        'product_id' => $product->getKey(),
+        'stock' => 75,
+        'stock_reserved' => 5,
+        'stock_min' => 8,
+        'price' => 120.00,
+        'purchase_price' => 70.00,
+        'stock_available' => 70,
     ]);
 });

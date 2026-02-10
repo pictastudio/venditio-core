@@ -12,6 +12,7 @@ class CreateProduct
     public function handle(array $payload): Product
     {
         $categoryIds = Arr::pull($payload, 'category_ids', []);
+        $inventoryPayload = Arr::pull($payload, 'inventory');
 
         /** @var Product $product */
         $product = resolve_model('product')::create($payload);
@@ -20,6 +21,10 @@ class CreateProduct
             $product->categories()->sync($categoryIds);
         }
 
-        return $product->refresh();
+        if (is_array($inventoryPayload)) {
+            $product->inventory()->create($inventoryPayload);
+        }
+
+        return $product->refresh()->load(['inventory', 'variantOptions']);
     }
 }

@@ -3,16 +3,14 @@
 namespace PictaStudio\VenditioCore\Http\Controllers\Api;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\{Builder, Collection};
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use PictaStudio\VenditioCore\Traits\ValidatesData;
 use Illuminate\Http\{JsonResponse, Response};
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\VenditioCore\Traits\ValidatesData;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
@@ -40,14 +38,17 @@ class Controller extends BaseController
                 'array',
             ],
             'id.*' => [
-                Rule::exists($model->getTableName(), $model->getKeyName()),
+                Rule::exists(
+                    method_exists($model, 'getTableName') ? $model->getTableName() : $model->getTable(),
+                    $model->getKeyName()
+                ),
             ],
         ]);
 
         return $query->when(
-                isset($filters['id']),
-                fn (Builder $query) => $query->whereKey($filters['id']),
-            )
+            isset($filters['id']),
+            fn (Builder $query) => $query->whereKey($filters['id']),
+        )
             ->when(
                 isset($filters['all']),
                 fn (Builder $query) => $query->get(),
@@ -55,19 +56,6 @@ class Controller extends BaseController
                     request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
                 ),
             );
-    }
-
-    protected function authorizeIfConfigured(string $ability, mixed $arguments): void
-    {
-        if (!config('venditio-core.policies.register')) {
-            return;
-        }
-
-        if (!auth()->check()) {
-            return;
-        }
-
-        $this->authorize($ability, $arguments);
     }
 
     public function successJsonResponse(array|string $data = [], ?string $message = null, int $status = Response::HTTP_OK): JsonResponse
@@ -96,5 +84,18 @@ class Controller extends BaseController
         }
 
         return response()->json($response, $status);
+    }
+
+    protected function authorizeIfConfigured(string $ability, mixed $arguments): void
+    {
+        if (!config('venditio-core.policies.register')) {
+            return;
+        }
+
+        if (!auth()->check()) {
+            return;
+        }
+
+        $this->authorize($ability, $arguments);
     }
 }

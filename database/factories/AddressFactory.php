@@ -3,7 +3,6 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Enums\AddressType;
 use PictaStudio\VenditioCore\Models\Address;
 
 class AddressFactory extends Factory
@@ -27,7 +26,6 @@ class AddressFactory extends Factory
             'city' => fake()->city(),
             'state' => fake()->state(),
             'zip' => fake()->postcode(),
-            'country' => fake()->country(),
             'birth_date' => fake()->date(),
             'birth_place' => fake()->city(),
             'notes' => fake()->sentences(asText: true),

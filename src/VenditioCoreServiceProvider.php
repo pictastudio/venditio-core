@@ -16,8 +16,8 @@ use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifie
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
-use PictaStudio\VenditioCore\Validations\{AddressValidation, CartLineValidation, CartValidation, OrderValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
-use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
+use PictaStudio\VenditioCore\Validations\{AddressValidation, BrandValidation, CartLineValidation, CartValidation, OrderValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
+use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, BrandValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
 
 class VenditioCoreServiceProvider extends PackageServiceProvider
@@ -87,6 +87,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
     {
         $validations = [
             AddressValidationRules::class => AddressValidation::class,
+            BrandValidationRules::class => BrandValidation::class,
             CartValidationRules::class => CartValidation::class,
             CartLineValidationRules::class => CartLineValidation::class,
             OrderValidationRules::class => OrderValidation::class,

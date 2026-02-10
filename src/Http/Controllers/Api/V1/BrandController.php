@@ -2,19 +2,14 @@
 
 namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\BrandDto;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Brand\StoreBrandRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\Brand\UpdateBrandRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Brand\{StoreBrandRequest, UpdateBrandRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\BrandResource;
 use PictaStudio\VenditioCore\Models\Brand;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_model};
 
 class BrandController extends Controller
 {
@@ -34,7 +29,7 @@ class BrandController extends Controller
         $this->authorizeIfConfigured('create', resolve_model('brand'));
 
         return BrandResource::make(
-            BrandDto::fromArray($request->validated())->create()
+            query('brand')->create($request->validated())
         );
     }
 
@@ -49,11 +44,10 @@ class BrandController extends Controller
     {
         $this->authorizeIfConfigured('update', $brand);
 
-        return BrandResource::make(
-            BrandDto::fromArray(array_merge(
-                $request->validated(), ['brand' => $brand]
-            ))->update()
-        );
+        $brand->fill($request->validated());
+        $brand->save();
+
+        return BrandResource::make($brand->refresh());
     }
 
     public function destroy(Brand $brand)

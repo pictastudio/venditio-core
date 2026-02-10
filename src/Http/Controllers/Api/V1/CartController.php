@@ -5,9 +5,8 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\CartDto;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
@@ -26,20 +25,25 @@ class CartController extends Controller
     {
         $filters = request()->all();
 
-        // $this->validateData($filters, [
-        //     'all' => [
-        //         'boolean',
-        //     ],
-        //     'id' => [
-        //         'array',
-        //     ],
-        //     'id.*' => [
-        //         Rule::exists('carts', 'id'),
-        //     ],
-        // ]);
+        $this->validateData($filters, [
+            'user_id' => [
+                'sometimes',
+                'integer',
+                Rule::exists((new (config('venditio-core.models.user')))->getTable(), 'id'),
+            ],
+        ]);
 
         return CartResource::collection(
-            $this->applyBaseFilters(query('cart'), $filters, 'cart')
+            $this->applyBaseFilters(
+                query('cart')
+                    ->with('lines')
+                    ->when(
+                        isset($filters['user_id']),
+                        fn (Builder $builder) => $builder->where('user_id', $filters['user_id']),
+                    ),
+                $filters,
+                'cart'
+            )
         );
     }
 
@@ -83,12 +87,10 @@ class CartController extends Controller
     public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getStoreValidationRules());
+        $lines = $this->mergeExistingAndIncomingLines($cart, $validationResponse['lines']);
+        $updatedCart = $this->runCartUpdatePipeline($cart, ['lines' => $lines])->load('lines');
 
-        $cart->lines()->createMany($validationResponse['lines']);
-
-        return $this->successJsonResponse(
-            message: 'Lines added successfully',
-        );
+        return response()->json(CartResource::make($updatedCart));
     }
 
     public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
@@ -103,8 +105,119 @@ class CartController extends Controller
             ]);
         }
 
-        return $this->successJsonResponse(
-            message: 'Lines updated successfully',
+        $updatedCart = $this->runCartUpdatePipeline(
+            $cart,
+            [
+                'lines' => $cart->lines()
+                    ->get(['product_id', 'qty'])
+                    ->map(fn ($line) => [
+                        'product_id' => $line->product_id,
+                        'qty' => $line->qty,
+                    ])
+                    ->toArray(),
+            ]
+        )->load('lines');
+
+        return response()->json(CartResource::make($updatedCart));
+    }
+
+    public function removeLines(Cart $cart): JsonResponse
+    {
+        $validated = $this->validateData(request()->all(), [
+            'line_ids' => 'required|array|min:1',
+            'line_ids.*' => [
+                'integer',
+                Rule::exists((new (config('venditio-core.models.cart_line')))->getTable(), 'id'),
+            ],
+        ]);
+
+        $lineIds = collect($validated['line_ids'])->map(fn ($id) => (int) $id)->all();
+        $cartLines = $cart->lines()->get(['id', 'product_id', 'qty']);
+        $lineIdsNotBelongingToCart = collect($lineIds)->diff($cartLines->pluck('id'));
+
+        if ($lineIdsNotBelongingToCart->isNotEmpty()) {
+            return $this->errorJsonResponse(
+                data: ['line_ids' => $lineIdsNotBelongingToCart->values()->all()],
+                message: 'Some lines do not belong to the provided cart.',
+                status: 422,
+            );
+        }
+
+        $remainingLines = $cartLines
+            ->reject(fn ($line) => in_array($line->id, $lineIds, true))
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines) => [
+                'product_id' => (int) $lines->first()->product_id,
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values()
+            ->all();
+
+        $updatedCart = $this->runCartUpdatePipeline($cart, ['lines' => $remainingLines])->load('lines');
+
+        return response()->json(CartResource::make($updatedCart));
+    }
+
+    public function addDiscount(Cart $cart): JsonResponse
+    {
+        $validated = $this->validateData(request()->all(), [
+            'discount_code' => 'required|string|max:255',
+        ]);
+
+        $updatedCart = $this->runCartUpdatePipeline(
+            $cart,
+            [
+                'discount_code' => $validated['discount_code'],
+            ]
+        )->load('lines');
+
+        return response()->json(CartResource::make($updatedCart));
+    }
+
+    private function mergeExistingAndIncomingLines(Cart $cart, array $incomingLines): array
+    {
+        $existingLines = $cart->lines()
+            ->get(['product_id', 'qty'])
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines, mixed $productId) => [
+                'product_id' => (int) $productId,
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values();
+
+        $incomingGrouped = collect($incomingLines)
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines, mixed $productId) => [
+                'product_id' => (int) $productId,
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values();
+
+        return $existingLines
+            ->concat($incomingGrouped)
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines) => [
+                'product_id' => (int) $lines->first()['product_id'],
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function runCartUpdatePipeline(Cart $cart, array $payload): Cart
+    {
+        /** @var CartUpdatePipeline $pipeline */
+        $pipeline = app(CartUpdatePipeline::class);
+
+        $payload = array_merge(
+            [
+                'cart' => $cart,
+            ],
+            $payload
+        );
+
+        return $pipeline->run(
+            resolve_dto('cart')::fromArray($payload)
         );
     }
 }

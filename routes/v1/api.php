@@ -1,15 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\AddressController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\BrandController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\CartController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\OrderController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductCategoryController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductTypeController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductVariantController;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\ProductVariantOptionController;
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\{AddressController, BrandController, CartController, CartLineController, CountryController, CountryTaxClassController, CurrencyController, DiscountApplicationController, DiscountController, InventoryController, OrderController, OrderLineController, ProductCategoryController, ProductController, ProductCustomFieldController, ProductTypeController, ProductVariantController, ProductVariantOptionController, ShippingStatusController, TaxClassController};
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +24,20 @@ Route::apiResource('product_variants', ProductVariantController::class)->only(['
 Route::apiResource('product_variant_options', ProductVariantOptionController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 Route::apiResource('carts', CartController::class);
 Route::post('carts/{cart}/add_lines', [CartController::class, 'addLines']);
+Route::post('carts/{cart}/remove_lines', [CartController::class, 'removeLines']);
+Route::post('carts/{cart}/add_discount', [CartController::class, 'addDiscount']);
 Route::patch('carts/{cart}/update_lines', [CartController::class, 'updateLines']);
-Route::apiResource('orders', OrderController::class)->only(['index', 'show', 'store', 'update']);
-Route::apiResource('addresses', AddressController::class)->only(['index', 'show', 'store', 'update']);
-Route::apiResource('brands', BrandController::class)->only(['index', 'show', 'store', 'update']);
+Route::apiResource('orders', OrderController::class);
+Route::apiResource('addresses', AddressController::class);
+Route::apiResource('brands', BrandController::class);
+Route::apiResource('inventories', InventoryController::class);
+Route::apiResource('countries', CountryController::class);
+Route::apiResource('country_tax_classes', CountryTaxClassController::class);
+Route::apiResource('currencies', CurrencyController::class);
+Route::apiResource('tax_classes', TaxClassController::class);
+Route::apiResource('shipping_statuses', ShippingStatusController::class);
+Route::apiResource('discounts', DiscountController::class);
+Route::apiResource('discount_applications', DiscountApplicationController::class);
+Route::apiResource('product_custom_fields', ProductCustomFieldController::class);
+Route::apiResource('cart_lines', CartLineController::class);
+Route::apiResource('order_lines', OrderLineController::class);

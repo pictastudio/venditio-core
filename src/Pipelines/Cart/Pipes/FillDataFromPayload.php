@@ -34,7 +34,11 @@ class FillDataFromPayload
             'addresses' => $addresses,
         ]);
 
-        $cart->setRelation('lines', $cartDto->getLines());
+        if (!$cart->exists || $cartDto->hasLinesProvided()) {
+            $cart->setRelation('lines', $cartDto->getLines());
+        }
+
+        $cart->setAttribute('lines_payload_provided', $cartDto->hasLinesProvided());
 
         return $next($cart);
     }

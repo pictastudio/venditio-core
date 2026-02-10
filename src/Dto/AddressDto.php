@@ -29,7 +29,6 @@ class AddressDto extends Dto implements AddressDtoContract
         private ?string $city,
         private ?string $state,
         private ?string $zip,
-        private ?string $country,
         private ?string $birthDate,
         private ?string $birthPlace,
         private ?string $notes,
@@ -141,11 +140,6 @@ class AddressDto extends Dto implements AddressDtoContract
         return $this->zip;
     }
 
-    public function getCountry(): ?string
-    {
-        return $this->country;
-    }
-
     public function getBirthDate(): null|string|Date
     {
         return $this->birthDate;
@@ -185,7 +179,6 @@ class AddressDto extends Dto implements AddressDtoContract
             'city' => $this->getCity(),
             'state' => $this->getState(),
             'zip' => $this->getZip(),
-            'country' => $this->getCountry(),
             'birth_date' => $this->getBirthDate(),
             'birth_place' => $this->getBirthPlace(),
             'notes' => $this->getNotes(),
@@ -217,7 +210,6 @@ class AddressDto extends Dto implements AddressDtoContract
             'city' => $this->getCity(),
             'state' => $this->getState(),
             'zip' => $this->getZip(),
-            'country' => $this->getCountry(),
             'birth_date' => $this->getBirthDate(),
             'birth_place' => $this->getBirthPlace(),
             'notes' => $this->getNotes(),

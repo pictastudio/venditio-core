@@ -5,11 +5,20 @@ namespace PictaStudio\VenditioCore\Validations;
 use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
 
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+
 class AddressValidation implements AddressValidationRules
 {
     public function getStoreValidationRules(): array
     {
         return [
+            'addressable_type' => 'sometimes|string|max:255',
+            'addressable_id' => 'sometimes|integer',
+            'country_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('country'), 'id'),
+            ],
             'type' => [
                 'required',
                 'string',
@@ -38,6 +47,13 @@ class AddressValidation implements AddressValidationRules
     public function getUpdateValidationRules(): array
     {
         return [
+            'addressable_type' => 'sometimes|string|max:255',
+            'addressable_id' => 'sometimes|integer',
+            'country_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('country'), 'id'),
+            ],
             'type' => [
                 'sometimes',
                 'string',
@@ -61,5 +77,10 @@ class AddressValidation implements AddressValidationRules
             'birth_place' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
         ];
+    }
+
+    private function tableFor(string $model): string
+    {
+        return (new (resolve_model($model)))->getTable();
     }
 }

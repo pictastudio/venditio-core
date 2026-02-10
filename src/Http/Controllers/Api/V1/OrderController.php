@@ -2,20 +2,16 @@
 
 namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Order\StoreOrderRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\Order\UpdateOrderRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Order\{StoreOrderRequest, UpdateOrderRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\OrderResource;
 use PictaStudio\VenditioCore\Models\Order;
 use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_dto};
 
 class OrderController extends Controller
 {
@@ -60,7 +56,10 @@ class OrderController extends Controller
 
     public function update(UpdateOrderRequest $request, Order $order): JsonResource
     {
-        return OrderResource::make($order);
+        $order->fill($request->validated());
+        $order->save();
+
+        return OrderResource::make($order->refresh()->load('lines'));
     }
 
     public function destroy(Order $order)

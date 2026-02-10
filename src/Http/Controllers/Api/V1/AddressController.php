@@ -2,19 +2,15 @@
 
 namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\AddressDto;
+use Illuminate\Validation\{ValidationException};
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Address\StoreAddressRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\Address\UpdateAddressRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Address\{StoreAddressRequest, UpdateAddressRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\AddressResource;
 use PictaStudio\VenditioCore\Models\Address;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_model};
 
 class AddressController extends Controller
 {
@@ -33,9 +29,22 @@ class AddressController extends Controller
     {
         $this->authorizeIfConfigured('create', resolve_model('address'));
 
-        return AddressResource::make(
-            AddressDto::fromArray($request->validated())->create()
-        );
+        $payload = $request->validated();
+        $addressable = auth()->guard()->user();
+
+        if ($addressable) {
+            $address = $addressable->addresses()->create($payload);
+        } else {
+            if (!isset($payload['addressable_type'], $payload['addressable_id'])) {
+                throw ValidationException::withMessages([
+                    'addressable' => 'addressable_type and addressable_id are required when no authenticated user is available.',
+                ]);
+            }
+
+            $address = query('address')->create($payload);
+        }
+
+        return AddressResource::make($address);
     }
 
     public function show(Address $address): JsonResource
@@ -49,12 +58,10 @@ class AddressController extends Controller
     {
         $this->authorizeIfConfigured('update', $address);
 
-        return AddressResource::make(
-            AddressDto::fromArray(array_merge(
-                $request->validated(),
-                ['address' => $address]
-            ))->update()
-        );
+        $address->fill($request->validated());
+        $address->save();
+
+        return AddressResource::make($address->refresh());
     }
 
     public function destroy(Address $address)

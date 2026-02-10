@@ -20,8 +20,6 @@ class CartValidation implements CartValidationRules
             'lines' => 'sometimes|array',
             'lines.*.product_id' => 'sometimes|integer|exists:products,id',
             'lines.*.qty' => 'sometimes|integer|min:1',
-
-            // TODO: add fields for discounts
         ];
     }
 

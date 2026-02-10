@@ -5,9 +5,7 @@ namespace PictaStudio\VenditioCore\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\URL;
-use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
-use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
-use PictaStudio\VenditioCore\Http\Resources\V1\ProductVariantOptionResource;
+use PictaStudio\VenditioCore\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
 class ProductResource extends JsonResource
 {
@@ -31,6 +29,7 @@ class ProductResource extends JsonResource
     {
         return [
             'variant_options' => ProductVariantOptionResource::collection($this->whenLoaded('variantOptions')),
+            'inventory' => InventoryResource::make($this->whenLoaded('inventory')),
         ];
     }
 

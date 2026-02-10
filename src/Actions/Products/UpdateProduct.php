@@ -11,6 +11,8 @@ class UpdateProduct
     {
         $categoryIdsProvided = array_key_exists('category_ids', $payload);
         $categoryIds = Arr::pull($payload, 'category_ids', []);
+        $inventoryProvided = array_key_exists('inventory', $payload);
+        $inventoryPayload = Arr::pull($payload, 'inventory');
 
         $product->fill($payload);
         $product->save();
@@ -19,6 +21,13 @@ class UpdateProduct
             $product->categories()->sync($categoryIds ?? []);
         }
 
-        return $product->refresh();
+        if ($inventoryProvided && is_array($inventoryPayload)) {
+            $product->inventory()->updateOrCreate(
+                ['product_id' => $product->getKey()],
+                $inventoryPayload
+            );
+        }
+
+        return $product->refresh()->load(['inventory', 'variantOptions']);
     }
 }
