@@ -2,9 +2,9 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Models\{Brand, Inventory, Product, ProductCategory, TaxClass};
+use PictaStudio\VenditioCore\Models\{Brand, Inventory, Product, ProductCategory, ProductType, ProductVariant, ProductVariantOption, TaxClass};
 
-use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, patchJson, postJson};
+use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, getJson, patchJson, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -176,4 +176,99 @@ it('updates nested inventory fields via product api', function () {
         'purchase_price' => 70.00,
         'stock_available' => 70,
     ]);
+});
+
+it('includes variants and variants options table when requested', function () {
+    $brand = Brand::factory()->create();
+    $taxClass = TaxClass::factory()->create();
+    $productType = ProductType::factory()->create();
+
+    $size = ProductVariant::factory()->create([
+        'product_type_id' => $productType->getKey(),
+        'name' => 'Size',
+        'sort_order' => 10,
+    ]);
+    $color = ProductVariant::factory()->create([
+        'product_type_id' => $productType->getKey(),
+        'name' => 'Color',
+        'sort_order' => 20,
+    ]);
+
+    $small = ProductVariantOption::factory()->create([
+        'product_variant_id' => $size->getKey(),
+        'name' => 's',
+        'sort_order' => 10,
+    ]);
+    $medium = ProductVariantOption::factory()->create([
+        'product_variant_id' => $size->getKey(),
+        'name' => 'm',
+        'sort_order' => 20,
+    ]);
+    $red = ProductVariantOption::factory()->create([
+        'product_variant_id' => $color->getKey(),
+        'name' => 'red',
+        'sort_order' => 10,
+    ]);
+    $blue = ProductVariantOption::factory()->create([
+        'product_variant_id' => $color->getKey(),
+        'name' => 'blue',
+        'sort_order' => 20,
+    ]);
+
+    $product = Product::factory()->create([
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'product_type_id' => $productType->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $variantA = Product::factory()->create([
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'product_type_id' => $productType->getKey(),
+        'parent_id' => $product->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $variantA->variantOptions()->sync([$small->getKey(), $red->getKey()]);
+
+    $variantB = Product::factory()->create([
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'product_type_id' => $productType->getKey(),
+        'parent_id' => $product->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $variantB->variantOptions()->sync([$medium->getKey(), $blue->getKey()]);
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")->ddJson();
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")
+        ->assertOk()
+        ->assertJsonCount(2, 'variants')
+        ->assertJsonPath('variants_options_table.0.id', $size->getKey())
+        ->assertJsonPath('variants_options_table.0.name', 'Size')
+        ->assertJsonPath('variants_options_table.0.values.0.value', 's')
+        ->assertJsonPath('variants_options_table.0.values.1.value', 'm')
+        ->assertJsonPath('variants_options_table.1.id', $color->getKey())
+        ->assertJsonPath('variants_options_table.1.name', 'Color')
+        ->assertJsonPath('variants_options_table.1.values.0.value', 'red')
+        ->assertJsonPath('variants_options_table.1.values.1.value', 'blue');
+});
+
+it('rejects unknown includes on products api', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=unknown")
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['include.0']);
 });
