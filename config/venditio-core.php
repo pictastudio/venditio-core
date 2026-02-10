@@ -169,6 +169,7 @@ return [
                     Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\GenerateIdentifier::class,
                     Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\ReserveStock::class,
                     Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
@@ -177,6 +178,7 @@ return [
                 'pipes' => [
                     Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\UpdateLines::class,
+                    Cart\Pipes\ReserveStock::class,
                     Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
@@ -234,6 +236,7 @@ return [
                     Order\Pipes\ApplyDiscounts::class,
                     Order\Pipes\CalculateLines::class,
                     Order\Pipes\RegisterDiscountUsages::class,
+                    Order\Pipes\CommitStock::class,
                     Order\Pipes\ApproveOrder::class,
                 ],
             ],

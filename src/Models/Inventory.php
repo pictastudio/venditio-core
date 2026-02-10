@@ -5,6 +5,7 @@ namespace PictaStudio\VenditioCore\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use PictaStudio\VenditioCore\Events\ProductStockBelowMinimum;
 use PictaStudio\VenditioCore\Models\Traits\{HasHelperMethods, LogsActivity};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
@@ -26,20 +27,39 @@ class Inventory extends Model
     protected function casts(): array
     {
         return [
+            'stock' => 'integer',
+            'stock_reserved' => 'integer',
+            'stock_available' => 'integer',
+            'stock_min' => 'integer',
             'price' => 'decimal:2',
             'price_includes_tax' => 'boolean',
             'purchase_price' => 'decimal:2',
         ];
     }
 
-    // protected function stockAvailable(): Attribute
-    // {
-    //     return Attribute::make(
-    //         set: fn (int $value) => (
-    //             $this->getAttribute('stock') - $this->getAttribute('stock_reserved')
-    //         ),
-    //     );
-    // }
+    protected static function booted(): void
+    {
+        static::saving(function (self $inventory) {
+            $inventory->stock_available = (int) $inventory->stock - (int) $inventory->stock_reserved;
+        });
+
+        static::saved(function (self $inventory) {
+            $stockMin = $inventory->stock_min;
+
+            if ($stockMin === null || !$inventory->wasChanged('stock')) {
+                return;
+            }
+
+            $previousStock = $inventory->getOriginal('stock');
+            $currentStock = (int) $inventory->stock;
+
+            if ($previousStock !== null && (int) $previousStock >= $stockMin && $currentStock < $stockMin) {
+                event(new ProductStockBelowMinimum(
+                    inventory: $inventory->fresh(['product']) ?? $inventory,
+                ));
+            }
+        });
+    }
 
     public function product(): BelongsTo
     {

@@ -51,7 +51,7 @@ function createProduct(float $price, TaxClass $taxClass, bool $priceIncludesTax 
     /** @var Product $product */
     $product = Product::factory()->create([
         'tax_class_id' => $taxClass->getKey(),
-        'status' => ProductStatus::Published->value,
+        'status' => ProductStatus::Published,
         'active' => true,
         'visible_from' => now()->subDay(),
         'visible_until' => now()->addDay(),
