@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('products')->nullOnDelete();
-            $table->foreignIdFor(Brand::class);
+            $table->foreignIdFor(Brand::class)->nullable();
             $table->foreignIdFor(ProductType::class)->nullable();
             $table->foreignIdFor(TaxClass::class);
             $table->string('name');

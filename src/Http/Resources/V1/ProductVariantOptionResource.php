@@ -36,7 +36,11 @@ class ProductVariantOptionResource extends JsonResource
     protected function transformAttributes(): array
     {
         return [
-            'image' => function (string $image) {
+            'image' => function (?string $image) {
+                if (blank($image)) {
+                    return null;
+                }
+
                 return URL::isValidUrl($image) ? $image : asset('storage/' . $image);
             },
         ];

@@ -18,7 +18,7 @@ class ProductValidation implements ProductValidationRules
                 Rule::exists($this->tableFor('product'), 'id'),
             ],
             'brand_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists($this->tableFor('brand'), 'id'),
             ],
@@ -82,6 +82,7 @@ class ProductValidation implements ProductValidationRules
             ],
             'brand_id' => [
                 'sometimes',
+                'nullable',
                 'integer',
                 Rule::exists($this->tableFor('brand'), 'id'),
             ],

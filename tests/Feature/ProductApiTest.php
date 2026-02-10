@@ -47,7 +47,7 @@ it('creates a product with categories', function () {
 it('validates product creation', function () {
     postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['brand_id', 'tax_class_id', 'name', 'status']);
+        ->assertJsonValidationErrors(['tax_class_id', 'name', 'status']);
 });
 
 it('updates product categories when provided', function () {
