@@ -122,7 +122,7 @@ it('applies a category discount through polymorphic relations during cart calcul
     expect((float) $line->unit_discount)->toBe(10.0)
         ->and((float) $line->discount_amount)->toBe(20.0)
         ->and($line->discount_code)->toBe('CAT10')
-        ->and((float) $cart->discount_amount)->toBe(20.0);
+        ->and((float) $cart->discount_amount)->toBe(0.0);
 });
 
 it('applies discounts only once per cart when the rule is enabled', function () {
@@ -198,4 +198,43 @@ it('enforces per-user usage limits after order registration', function () {
 
     expect(blank($secondLine->discount_code))->toBeTrue()
         ->and((float) $secondLine->unit_discount)->toBe(0.0);
+});
+
+it('applies cart total discount code at checkout', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(100, $taxClass);
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'discountable_type' => null,
+        'discountable_id' => null,
+        'type' => DiscountType::Percentage,
+        'value' => 10,
+        'code' => 'CHECKOUT10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'rules' => [
+            'apply_to_cart_total' => true,
+        ],
+    ]);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'discount_code' => 'CHECKOUT10',
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 2,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    expect($cart->discount_code)->toBe('CHECKOUT10')
+        ->and((float) $cart->sub_total)->toBe(244.0)
+        ->and((float) $cart->discount_amount)->toBe(24.4)
+        ->and((float) $cart->total_final)->toBe(219.6);
 });

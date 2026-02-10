@@ -273,10 +273,23 @@ return [
         'discountables_resolver' => Discounts\DiscountablesResolver::class,
         'usage_recorder' => Discounts\DiscountUsageRecorder::class,
         'rules' => [
+            Discounts\Rules\LineScopeRule::class,
             Discounts\Rules\ActiveWindowRule::class,
             Discounts\Rules\MaxUsesRule::class,
             Discounts\Rules\MaxUsesPerUserRule::class,
             Discounts\Rules\OncePerCartRule::class,
+        ],
+        'cart_total' => [
+            'calculator' => Discounts\CartTotalDiscountCalculator::class,
+            // `subtotal` applies coupon to line totals (tax included),
+            // `checkout_total` also includes shipping + payment fees.
+            'base' => 'subtotal',
+            'rules' => [
+                Discounts\Rules\ActiveWindowRule::class,
+                Discounts\Rules\MaxUsesRule::class,
+                Discounts\Rules\MaxUsesPerUserRule::class,
+                Discounts\Rules\OncePerCartRule::class,
+            ],
         ],
     ],
 

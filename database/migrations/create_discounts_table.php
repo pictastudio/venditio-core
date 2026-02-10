@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->morphs('discountable');
+            $table->nullableMorphs('discountable');
             $table->string('type', 20)->comment('percentage, fixed');
             $table->decimal('value', 10, 2);
             $table->string('name')->nullable();

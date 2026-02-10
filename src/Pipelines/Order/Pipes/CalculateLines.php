@@ -20,15 +20,14 @@ class CalculateLines
         $subTotalTaxable = $lines->sum('unit_final_price_taxable');
         $subTotalTax = $lines->sum('unit_final_price_tax');
         $subTotal = $lines->sum('total_final_price');
-        $discountAmount = round((float) $lines->sum('discount_amount'), 2);
-        $totalFinal = $subTotal + (float) $order->shipping_fee + (float) $order->payment_fee;
+        $discountAmount = (float) ($order->discount_amount ?? 0);
+        $totalFinal = max(0, $subTotal + (float) $order->shipping_fee + (float) $order->payment_fee - $discountAmount);
 
         $order->fill([
             'sub_total_taxable' => $subTotalTaxable,
             'sub_total_tax' => $subTotalTax,
             'sub_total' => $subTotal,
             'discount_amount' => $discountAmount,
-            'discount_code' => $lines->pluck('discount_code')->filter()->first(),
             'total_final' => $totalFinal,
         ]);
 

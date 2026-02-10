@@ -65,6 +65,7 @@ class DiscountUsageRecorder implements DiscountUsageRecorderInterface
             }
         });
 
+        $this->recordOrderLevelDiscountUsage($order, $discounts, $increments);
         $this->incrementDiscountUses($increments);
     }
 
@@ -96,6 +97,51 @@ class DiscountUsageRecorder implements DiscountUsageRecorderInterface
                 ->withoutGlobalScopes()
                 ->whereKey($discountId)
                 ->increment('uses', $uses);
+        }
+    }
+
+    /**
+     * @param  Collection<string, Discount>  $discounts
+     * @param  array<int|string, int>  $increments
+     */
+    private function recordOrderLevelDiscountUsage(Model $order, Collection $discounts, array &$increments): void
+    {
+        $orderDiscountCode = $order->getAttribute('discount_code');
+        $orderDiscountAmount = (float) ($order->getAttribute('discount_amount') ?? 0);
+
+        if (blank($orderDiscountCode) || $orderDiscountAmount <= 0) {
+            return;
+        }
+
+        /** @var Discount|null $discount */
+        $discount = $discounts->get($orderDiscountCode)
+            ?? $this->loadDiscountsByCode(collect([$orderDiscountCode]))->get($orderDiscountCode);
+
+        if (!$discount instanceof Discount) {
+            return;
+        }
+
+        $usageModel = resolve_model('discount_application');
+
+        $usage = $usageModel::query()->firstOrCreate(
+            [
+                'discount_id' => $discount->getKey(),
+                'order_id' => $order->getKey(),
+                'order_line_id' => null,
+            ],
+            [
+                'discountable_type' => $order->getMorphClass(),
+                'discountable_id' => $order->getKey(),
+                'user_id' => $order->getAttribute('user_id'),
+                'cart_id' => $order->getRelation('sourceCart')?->getKey(),
+                'qty' => 1,
+                'amount' => $orderDiscountAmount,
+            ]
+        );
+
+        if ($usage->wasRecentlyCreated) {
+            $discountId = $discount->getKey();
+            $increments[$discountId] = ($increments[$discountId] ?? 0) + 1;
         }
     }
 }

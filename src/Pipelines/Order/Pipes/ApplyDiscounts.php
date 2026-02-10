@@ -5,7 +5,7 @@ namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Contracts\DiscountCalculatorInterface;
+use PictaStudio\VenditioCore\Contracts\{CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface};
 use PictaStudio\VenditioCore\Discounts\DiscountContext;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
@@ -14,6 +14,7 @@ class ApplyDiscounts
 {
     public function __construct(
         private readonly DiscountCalculatorInterface $discountCalculator,
+        private readonly CartTotalDiscountCalculatorInterface $cartTotalDiscountCalculator,
     ) {}
 
     public function __invoke(Model $order, Closure $next): Model
@@ -43,10 +44,12 @@ class ApplyDiscounts
             return $line;
         });
 
+        $cartTotalDiscount = $this->cartTotalDiscountCalculator->resolveForTarget($order, $lines, $context);
+
         $order->setRelation('lines', $lines);
         $order->fill([
-            'discount_amount' => round((float) $lines->sum('discount_amount'), 2),
-            'discount_code' => $lines->pluck('discount_code')->filter()->first(),
+            'discount_amount' => $cartTotalDiscount['discount_amount'],
+            'discount_code' => $cartTotalDiscount['discount_code'],
         ]);
 
         return $next($order);

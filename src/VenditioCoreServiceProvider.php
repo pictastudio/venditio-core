@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface};
-use PictaStudio\VenditioCore\Discounts\{DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
+use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface};
+use PictaStudio\VenditioCore\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
 use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
 use PictaStudio\VenditioCore\Facades\VenditioCore as VenditioCoreFacade;
@@ -117,6 +117,11 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $this->app->singleton(
             DiscountUsageRecorderInterface::class,
             config('venditio-core.discounts.usage_recorder', DiscountUsageRecorder::class)
+        );
+
+        $this->app->singleton(
+            CartTotalDiscountCalculatorInterface::class,
+            config('venditio-core.discounts.cart_total.calculator', CartTotalDiscountCalculator::class)
         );
     }
 
