@@ -20,6 +20,7 @@ return new class extends Migration
             $table->dateTime('ends_at')->nullable()->comment('the datetime the discount ends at, if NULL it won\'t expire');
             $table->unsignedInteger('uses')->default(0)->comment('how many times the discount has been used');
             $table->unsignedInteger('max_uses')->nullable()->comment('how many times the discount can be used');
+            $table->json('rules')->nullable()->comment('rule options, e.g. {"max_uses_per_user": 1, "apply_once_per_cart": true}');
             $table->integer('priority')->default(0)->comment('the order of priority');
             $table->boolean('stop_after_propagation')->default(false)->comment('whether this discount will stop others after propagating');
             $table->datetimes();

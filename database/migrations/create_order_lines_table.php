@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Models\Order;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\VenditioCore\Models\{Order, Discount, Product};
 
 return new class extends Migration
 {
@@ -14,8 +13,11 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Order::class);
             $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(Discount::class)->nullable()->index();
             $table->string('product_name');
             $table->string('product_sku');
+            $table->string('discount_code', 30)->nullable()->comment('discount code');
+            $table->decimal('discount_amount', 10, 2)->default(0.00)->comment('absolute line discount amount');
             $table->decimal('unit_price', 10, 2)->comment('prezzo unitario di listino');
             $table->decimal('unit_discount', 10, 2)->default(0)->comment('sconto unitario');
             $table->decimal('unit_final_price', 10, 2)->comment('prezzo finale prodotto inclusi sconti');

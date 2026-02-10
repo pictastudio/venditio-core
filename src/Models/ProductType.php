@@ -3,16 +3,16 @@
 namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Scopes\Active;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class ProductType extends Model
 {
+    use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use SoftDeletes;

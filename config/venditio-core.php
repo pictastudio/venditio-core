@@ -4,6 +4,7 @@ use PictaStudio\VenditioCore\Dto;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Managers;
 use PictaStudio\VenditioCore\Enums;
+use PictaStudio\VenditioCore\Discounts;
 use PictaStudio\VenditioCore\Models;
 use PictaStudio\VenditioCore\Pipelines\Cart;
 use PictaStudio\VenditioCore\Pipelines\CartLine;
@@ -89,6 +90,7 @@ return [
         'country_tax_class' => Models\CountryTaxClass::class,
         'currency' => Models\Currency::class,
         'discount' => Models\Discount::class,
+        'discount_application' => Models\DiscountApplication::class,
         'inventory' => Models\Inventory::class,
         'order' => Models\Order::class,
         'order_line' => Models\OrderLine::class,
@@ -167,6 +169,7 @@ return [
                     Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\GenerateIdentifier::class,
                     Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
             ],
@@ -174,6 +177,7 @@ return [
                 'pipes' => [
                     Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\UpdateLines::class,
+                    Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
             ],
@@ -227,7 +231,9 @@ return [
                 'pipes' => [
                     Order\Pipes\FillOrderFromCart::class,
                     Order\Pipes\GenerateIdentifier::class,
+                    Order\Pipes\ApplyDiscounts::class,
                     Order\Pipes\CalculateLines::class,
+                    Order\Pipes\RegisterDiscountUsages::class,
                     Order\Pipes\ApproveOrder::class,
                 ],
             ],
@@ -250,6 +256,28 @@ return [
     'product' => [
         'status_enum' => Enums\ProductStatus::class,
         'measuring_unit_enum' => Enums\ProductMeasuringUnit::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Discounts
+    |--------------------------------------------------------------------------
+    |
+    | Bindings and rule classes used to evaluate discount eligibility.
+    | Host applications can override the calculator/resolver/usage recorder
+    | implementations or completely replace the rules list.
+    |
+    */
+    'discounts' => [
+        'calculator' => Discounts\DiscountCalculator::class,
+        'discountables_resolver' => Discounts\DiscountablesResolver::class,
+        'usage_recorder' => Discounts\DiscountUsageRecorder::class,
+        'rules' => [
+            Discounts\Rules\ActiveWindowRule::class,
+            Discounts\Rules\MaxUsesRule::class,
+            Discounts\Rules\MaxUsesPerUserRule::class,
+            Discounts\Rules\OncePerCartRule::class,
+        ],
     ],
 
     /*

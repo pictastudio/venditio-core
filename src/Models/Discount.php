@@ -4,16 +4,14 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\{HasMany, MorphTo};
 use PictaStudio\VenditioCore\Enums\DiscountType;
-use PictaStudio\VenditioCore\Models\Scopes\Active;
-use PictaStudio\VenditioCore\Models\Scopes\InDateRange;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Models\Scopes\{Active, InDateRange};
+use PictaStudio\VenditioCore\Models\Traits\{HasHelperMethods, LogsActivity};
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class Discount extends Model
 {
@@ -37,6 +35,7 @@ class Discount extends Model
             'active' => 'boolean',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'rules' => 'array',
         ];
     }
 
@@ -51,6 +50,16 @@ class Discount extends Model
     public function discountable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(resolve_model('discount_application'));
+    }
+
+    public function getRule(string $rule, mixed $default = null): mixed
+    {
+        return data_get($this->rules ?? [], $rule, $default);
     }
 
     #[Scope]

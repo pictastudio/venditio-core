@@ -8,8 +8,7 @@ use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
 use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineCreationPipeline;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+use function PictaStudio\VenditioCore\Helpers\Functions\{resolve_dto};
 
 class CalculateLines
 {
@@ -31,10 +30,12 @@ class CalculateLines
 
     public function calculateLines(Collection $lines)
     {
-        return $lines->map(function (array $line) {
-            return CartLineCreationPipeline::make()->run(
-                resolve_dto('cart_line')::fromArray($line)
-            );
+        return $lines->map(function (mixed $line) {
+            $cartLineDto = $line instanceof CartLineDtoContract
+                ? $line
+                : resolve_dto('cart_line')::fromArray((array) $line);
+
+            return CartLineCreationPipeline::make()->run($cartLineDto);
         });
     }
 }

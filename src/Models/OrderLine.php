@@ -3,15 +3,15 @@
 namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class OrderLine extends Model
 {
+    use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use SoftDeletes;
@@ -26,6 +26,8 @@ class OrderLine extends Model
     protected function casts(): array
     {
         return [
+            'discount_id' => 'integer',
+            'discount_amount' => 'decimal:2',
             'unit_price' => 'decimal:2',
             'unit_discount' => 'decimal:2',
             'unit_final_price' => 'decimal:2',
@@ -45,5 +47,10 @@ class OrderLine extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(resolve_model('product'));
+    }
+
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(resolve_model('discount'));
     }
 }

@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use PictaStudio\VenditioCore\Enums\DiscountType;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\VenditioCore\Models\{Discount, Product};
 
 class DiscountFactory extends Factory
 {
@@ -13,12 +13,16 @@ class DiscountFactory extends Factory
     public function definition(): array
     {
         return [
+            'discountable_type' => 'product',
+            'discountable_id' => Product::factory(),
             'type' => fake()->randomElement(DiscountType::cases())->value,
             'value' => fake()->numberBetween(1, 100),
             'name' => fake()->word(),
-            'active' => fake()->boolean(),
-            'starts_at' => fake()->dateTime(),
-            'ends_at' => fake()->dateTime(),
+            'code' => mb_strtoupper(fake()->bothify('DISC-#####')),
+            'active' => true,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addDay(),
+            'rules' => [],
         ];
     }
 

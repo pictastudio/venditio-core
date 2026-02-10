@@ -2,8 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Helpers\Functions;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
@@ -22,13 +21,13 @@ if (!function_exists('resolve_model')) {
     /**
      * Resolve the configured model class
      *
-     * @param string $model Can be one of the following values:
-     *                      'address', 'brand', 'cart', 'cart_line', 'country',
-     *                      'country_tax_class', 'currency', 'discount', 'inventory',
-     *                      'order', 'order_line', 'product', 'product_category',
-     *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_type',
-     *                      'product_variant', 'product_variant_option'
+     * @param  string  $model  Can be one of the following values:
+     *                         'address', 'brand', 'cart', 'cart_line', 'country',
+     *                         'country_tax_class', 'currency', 'discount', 'discount_application', 'inventory',
+     *                         'order', 'order_line', 'product', 'product_category',
+     *                         'shipping_status', 'tax_class', 'user'.
+     *                         'product_custom_field', 'product_type',
+     *                         'product_variant', 'product_variant_option'
      */
     function resolve_model(string $model): string
     {
@@ -39,14 +38,14 @@ if (!function_exists('resolve_model')) {
 if (!function_exists('query')) {
     /**
      * Initialize a query builder for the given model
-     * 
-     * @param string $model Can be one of the following values:
-     *                      'address', 'brand', 'cart', 'cart_line', 'country',
-     *                      'country_tax_class', 'currency', 'discount', 'inventory',
-     *                      'order', 'order_line', 'product', 'product_category',
-     *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_type',
-     *                      'product_variant', 'product_variant_option'
+     *
+     * @param  string  $model  Can be one of the following values:
+     *                         'address', 'brand', 'cart', 'cart_line', 'country',
+     *                         'country_tax_class', 'currency', 'discount', 'discount_application', 'inventory',
+     *                         'order', 'order_line', 'product', 'product_category',
+     *                         'shipping_status', 'tax_class', 'user'.
+     *                         'product_custom_field', 'product_type',
+     *                         'product_variant', 'product_variant_option'
      */
     function query(string $model): Builder
     {
@@ -58,13 +57,13 @@ if (!function_exists('get_fresh_model_instance')) {
     /**
      * Get a fresh instance of the given model
      *
-     * @param string $model Can be one of the following values:
-     *                      'address', 'brand', 'cart', 'cart_line', 'country',
-     *                      'country_tax_class', 'currency', 'discount', 'inventory',
-     *                      'order', 'order_line', 'product', 'product_category',
-     *                      'shipping_status', 'tax_class', 'user'.
-     *                      'product_custom_field', 'product_type',
-     *                      'product_variant', 'product_variant_option'
+     * @param  string  $model  Can be one of the following values:
+     *                         'address', 'brand', 'cart', 'cart_line', 'country',
+     *                         'country_tax_class', 'currency', 'discount', 'discount_application', 'inventory',
+     *                         'order', 'order_line', 'product', 'product_category',
+     *                         'shipping_status', 'tax_class', 'user'.
+     *                         'product_custom_field', 'product_type',
+     *                         'product_variant', 'product_variant_option'
      */
     function get_fresh_model_instance(string $model): Model
     {
@@ -76,9 +75,8 @@ if (!function_exists('resolve_dto')) {
     /**
      * Resolve the DTO class for the given model/type, returns the fully qualified class name
      *
-     * @param string $dto Can be one of the following values:
-     *                     'order', 'cart', 'cart_line', 'address'
-     *
+     * @param  string  $dto  Can be one of the following values:
+     *                       'order', 'cart', 'cart_line', 'address'
      * @return class-string
      */
     function resolve_dto(string $dto): string
@@ -96,9 +94,8 @@ if (!function_exists('resolve_enum')) {
     /**
      * Resolve the enum class for the given model/type, returns the fully qualified class name
      *
-     * @param string $enum Can be one of the following values:
-     *                     'order_status', 'cart_status', 'cart_line_status', 'address_type'
-     *
+     * @param  string  $enum  Can be one of the following values:
+     *                        'order_status', 'cart_status', 'cart_line_status', 'address_type'
      * @return class-string
      */
     function resolve_enum(string $enum): string

@@ -28,7 +28,7 @@ class FillProductInformations
             'product_name' => $product->name,
             'product_sku' => $product->sku,
             'qty' => $cartLineDto->getQty(),
-            'product' => $product->toArray(),
+            'product_data' => $product->toArray(),
         ]);
 
         return $next($cartLine);

@@ -3,46 +3,22 @@
 namespace PictaStudio\VenditioCore;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Contracts\CartIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Contracts\OrderIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Dto\CartDto;
-use PictaStudio\VenditioCore\Dto\CartLineDto;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Dto\OrderDto;
+use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface};
+use PictaStudio\VenditioCore\Discounts\{DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
+use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
+use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
 use PictaStudio\VenditioCore\Facades\VenditioCore as VenditioCoreFacade;
-use PictaStudio\VenditioCore\Generators\CartIdentifierGenerator;
-use PictaStudio\VenditioCore\Generators\OrderIdentifierGenerator;
+use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator};
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
-use PictaStudio\VenditioCore\Validations\AddressValidation;
-use PictaStudio\VenditioCore\Validations\CartLineValidation;
-use PictaStudio\VenditioCore\Validations\CartValidation;
-use PictaStudio\VenditioCore\Validations\OrderValidation;
-use PictaStudio\VenditioCore\Validations\ProductCategoryValidation;
-use PictaStudio\VenditioCore\Validations\ProductValidation;
-use PictaStudio\VenditioCore\Validations\ProductTypeValidation;
-use PictaStudio\VenditioCore\Validations\ProductVariantValidation;
-use PictaStudio\VenditioCore\Validations\ProductVariantOptionValidation;
-use PictaStudio\VenditioCore\Packages\Tools\Commands\InstallCommand;
+use PictaStudio\VenditioCore\Validations\{AddressValidation, CartLineValidation, CartValidation, OrderValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
+use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
-use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\OrderValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductCategoryValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductTypeValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantValidationRules;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantOptionValidationRules;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class VenditioCoreServiceProvider extends PackageServiceProvider
 {
@@ -67,6 +43,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
                 'create_shipping_statuses_table',
                 'create_brands_table',
                 'create_product_categories_table',
+                'create_discount_applications_table',
                 'create_discounts_table',
                 'create_products_table',
                 'create_product_types_table',
@@ -79,7 +56,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
                 'create_carts_table',
                 'create_cart_lines_table',
             ]);
-            // ->hasRoute('api');
+        // ->hasRoute('api');
     }
 
     public function registeringPackage()
@@ -96,6 +73,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         // $this->bindDtos();
         $this->registerFactoriesGuessing();
         $this->registerMorphMap();
+        $this->bindDiscountClasses();
 
         $this->app->singleton(AuthManagerContract::class, fn () => (
             AuthManager::make(fn () => auth()->guard()->user())
@@ -122,6 +100,24 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         foreach ($validations as $contract => $implementation) {
             $this->app->singleton($contract, $implementation);
         }
+    }
+
+    private function bindDiscountClasses(): void
+    {
+        $this->app->singleton(
+            DiscountCalculatorInterface::class,
+            config('venditio-core.discounts.calculator', DiscountCalculator::class)
+        );
+
+        $this->app->singleton(
+            DiscountablesResolverInterface::class,
+            config('venditio-core.discounts.discountables_resolver', DiscountablesResolver::class)
+        );
+
+        $this->app->singleton(
+            DiscountUsageRecorderInterface::class,
+            config('venditio-core.discounts.usage_recorder', DiscountUsageRecorder::class)
+        );
     }
 
     // private function bindDtos(): void
@@ -154,7 +150,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
 
         Route::middleware(config('venditio-core.routes.api.v1.middleware'))
             ->prefix($prefix)
-            ->name(rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
+            ->name(mb_rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
             ->group(fn () => (
                 $this->loadRoutesFrom($this->package->basePath('/../routes/v1/api.php'))
             ));
@@ -172,12 +168,13 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
 
     private function registerMorphMap(): void
     {
-        $morphMap = [
-            'user' => User::class,
-        ];
+        $morphMap = collect(config('venditio-core.models', []))
+            ->filter(fn (mixed $model) => is_string($model) && class_exists($model))
+            ->toArray();
 
-        $productModel = resolve_model('product');
-        $morphMap['product'] = $productModel;
+        if (!isset($morphMap['user'])) {
+            $morphMap['user'] = User::class;
+        }
 
         Relation::morphMap($morphMap);
     }

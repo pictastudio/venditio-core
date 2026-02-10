@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\VenditioCore\Models\{Cart, Discount, Product};
 
 return new class extends Migration
 {
@@ -14,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Cart::class);
             $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(Discount::class)->nullable()->index();
             $table->string('product_name');
             $table->string('product_sku');
             $table->string('discount_code', 30)->nullable()->comment('codice sconto');
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->mediumInteger('qty')->comment('quantità ordinata');
             $table->decimal('total_final_price', 10, 2)->comment('prezzo totale finale inclusi sconti e tasse');
             $table->decimal('tax_rate', 10, 2)->comment('aliquota tassa applicata');
-            $table->json('product')->comment('tutti i dati del prodotto salvati statici al momento della creazione della riga'); // valutare se cambiare nome per non andare in conflito con la relation
+            $table->json('product_data')->comment('tutti i dati del prodotto salvati statici al momento della creazione della riga');
             $table->datetimes();
             $table->softDeletesDatetime();
         });

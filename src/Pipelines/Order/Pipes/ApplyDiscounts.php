@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
+namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -16,40 +16,40 @@ class ApplyDiscounts
         private readonly DiscountCalculatorInterface $discountCalculator,
     ) {}
 
-    /**
-     * Called just before cart totals are calculated.
-     */
-    public function handle(Model $cart, Closure $next): Model
+    public function __invoke(Model $order, Closure $next): Model
     {
-        $lines = $cart->getRelation('lines');
+        $lines = $order->getRelation('lines');
 
         if (!$lines instanceof Collection) {
             $lines = collect($lines ?? []);
         }
 
+        $sourceCart = $order->getRelation('sourceCart');
+        $user = filled($order->getAttribute('user_id'))
+            ? query('user')->find($order->getAttribute('user_id'))
+            : null;
+
         $context = DiscountContext::make(
-            cart: $cart,
-            user: $cart->relationLoaded('user')
-                ? $cart->user
-                : (filled($cart->getAttribute('user_id'))
-                    ? query('user')->find($cart->getAttribute('user_id'))
-                    : null),
+            cart: $sourceCart,
+            order: $order,
+            user: $user,
         );
 
-        $lines = $lines->map(function (Model $line) use ($context, $cart) {
-            $line->setRelation('cart', $cart);
+        $lines = $lines->map(function (Model $line) use ($context, $order) {
+            $line->setRelation('order', $order);
             $this->discountCalculator->apply($line, $context);
             $this->recalculateLineTotals($line);
 
             return $line;
         });
 
-        $cart->setRelation('lines', $lines);
-        $cart->fill([
+        $order->setRelation('lines', $lines);
+        $order->fill([
             'discount_amount' => round((float) $lines->sum('discount_amount'), 2),
+            'discount_code' => $lines->pluck('discount_code')->filter()->first(),
         ]);
 
-        return $next($cart);
+        return $next($order);
     }
 
     private function recalculateLineTotals(Model $line): void

@@ -13,7 +13,7 @@ class CalculateTaxes
     {
         $unitFinalPrice = $cartLine->unit_final_price;
 
-        $taxRate = $this->getTaxRate($cartLine->getAttribute('product'));
+        $taxRate = $this->getTaxRate($cartLine->getAttribute('product_data'));
 
         // il valore imponibile è uguale al prezzo finale (trattiamo il prezzo flat dei prodotti, privo di tasse)
         $unitFinalPriceTaxable = $unitFinalPrice;

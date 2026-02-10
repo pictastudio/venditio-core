@@ -3,61 +3,25 @@
 namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
 
 use Closure;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Dto\OrderDto;
 use PictaStudio\VenditioCore\Models\Cart;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class FillOrderFromCart
 {
     public function __invoke(OrderDtoContract $orderDto, Closure $next): Model
     {
-        // dd($orderDto->toModel()->toArray());
-
-        // $cart = query('cart')
-        //     ->where('status', config('venditio-core.cart.status_enum')::getActiveStatus())
-        //     ->findOrFail($requestValidated['cart_id']);
-
-        // throw_if(
-        //     is_null($cart),
-        //     new Exception('Cart not found')
-        // );
-
-        // $order = get_fresh_model_instance('order');
-
-        // // move this inside the OrderDto toArray method
-        // $order->fill([
-        //     'user_id' => auth()->guard()->id(),
-        //     'status' => config('venditio-core.order.status_enum')::getProcessingStatus(),
-        //     // 'tracking_code' => null,
-        //     // 'tracking_date' => null,
-        //     // 'courier_code' => null,
-        //     'sub_total_taxable' => $cart->sub_total_taxable,
-        //     'sub_total_tax' => $cart->sub_total_tax,
-        //     'sub_total' => $cart->sub_total,
-        //     'shipping_fee' => $cart->shipping_fee,
-        //     'payment_fee' => $cart->payment_fee,
-        //     'discount_code' => $cart->discount_code,
-        //     'discount_amount' => $cart->discount_amount,
-        //     'total_final' => $cart->total_final,
-        //     'user_first_name' => $cart->user_first_name,
-        //     'user_last_name' => $cart->user_last_name,
-        //     'user_email' => $cart->user_email,
-        //     'addresses' => $cart->addresses,
-        //     'customer_notes' => $cart->notes,
-        //     // 'admin_notes' => null,
-        // ]);
-
+        $cart = $orderDto->getCart()->loadMissing('lines');
         $order = $orderDto->toModel();
+        $order->fill([
+            'status' => config('venditio-core.order.status_enum')::getProcessingStatus(),
+        ]);
 
-        $order->setRelation('lines', $this->mapCartLineToOrderLine($orderDto->getCart()));
-
-        dd($order->toArray());
+        $order->setRelation('sourceCart', $cart);
+        $order->setRelation('lines', $this->mapCartLineToOrderLine($cart));
 
         return $next($order);
     }
@@ -69,6 +33,9 @@ class FillOrderFromCart
 
             return $orderLine->fill([
                 'product_id' => $cartLine->product_id,
+                'discount_id' => $cartLine->discount_id,
+                'discount_code' => $cartLine->discount_code,
+                'discount_amount' => $cartLine->discount_amount,
                 'product_name' => $cartLine->product_name,
                 'product_sku' => $cartLine->product_sku,
                 'unit_price' => $cartLine->unit_price,
