@@ -17,14 +17,12 @@ class ProductVariantOptionValidation implements ProductVariantOptionValidationRu
                 'integer',
                 Rule::exists($this->tableFor('product_variant'), 'id'),
             ],
-            'value' => [
+            'name' => [
                 'required',
-                function (string $attribute, mixed $value, callable $fail) {
-                    if (!is_string($value) && !is_array($value)) {
-                        $fail('The value field must be a string or an array.');
-                    }
-                },
+                'string',
             ],
+            'image' => 'sometimes|nullable|string',
+            'hex_color' => 'sometimes|nullable|string|max:20',
             'sort_order' => 'required|integer|min:0',
         ];
     }
@@ -37,14 +35,9 @@ class ProductVariantOptionValidation implements ProductVariantOptionValidationRu
                 'integer',
                 Rule::exists($this->tableFor('product_variant'), 'id'),
             ],
-            'value' => [
-                'sometimes',
-                function (string $attribute, mixed $value, callable $fail) {
-                    if (!is_string($value) && !is_array($value)) {
-                        $fail('The value field must be a string or an array.');
-                    }
-                },
-            ],
+            'name' => 'sometimes|string',
+            'image' => 'sometimes|nullable|string',
+            'hex_color' => 'sometimes|nullable|string|max:20',
             'sort_order' => 'sometimes|integer|min:0',
         ];
     }

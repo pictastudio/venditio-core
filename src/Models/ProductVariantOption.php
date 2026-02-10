@@ -25,10 +25,6 @@ class ProductVariantOption extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'value' => 'json',
-    ];
-
     protected static function booted(): void
     {
         static::addGlobalScope(Ordered::class);

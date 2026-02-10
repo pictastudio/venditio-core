@@ -198,7 +198,7 @@ class CreateProductVariants
         $suffixSeparator = config('venditio-core.product_variants.name_suffix_separator', ' - ');
 
         $optionLabel = collect($options)
-            ->map(fn ($option) => $this->formatOptionLabel($option->value))
+            ->map(fn ($option) => $this->formatOptionLabel($option->name))
             ->filter()
             ->implode($separator);
 
@@ -211,10 +211,6 @@ class CreateProductVariants
 
     private function formatOptionLabel(mixed $value): string
     {
-        if (is_array($value)) {
-            return (string) ($value['label'] ?? $value['name'] ?? $value['value'] ?? json_encode($value));
-        }
-
         return is_scalar($value) ? (string) $value : '';
     }
 

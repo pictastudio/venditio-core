@@ -152,7 +152,7 @@ Content-Type: application/json
 
 {
   "product_variant_id": 10,
-  "value": "red",
+  "name": "red",
   "sort_order": 1
 }
 ```
@@ -163,7 +163,7 @@ Content-Type: application/json
 
 {
   "product_variant_id": 11,
-  "value": "m",
+  "name": "m",
   "sort_order": 2
 }
 ```

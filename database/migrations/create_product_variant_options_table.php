@@ -12,7 +12,9 @@ return new class extends Migration
         Schema::create('product_variant_options', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(ProductVariant::class);
-            $table->json('value');
+            $table->string('name');
+            $table->string('image')->nullable();
+            $table->string('hex_color', 20)->nullable();
             $table->smallInteger('sort_order');
             $table->datetimes();
             $table->softDeletesDatetime();

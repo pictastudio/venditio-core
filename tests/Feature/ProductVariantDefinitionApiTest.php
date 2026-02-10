@@ -28,12 +28,12 @@ it('creates product types, variants, and options', function () {
 
     postJson(config('venditio-core.routes.api.v1.prefix') . '/product_variant_options', [
         'product_variant_id' => $variantId,
-        'value' => 'red',
+        'name' => 'red',
         'sort_order' => 1,
     ])->assertCreated()
         ->assertJsonFragment([
             'product_variant_id' => $variantId,
-            'value' => 'red',
+        'name' => 'red',
         ]);
 });
 
@@ -60,11 +60,11 @@ it('filters variant options by variant', function () {
 
     ProductVariantOption::factory()->create([
         'product_variant_id' => $variant->getKey(),
-        'value' => 'red',
+        'name' => 'red',
     ]);
     ProductVariantOption::factory()->create([
         'product_variant_id' => $otherVariant->getKey(),
-        'value' => 'blue',
+        'name' => 'blue',
     ]);
 
     $response = getJson(config('venditio-core.routes.api.v1.prefix') . '/product_variant_options?product_variant_id=' . $variant->getKey())

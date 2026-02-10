@@ -28,19 +28,19 @@ it('generates product variants from variant options', function () {
 
     $red = ProductVariantOption::factory()->create([
         'product_variant_id' => $colorVariant->getKey(),
-        'value' => 'red',
+        'name' => 'red',
     ]);
     $blue = ProductVariantOption::factory()->create([
         'product_variant_id' => $colorVariant->getKey(),
-        'value' => 'blue',
+        'name' => 'blue',
     ]);
     $small = ProductVariantOption::factory()->create([
         'product_variant_id' => $sizeVariant->getKey(),
-        'value' => 's',
+        'name' => 's',
     ]);
     $large = ProductVariantOption::factory()->create([
         'product_variant_id' => $sizeVariant->getKey(),
-        'value' => 'l',
+        'name' => 'l',
     ]);
 
     $product = Product::factory()->create([
@@ -83,11 +83,11 @@ it('skips existing variant combinations', function () {
     ]);
     $red = ProductVariantOption::factory()->create([
         'product_variant_id' => $colorVariant->getKey(),
-        'value' => 'red',
+        'name' => 'red',
     ]);
     $blue = ProductVariantOption::factory()->create([
         'product_variant_id' => $colorVariant->getKey(),
-        'value' => 'blue',
+        'name' => 'blue',
     ]);
 
     $product = Product::factory()->create([
@@ -137,19 +137,19 @@ it('creates only new combinations when adding options later', function () {
 
     $red = ProductVariantOption::factory()->create([
         'product_variant_id' => $colorVariant->getKey(),
-        'value' => 'red',
+        'name' => 'red',
     ]);
     $blue = ProductVariantOption::factory()->create([
         'product_variant_id' => $colorVariant->getKey(),
-        'value' => 'blue',
+        'name' => 'blue',
     ]);
     $small = ProductVariantOption::factory()->create([
         'product_variant_id' => $sizeVariant->getKey(),
-        'value' => 's',
+        'name' => 's',
     ]);
     $medium = ProductVariantOption::factory()->create([
         'product_variant_id' => $sizeVariant->getKey(),
-        'value' => 'm',
+        'name' => 'm',
     ]);
 
     $product = Product::factory()->create([
@@ -178,7 +178,7 @@ it('creates only new combinations when adding options later', function () {
 
     $large = ProductVariantOption::factory()->create([
         'product_variant_id' => $sizeVariant->getKey(),
-        'value' => 'l',
+        'name' => 'l',
     ]);
 
     $response = postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
