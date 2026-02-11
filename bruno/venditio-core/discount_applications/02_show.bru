@@ -1,0 +1,20 @@
+meta {
+  name: Show discount_applications
+  type: http
+  seq: 82
+}
+
+get {
+  url: {{baseUrl}}/discount_applications/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

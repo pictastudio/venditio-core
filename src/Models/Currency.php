@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\VenditioCore\Models\Traits\HasDefault;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
@@ -33,8 +33,9 @@ class Currency extends Model
         ];
     }
 
-    public function country(): BelongsTo
+    public function countries(): BelongsToMany
     {
-        return $this->belongsTo(resolve_model('country'));
+        return $this->belongsToMany(resolve_model('country'), 'country_currency')
+            ->withTimestamps();
     }
 }

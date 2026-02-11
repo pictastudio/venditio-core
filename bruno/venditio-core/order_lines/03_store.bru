@@ -1,0 +1,22 @@
+meta {
+  name: Store order_lines
+  type: http
+  seq: 98
+}
+
+post {
+  url: {{baseUrl}}/order_lines
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

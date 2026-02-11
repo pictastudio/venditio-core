@@ -427,6 +427,15 @@ the package provides some console commands to deal with common use cases
   checks all carts with a pending status which by default are `processing` and `active`
   pending statuses are customizable by changing the `getPendingStatuses()` function in `CartStatus` enum which is located in the config file under `carts.status_enum`
 
+#### Bruno API Collection
+
+- PublishBrunoCollection
+  publishes the Bruno request collection into the host app at `bruno/venditio-core`
+
+```bash
+php artisan vendor:publish --tag=venditio-core-bruno
+```
+
 ## Structure
 
 ```

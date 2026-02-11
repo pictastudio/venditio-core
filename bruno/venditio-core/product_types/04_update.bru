@@ -1,0 +1,26 @@
+meta {
+  name: Update product_types
+  type: http
+  seq: 14
+}
+
+patch {
+  url: {{baseUrl}}/product_types/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Updated example"
+  }
+}

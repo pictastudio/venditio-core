@@ -1,0 +1,20 @@
+meta {
+  name: Delete orders
+  type: http
+  seq: 35
+}
+
+delete {
+  url: {{baseUrl}}/orders/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

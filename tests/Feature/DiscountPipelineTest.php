@@ -57,7 +57,7 @@ function createProduct(float $price, TaxClass $taxClass, bool $priceIncludesTax 
         'visible_until' => now()->addDay(),
     ]);
 
-    $product->inventory()->create([
+    $product->inventory()->updateOrCreate([], [
         'stock' => 100,
         'stock_reserved' => 0,
         'stock_available' => 100,

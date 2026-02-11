@@ -1,0 +1,20 @@
+meta {
+  name: Delete product_variant_options
+  type: http
+  seq: 25
+}
+
+delete {
+  url: {{baseUrl}}/product_variant_options/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

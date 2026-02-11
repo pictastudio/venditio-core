@@ -58,7 +58,7 @@ function createStockProduct(TaxClass $taxClass, int $stock, int $stockMin = 0): 
         'visible_until' => now()->addDay(),
     ]);
 
-    $product->inventory()->create([
+    $product->inventory()->updateOrCreate([], [
         'stock' => $stock,
         'stock_reserved' => 0,
         'stock_available' => $stock,
@@ -176,8 +176,8 @@ it('dispatches a `low stock` event with the expected data when `stock` goes belo
     Event::assertDispatched(ProductStockBelowMinimum::class, function (ProductStockBelowMinimum $event) use ($product) {
         return $event->product->getKey() === $product->getKey()
             && $event->stock === 7
-            && $event->stockReserved === 0
-            && $event->stockAvailable === 7
-            && $event->stockMin === 8;
+            && $event->stock_reserved === 0
+            && $event->stock_available === 7
+            && $event->stock_min === 8;
     });
 });

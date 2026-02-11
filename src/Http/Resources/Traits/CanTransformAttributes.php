@@ -3,6 +3,7 @@
 namespace PictaStudio\VenditioCore\Http\Resources\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
 
 trait CanTransformAttributes
 {
@@ -50,5 +51,14 @@ trait CanTransformAttributes
         }
 
         return $value;
+    }
+
+    private function getImageAssetUrl(?string $image): ?string
+    {
+        if (blank($image)) {
+            return null;
+        }
+
+        return URL::isValidUrl($image) ? $image : asset('storage/' . $image);
     }
 }

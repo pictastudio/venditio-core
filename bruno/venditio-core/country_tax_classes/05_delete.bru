@@ -1,0 +1,20 @@
+meta {
+  name: Delete country_tax_classes
+  type: http
+  seq: 60
+}
+
+delete {
+  url: {{baseUrl}}/country_tax_classes/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

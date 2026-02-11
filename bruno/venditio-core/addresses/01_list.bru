@@ -1,0 +1,21 @@
+meta {
+  name: List addresses
+  type: http
+  seq: 36
+}
+
+get {
+  url: {{baseUrl}}/addresses
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

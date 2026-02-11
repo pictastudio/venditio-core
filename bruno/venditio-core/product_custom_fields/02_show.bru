@@ -1,0 +1,20 @@
+meta {
+  name: Show product_custom_fields
+  type: http
+  seq: 87
+}
+
+get {
+  url: {{baseUrl}}/product_custom_fields/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

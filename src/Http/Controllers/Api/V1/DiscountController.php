@@ -29,7 +29,7 @@ class DiscountController extends Controller
 
     public function show(Discount $discount): JsonResource
     {
-        return GenericModelResource::make($discount);
+        return GenericModelResource::make($discount->load('discountable'));
     }
 
     public function update(UpdateDiscountRequest $request, Discount $discount): JsonResource

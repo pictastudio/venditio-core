@@ -1,0 +1,20 @@
+meta {
+  name: Show orders
+  type: http
+  seq: 32
+}
+
+get {
+  url: {{baseUrl}}/orders/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Update country_tax_classes
+  type: http
+  seq: 59
+}
+
+patch {
+  url: {{baseUrl}}/country_tax_classes/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Updated example"
+  }
+}

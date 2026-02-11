@@ -1,0 +1,21 @@
+meta {
+  name: List shipping_statuses
+  type: http
+  seq: 71
+}
+
+get {
+  url: {{baseUrl}}/shipping_statuses
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

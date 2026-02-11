@@ -10,19 +10,12 @@ class TaxClassSeeder extends Seeder
 {
     public function run(): void
     {
-        // TaxClass::factory()
-        //     ->hasAttached(
-        //         Country::factory(),
-        //         [
-        //             'rate' => 22,
-        //         ],
-        //     )
-        //     ->create([
-        //         'name' => 'Standard',
-        //     ]);
-
-        TaxClass::create([
+        $taxClass = TaxClass::query()->create([
             'name' => 'Standard',
+        ]);
+
+        $taxClass->countries()->attach(Country::where('iso_2', 'IT')->value('id'), [
+            'rate' => 22,
         ]);
     }
 }

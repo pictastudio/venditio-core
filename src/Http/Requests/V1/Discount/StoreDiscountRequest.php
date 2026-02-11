@@ -3,8 +3,11 @@
 namespace PictaStudio\VenditioCore\Http\Requests\V1\Discount;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Enums\DiscountType;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class StoreDiscountRequest extends FormRequest
 {
@@ -16,8 +19,18 @@ class StoreDiscountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'discountable_type' => 'nullable|string|max:255',
-            'discountable_id' => 'nullable|integer|required_with:discountable_type',
+            'discountable_type' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::in(['product', 'product_category', 'product_type', 'brand']),
+            ],
+            'discountable_id' => [
+                'nullable',
+                'integer',
+                'required_with:discountable_type',
+                Rule::exists($this->tableFor($this->discountable_type), 'id'),
+            ],
             'type' => ['required', Rule::enum(DiscountType::class)],
             'value' => 'required|numeric|min:0',
             'name' => 'nullable|string|max:255',
@@ -31,5 +44,17 @@ class StoreDiscountRequest extends FormRequest
             'priority' => 'sometimes|integer',
             'stop_after_propagation' => 'sometimes|boolean',
         ];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'starts_at' => Date::parse($this->starts_at),
+        ]);
+    }
+
+    private function tableFor(string $model): string
+    {
+        return (new (resolve_model($model)))->getTable();
     }
 }

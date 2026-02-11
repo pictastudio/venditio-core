@@ -1,0 +1,26 @@
+meta {
+  name: Cart remove lines
+  type: http
+  seq: 1004
+}
+
+post {
+  url: {{baseUrl}}/carts/:id/remove_lines
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "line_ids": [1]
+  }
+}

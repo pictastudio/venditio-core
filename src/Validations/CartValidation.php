@@ -18,8 +18,8 @@ class CartValidation implements CartValidationRules
             'addresses' => 'nullable|array',
             ...$this->getAddressValidationRulesFromEnum(),
             'lines' => 'sometimes|array',
-            'lines.*.product_id' => 'sometimes|integer|exists:products,id',
-            'lines.*.qty' => 'sometimes|integer|min:1',
+            'lines.*.product_id' => 'required_with:lines|integer|exists:products,id',
+            'lines.*.qty' => 'required_with:lines.*.product_id|integer|min:1',
         ];
     }
 
@@ -32,9 +32,9 @@ class CartValidation implements CartValidationRules
             'user_email' => 'nullable|email|max:255',
             'discount_code' => 'nullable|string',
             ...$this->getAddressValidationRulesFromEnum(),
-            'lines' => 'nullable|array',
-            'lines.*.product_id' => 'nullable|integer|exists:products,id',
-            'lines.*.qty' => 'nullable|integer|min:1|required_with:lines.*.product_id',
+            'lines' => 'sometimes|array',
+            'lines.*.product_id' => 'required_with:lines|integer|exists:products,id',
+            'lines.*.qty' => 'required_with:lines.*.product_id|integer|min:1',
         ];
     }
 

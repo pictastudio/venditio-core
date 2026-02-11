@@ -1,0 +1,26 @@
+meta {
+  name: Cart add discount
+  type: http
+  seq: 1005
+}
+
+post {
+  url: {{baseUrl}}/carts/:id/add_discount
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "discount_code": "TEST10"
+  }
+}

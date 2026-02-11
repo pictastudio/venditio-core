@@ -1,0 +1,26 @@
+meta {
+  name: Store discounts
+  type: http
+  seq: 78
+}
+
+post {
+  url: {{baseUrl}}/discounts
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Discount 10%",
+    "type": "percentage",
+    "value": 10,
+    "code": "TEST10",
+    "starts_at": "2026-02-11 17:00:00"
+  }
+}

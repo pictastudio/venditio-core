@@ -5,7 +5,6 @@ namespace PictaStudio\VenditioCore\Http\Resources\V1;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\URL;
 use PictaStudio\VenditioCore\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
 class ProductResource extends JsonResource
@@ -61,7 +60,7 @@ class ProductResource extends JsonResource
                 return collect($images)
                     ->map(fn (array $image) => [
                         'alt' => $image['alt'],
-                        'src' => URL::isValidUrl($image['src']) ? $image['src'] : asset('storage/' . $image['src']),
+                        'src' => $this->getImageAssetUrl($image['src']),
                     ])
                     ->toArray();
             },
@@ -77,7 +76,7 @@ class ProductResource extends JsonResource
                 return collect($files)
                     ->map(fn (array $file) => [
                         'name' => $file['name'],
-                        'src' => URL::isValidUrl($file['src']) ? $file['src'] : asset('storage/' . $file['src']),
+                        'src' => $this->getImageAssetUrl($file['src']),
                     ])
                     ->toArray();
             },
@@ -126,6 +125,8 @@ class ProductResource extends JsonResource
                         ->map(fn ($option): array => [
                             'id' => $option->getKey(),
                             'value' => $option->name,
+                            'image' => $this->getImageAssetUrl($option->image),
+                            'hex_color' => $option->hex_color,
                         ])
                         ->all(),
                 ];

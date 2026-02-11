@@ -1,0 +1,26 @@
+meta {
+  name: Update countries
+  type: http
+  seq: 54
+}
+
+patch {
+  url: {{baseUrl}}/countries/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Updated example"
+  }
+}

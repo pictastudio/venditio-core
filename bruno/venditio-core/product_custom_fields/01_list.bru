@@ -1,0 +1,21 @@
+meta {
+  name: List product_custom_fields
+  type: http
+  seq: 86
+}
+
+get {
+  url: {{baseUrl}}/product_custom_fields
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -45,7 +45,8 @@
         ],
         "psr-4": {
             "PictaStudio\\VenditioCore\\": "src/",
-            "PictaStudio\\VenditioCore\\Database\\Factories\\": "database/factories/"
+            "PictaStudio\\VenditioCore\\Database\\Factories\\": "database/factories/",
+            "PictaStudio\\VenditioCore\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {

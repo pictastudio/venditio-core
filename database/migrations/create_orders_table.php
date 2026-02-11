@@ -34,9 +34,9 @@ return new class extends Migration
             $table->decimal('total_final', 10, 2)->unsigned()->comment('totale finale ordine');
 
             // user
-            $table->string('user_first_name');
-            $table->string('user_last_name');
-            $table->string('user_email');
+            $table->string('user_first_name')->nullable();
+            $table->string('user_last_name')->nullable();
+            $table->string('user_email')->nullable();
 
             // addresses
             $table->json('addresses')->comment('tutti i dati degli indirizzi salvati statici al momento dell\'ordine, formato: {"billing": {}, "shipping": {}}');

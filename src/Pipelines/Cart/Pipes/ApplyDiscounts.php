@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Actions\Taxes\ExtractTaxFromGrossPrice;
 use PictaStudio\VenditioCore\Contracts\{CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface};
+use PictaStudio\VenditioCore\Discounts\DiscountValidationException;
 use PictaStudio\VenditioCore\Discounts\DiscountContext;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
@@ -47,7 +48,13 @@ class ApplyDiscounts
             return $line;
         });
 
+        $requestedDiscountCode = (string) ($cart->getAttribute('discount_code') ?? '');
         $cartTotalDiscount = $this->cartTotalDiscountCalculator->resolveForTarget($cart, $lines, $context);
+        $appliedDiscountCode = (string) ($cartTotalDiscount['discount_code'] ?? '');
+
+        if (filled($requestedDiscountCode) && $appliedDiscountCode !== $requestedDiscountCode) {
+            throw DiscountValidationException::invalidCartTotalDiscountCode($requestedDiscountCode);
+        }
 
         $cart->setRelation('lines', $lines);
         $cart->fill([

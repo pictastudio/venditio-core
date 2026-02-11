@@ -17,7 +17,8 @@ class StoreCurrencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'country_id' => ['nullable', 'integer', Rule::exists($this->tableFor('country'), 'id')],
+            'country_ids' => ['sometimes', 'array'],
+            'country_ids.*' => ['integer', Rule::exists($this->tableFor('country'), 'id')],
             'name' => 'required|string|max:100',
             'code' => 'required|string|size:3|unique:currencies,code',
             'symbol' => 'nullable|string|max:10',

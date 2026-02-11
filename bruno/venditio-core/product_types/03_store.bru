@@ -1,0 +1,22 @@
+meta {
+  name: Store product_types
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/product_types
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "T shirts"
+  }
+}

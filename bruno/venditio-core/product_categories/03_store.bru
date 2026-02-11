@@ -1,0 +1,23 @@
+meta {
+  name: Store product_categories
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/product_categories
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Product Category 1",
+    "sort_order": 1
+  }
+}

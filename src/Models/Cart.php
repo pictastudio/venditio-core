@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Facades\DB;
 use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\{resolve_enum, resolve_model};
@@ -107,11 +108,36 @@ class Cart extends Model
 
     public function purge(): void
     {
-        $this->lines()->delete();
-        $this->update([
-            'status' => resolve_enum('cart_status')::getCancelledStatus(),
-        ]);
-        $this->delete();
+        DB::transaction(function () {
+            $reservedQtyByProduct = $this->lines()
+                ->selectRaw('product_id, SUM(qty) as qty')
+                ->groupBy('product_id')
+                ->pluck('qty', 'product_id');
+
+            if ($reservedQtyByProduct->isNotEmpty()) {
+                $inventories = resolve_model('inventory')::query()
+                    ->whereIn('product_id', $reservedQtyByProduct->keys()->all())
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('product_id');
+
+                foreach ($reservedQtyByProduct as $productId => $qtyToRelease) {
+                    $inventory = $inventories->get((int) $productId);
+
+                    if (!$inventory instanceof Model) {
+                        continue;
+                    }
+
+                    $inventory->stock_reserved = max(0, (int) $inventory->stock_reserved - (int) $qtyToRelease);
+                    $inventory->save();
+                }
+            }
+
+            $this->lines()->delete();
+            $this->status = resolve_enum('cart_status')::getCancelledStatus();
+            $this->save();
+            $this->delete();
+        });
     }
 
     protected function addresses(): Attribute

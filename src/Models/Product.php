@@ -54,6 +54,12 @@ class Product extends Model
             Active::class,
             new InDateRange('visible_from', 'visible_until'),
         ]);
+
+        static::created(function (self $product) {
+            if (!$product->inventory()->exists()) {
+                $product->inventory()->create();
+            }
+        });
     }
 
     public function brand(): BelongsTo

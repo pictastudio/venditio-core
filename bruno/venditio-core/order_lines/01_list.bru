@@ -1,0 +1,21 @@
+meta {
+  name: List order_lines
+  type: http
+  seq: 96
+}
+
+get {
+  url: {{baseUrl}}/order_lines
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
+use PictaStudio\VenditioCore\Console\Commands\{PublishBrunoCollection, UpdateAbandonedCarts};
 use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface};
 use PictaStudio\VenditioCore\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
@@ -32,12 +33,14 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
+            ->hasCommand(UpdateAbandonedCarts::class)
             ->hasMigrations([
                 'create_addresses_table',
                 'create_countries_table',
                 'create_country_tax_class_table',
                 'create_tax_classes_table',
                 'create_currencies_table',
+                'create_country_currency_table',
                 'create_orders_table',
                 'create_order_lines_table',
                 'create_shipping_statuses_table',
@@ -68,6 +71,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        $this->registerPublishableAssets();
         $this->registerApiRoutes();
         $this->bindValidationClasses();
         // $this->bindDtos();
@@ -183,5 +187,12 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         }
 
         Relation::morphMap($morphMap);
+    }
+
+    private function registerPublishableAssets(): void
+    {
+        $this->publishes([
+            $this->package->basePath('/../bruno/venditio-core') => base_path('bruno/venditio-core'),
+        ], 'venditio-core-bruno');
     }
 }

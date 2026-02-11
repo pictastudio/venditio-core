@@ -1,0 +1,20 @@
+meta {
+  name: Show cart_lines
+  type: http
+  seq: 92
+}
+
+get {
+  url: {{baseUrl}}/cart_lines/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

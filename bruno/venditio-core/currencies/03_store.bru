@@ -1,0 +1,22 @@
+meta {
+  name: Store currencies
+  type: http
+  seq: 63
+}
+
+post {
+  url: {{baseUrl}}/currencies
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

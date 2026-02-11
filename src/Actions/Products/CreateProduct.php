@@ -22,7 +22,7 @@ class CreateProduct
         }
 
         if (is_array($inventoryPayload)) {
-            $product->inventory()->create($inventoryPayload);
+            $product->inventory()->updateOrCreate([], $inventoryPayload);
         }
 
         return $product->refresh()->load(['inventory', 'variantOptions']);

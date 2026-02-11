@@ -178,6 +178,7 @@ class CreateProductVariants
             ->toArray();
         $attributes['parent_id'] = $product->getKey();
         $attributes['name'] = $this->buildVariantName($product, $options);
+        $attributes['sku'] = $this->buildVariantSku($product, $options);
 
         $variant = $product->newInstance($attributes);
         $variant->save();
@@ -220,5 +221,15 @@ class CreateProductVariants
             ->pluck('id')
             ->sort()
             ->implode('-');
+    }
+
+    private function buildVariantSku(Product $product, array $options): string
+    {
+        $baseSku = filled($product->sku)
+            ? (string) $product->sku
+            : 'P' . $product->getKey();
+        $signature = $this->signatureFor($options);
+
+        return substr($baseSku . '-' . $signature, 0, 255);
     }
 }

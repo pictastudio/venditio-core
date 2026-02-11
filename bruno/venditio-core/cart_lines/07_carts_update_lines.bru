@@ -1,0 +1,31 @@
+meta {
+  name: Cart update lines
+  type: http
+  seq: 1006
+}
+
+patch {
+  url: {{baseUrl}}/carts/:id/update_lines
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "lines": [
+      {
+        "id": 1,
+        "qty": 3
+      }
+    ]
+  }
+}

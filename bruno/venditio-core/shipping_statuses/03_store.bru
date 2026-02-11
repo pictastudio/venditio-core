@@ -1,0 +1,22 @@
+meta {
+  name: Store shipping_statuses
+  type: http
+  seq: 73
+}
+
+post {
+  url: {{baseUrl}}/shipping_statuses
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

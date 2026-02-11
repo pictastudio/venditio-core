@@ -7,7 +7,7 @@ use PictaStudio\VenditioCore\Enums\DiscountType;
 use PictaStudio\VenditioCore\Enums\ProductStatus;
 use PictaStudio\VenditioCore\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
 
-use function Pest\Laravel\{assertSoftDeleted, deleteJson, getJson, postJson};
+use function Pest\Laravel\{assertSoftDeleted, deleteJson, getJson, patchJson, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -56,7 +56,7 @@ function createCartProduct(TaxClass $taxClass, float $price = 100): Product
         'visible_until' => now()->addDay(),
     ]);
 
-    $product->inventory()->create([
+    $product->inventory()->updateOrCreate([], [
         'stock' => 100,
         'stock_reserved' => 0,
         'stock_available' => 100,
@@ -208,8 +208,11 @@ it('deletes a cart through api', function () {
     deleteJson($prefix . '/carts/' . $cartId)
         ->assertOk();
 
+    $product->inventory->refresh();
+
     assertSoftDeleted('carts', ['id' => $cartId]);
     assertSoftDeleted('cart_lines', ['cart_id' => $cartId]);
+    expect($product->inventory->stock_reserved)->toBe(0);
 });
 
 it('adds lines and recalculates cart totals through pipeline', function () {
@@ -359,4 +362,109 @@ it('adds a discount code to an existing cart through api and recalculates totals
         ->assertJsonPath('discount_code', 'CHECKOUT10')
         ->assertJsonPath('discount_amount', 24.4)
         ->assertJsonPath('total_final', 219.6);
+});
+
+it('returns 422 when adding a cart total discount code not eligible for cart total discounts', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-invalid-add-discount@example.test');
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'discountable_type' => null,
+        'discountable_id' => null,
+        'type' => DiscountType::Percentage,
+        'value' => 10,
+        'code' => 'TEST10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'rules' => null,
+    ]);
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()->json('id');
+
+    postJson($prefix . '/carts/' . $cartId . '/add_discount', [
+        'discount_code' => 'TEST10',
+    ])->assertUnprocessable()
+        ->assertJsonPath('errors.discount_code.0', 'The discount code [TEST10] is invalid or not eligible for cart total discounts.');
+});
+
+it('returns 422 when creating a cart with a non eligible cart total discount code', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-invalid-cart-create-discount@example.test');
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'discountable_type' => null,
+        'discountable_id' => null,
+        'type' => DiscountType::Percentage,
+        'value' => 10,
+        'code' => 'TEST10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'rules' => null,
+    ]);
+
+    postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'discount_code' => 'TEST10',
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonPath('errors.discount_code.0', 'The discount code [TEST10] is invalid or not eligible for cart total discounts.');
+});
+
+it('returns 422 when updating a cart with a non eligible cart total discount code', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-invalid-cart-update-discount@example.test');
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'discountable_type' => null,
+        'discountable_id' => null,
+        'type' => DiscountType::Percentage,
+        'value' => 10,
+        'code' => 'TEST10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'rules' => null,
+    ]);
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()->json('id');
+
+    patchJson($prefix . '/carts/' . $cartId, [
+        'discount_code' => 'TEST10',
+    ])->assertUnprocessable()
+        ->assertJsonPath('errors.discount_code.0', 'The discount code [TEST10] is invalid or not eligible for cart total discounts.');
 });

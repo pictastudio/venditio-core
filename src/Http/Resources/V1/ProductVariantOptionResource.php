@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
-use Illuminate\Support\Facades\URL;
 
 class ProductVariantOptionResource extends JsonResource
 {
@@ -36,13 +35,7 @@ class ProductVariantOptionResource extends JsonResource
     protected function transformAttributes(): array
     {
         return [
-            'image' => function (?string $image) {
-                if (blank($image)) {
-                    return null;
-                }
-
-                return URL::isValidUrl($image) ? $image : asset('storage/' . $image);
-            },
+            'image' => fn (?string $image) => $this->getImageAssetUrl($image),
         ];
     }
 }

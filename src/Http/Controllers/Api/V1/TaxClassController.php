@@ -4,6 +4,7 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\TaxClass\{StoreTaxClassRequest, UpdateTaxClassRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\GenericModelResource;
@@ -15,8 +16,20 @@ class TaxClassController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $includes = request()->query('include', []);
+
+        $this->validateData([
+            'include' => $includes,
+        ], [
+            'include' => ['array'],
+            'include.*' => [
+                'string',
+                Rule::in(['countries']),
+            ],
+        ]);
+
         return GenericModelResource::collection(
-            $this->applyBaseFilters(query('tax_class'), request()->all(), 'tax_class')
+            $this->applyBaseFilters(query('tax_class')->with($includes), request()->all(), 'tax_class')
         );
     }
 

@@ -1,0 +1,26 @@
+meta {
+  name: Update product_variant_options
+  type: http
+  seq: 24
+}
+
+patch {
+  url: {{baseUrl}}/product_variant_options/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Updated example"
+  }
+}

@@ -37,8 +37,9 @@ class Country extends Model
         return $this->hasMany(resolve_model('address'));
     }
 
-    public function currencies(): HasMany
+    public function currencies(): BelongsToMany
     {
-        return $this->hasMany(resolve_model('currency'));
+        return $this->belongsToMany(resolve_model('currency'), 'country_currency')
+            ->withTimestamps();
     }
 }

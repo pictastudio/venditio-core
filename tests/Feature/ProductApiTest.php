@@ -17,7 +17,8 @@ it('creates a product with categories', function () {
         'brand_id' => $brand->getKey(),
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Sample Product',
-        'status' => ProductStatus::Published->value,
+        'sku' => 'SAMPLE-PRODUCT-001',
+        'status' => ProductStatus::Published,
         'category_ids' => [$category->getKey()],
     ];
 
@@ -25,7 +26,7 @@ it('creates a product with categories', function () {
         ->assertCreated()
         ->assertJsonFragment([
             'name' => 'Sample Product',
-            'status' => ProductStatus::Published->value,
+            'status' => ProductStatus::Published,
         ]);
 
     $productId = $response->json('id');
@@ -82,7 +83,8 @@ it('creates a product with qty_for_unit', function () {
         'brand_id' => $brand->getKey(),
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Product with unit qty',
-        'status' => ProductStatus::Published->value,
+        'sku' => 'PRODUCT-UNIT-QTY-001',
+        'status' => ProductStatus::Published,
         'qty_for_unit' => 6,
     ])->assertCreated()
         ->assertJsonFragment([
@@ -118,7 +120,8 @@ it('creates a product with nested inventory fields', function () {
         'brand_id' => $brand->getKey(),
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Inventory Product',
-        'status' => ProductStatus::Published->value,
+        'sku' => 'INVENTORY-PRODUCT-001',
+        'status' => ProductStatus::Published,
         'inventory' => [
             'stock' => 120,
             'stock_reserved' => 15,

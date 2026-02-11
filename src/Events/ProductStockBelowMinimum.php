@@ -11,19 +11,19 @@ class ProductStockBelowMinimum
 
     public readonly int $stock;
 
-    public readonly int $stockReserved;
+    public readonly int $stock_reserved;
 
-    public readonly int $stockAvailable;
+    public readonly int $stock_available;
 
-    public readonly ?int $stockMin;
+    public readonly ?int $stock_min;
 
     public function __construct(
         public readonly Model $inventory,
     ) {
         $this->product = $inventory->product;
         $this->stock = (int) $inventory->stock;
-        $this->stockReserved = (int) $inventory->stock_reserved;
-        $this->stockAvailable = (int) $inventory->stock_available;
-        $this->stockMin = $inventory->stock_min !== null ? (int) $inventory->stock_min : null;
+        $this->stock_reserved = (int) $inventory->stock_reserved;
+        $this->stock_available = (int) $inventory->stock_available;
+        $this->stock_min = $inventory->stock_min !== null ? (int) $inventory->stock_min : null;
     }
 }

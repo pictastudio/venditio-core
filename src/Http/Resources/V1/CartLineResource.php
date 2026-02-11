@@ -4,7 +4,6 @@ namespace PictaStudio\VenditioCore\Http\Resources\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\URL;
 use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
 use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
 
@@ -38,7 +37,7 @@ class CartLineResource extends JsonResource
                 collect($images)
                     ->map(fn (array $image) => [
                         'alt' => $image['alt'],
-                        'src' => URL::isValidUrl($image['src']) ? $image['src'] : asset('storage/' . $image['src']),
+                        'src' => $this->getImageAssetUrl($image['src']),
                     ])
                     ->toArray()
             ),
@@ -46,7 +45,7 @@ class CartLineResource extends JsonResource
                 collect($files)
                     ->map(fn (array $file) => [
                         'name' => $file['name'],
-                        'src' => URL::isValidUrl($file['src']) ? $file['src'] : asset('storage/' . $file['src']),
+                        'src' => $this->getImageAssetUrl($file['src']),
                     ])
                     ->toArray()
             ),

@@ -1,0 +1,20 @@
+meta {
+  name: Show carts
+  type: http
+  seq: 27
+}
+
+get {
+  url: {{baseUrl}}/carts/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

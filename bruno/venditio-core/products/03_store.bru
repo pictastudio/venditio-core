@@ -1,0 +1,34 @@
+meta {
+  name: Store products
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/products
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "T-shirt",
+    "slug": "t-shirt",
+    "status": "published",
+    "brand_id": 1,
+    "tax_class_id": 1,
+    "product_type_id": 1,
+    "category_ids": [1],
+    "measuring_unit": "pz",
+    "qty_for_unit": 1,
+    "sku": "ZR-001",
+    "inventory": {
+      "price": 29.99
+    }
+  }
+}

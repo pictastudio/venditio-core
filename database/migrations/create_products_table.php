@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->boolean('new')->default(true);
             $table->boolean('in_evidence')->default(true);
-            $table->string('sku')->nullable();
+            $table->string('sku')->unique();
             $table->string('ean')->nullable();
             $table->dateTime('visible_from')->nullable()->index();
             $table->dateTime('visible_until')->nullable()->index();

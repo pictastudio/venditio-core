@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Models\Country;
 
 return new class extends Migration
 {
@@ -11,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('currencies', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Country::class)->nullable();
             $table->string('name', 100);
             $table->char('code', 3)->unique()->comment('ISO 4217 currency code');
             $table->string('symbol', 10)->nullable();

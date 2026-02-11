@@ -2,6 +2,7 @@
 
 namespace PictaStudio\VenditioCore\Validations;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
 
@@ -41,7 +42,12 @@ class ProductValidation implements ProductValidationRules
             'active' => 'sometimes|boolean',
             'new' => 'sometimes|boolean',
             'in_evidence' => 'sometimes|boolean',
-            'sku' => 'nullable|string|max:255',
+            'sku' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique($this->tableFor('product'), 'sku'),
+            ],
             'ean' => 'nullable|string|max:255',
             'visible_from' => 'nullable|date',
             'visible_until' => 'nullable|date|after_or_equal:visible_from',
@@ -114,7 +120,12 @@ class ProductValidation implements ProductValidationRules
             'active' => 'sometimes|boolean',
             'new' => 'sometimes|boolean',
             'in_evidence' => 'sometimes|boolean',
-            'sku' => 'nullable|string|max:255',
+            'sku' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique($this->tableFor('product'), 'sku')->ignore($this->productId()),
+            ],
             'ean' => 'nullable|string|max:255',
             'visible_from' => 'nullable|date',
             'visible_until' => 'nullable|date|after_or_equal:visible_from',
@@ -155,5 +166,16 @@ class ProductValidation implements ProductValidationRules
     private function tableFor(string $model): string
     {
         return (new (resolve_model($model)))->getTable();
+    }
+
+    private function productId(): ?int
+    {
+        $product = request()?->route('product');
+
+        if ($product instanceof Model) {
+            return $product->getKey();
+        }
+
+        return is_numeric($product) ? (int) $product : null;
     }
 }

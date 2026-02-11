@@ -5,6 +5,8 @@ namespace PictaStudio\VenditioCore\Http\Requests\V1\Country;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+
 class UpdateCountryRequest extends FormRequest
 {
     public function authorize(): bool
@@ -25,6 +27,13 @@ class UpdateCountryRequest extends FormRequest
             'flag_emoji' => 'sometimes|string|max:50',
             'capital' => 'sometimes|string|max:150',
             'native' => 'nullable|string|max:150',
+            'currency_ids' => ['sometimes', 'array'],
+            'currency_ids.*' => ['integer', Rule::exists($this->tableFor('currency'), 'id')],
         ];
+    }
+
+    private function tableFor(string $model): string
+    {
+        return (new (resolve_model($model)))->getTable();
     }
 }

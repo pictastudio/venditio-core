@@ -1,0 +1,21 @@
+meta {
+  name: List cart_lines
+  type: http
+  seq: 91
+}
+
+get {
+  url: {{baseUrl}}/cart_lines
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

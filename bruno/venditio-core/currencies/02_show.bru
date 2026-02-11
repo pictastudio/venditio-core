@@ -1,0 +1,20 @@
+meta {
+  name: Show currencies
+  type: http
+  seq: 62
+}
+
+get {
+  url: {{baseUrl}}/currencies/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Store orders
+  type: http
+  seq: 33
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "cart_id": 1
+  }
+}
