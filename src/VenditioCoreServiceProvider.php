@@ -8,12 +8,12 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
 use PictaStudio\VenditioCore\Console\Commands\{PublishBrunoCollection, UpdateAbandonedCarts};
-use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface};
+use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductSkuGeneratorInterface};
 use PictaStudio\VenditioCore\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
 use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
 use PictaStudio\VenditioCore\Facades\VenditioCore as VenditioCoreFacade;
-use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator};
+use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator, ProductSkuGenerator};
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
@@ -85,6 +85,10 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
         $this->app->singleton(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
+        $this->app->singleton(
+            ProductSkuGeneratorInterface::class,
+            config('venditio-core.product.sku_generator', ProductSkuGenerator::class)
+        );
     }
 
     private function bindValidationClasses(): void

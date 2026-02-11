@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PictaStudio\VenditioCore\Contracts\ProductSkuGeneratorInterface;
 use PictaStudio\VenditioCore\Models\ProductType;
 use PictaStudio\VenditioCore\Models\ProductVariant;
 use PictaStudio\VenditioCore\Models\ProductVariantOption;
@@ -390,3 +391,59 @@ it('rejects duplicate variant ids in the payload', function () {
     ])->assertUnprocessable()
         ->assertJsonValidationErrors(['variants']);
 });
+
+it('uses a custom product sku generator when creating variants', function () {
+    app()->singleton(ProductSkuGeneratorInterface::class, TestProductSkuGenerator::class);
+
+    $brand = Brand::factory()->create();
+    $taxClass = TaxClass::factory()->create();
+    $productType = ProductType::factory()->create();
+
+    $colorVariant = ProductVariant::factory()->create([
+        'product_type_id' => $productType->getKey(),
+        'name' => 'Color',
+    ]);
+    $red = ProductVariantOption::factory()->create([
+        'product_variant_id' => $colorVariant->getKey(),
+        'name' => 'red',
+    ]);
+
+    $product = Product::factory()->create([
+        'brand_id' => $brand->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'product_type_id' => $productType->getKey(),
+        'sku' => 'BASE-SKU',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+        'variants' => [
+            [
+                'variant_id' => $colorVariant->getKey(),
+                'option_ids' => [$red->getKey()],
+            ],
+        ],
+    ])->assertCreated();
+
+    $variant = Product::query()
+        ->withoutGlobalScopes()
+        ->where('parent_id', $product->getKey())
+        ->firstOrFail();
+
+    expect($variant->sku)->toBe('CUSTOM-VARIANT-' . $product->getKey());
+});
+
+class TestProductSkuGenerator implements ProductSkuGeneratorInterface
+{
+    public function forProductPayload(array $payload): string
+    {
+        return 'CUSTOM-PRODUCT-SKU';
+    }
+
+    public function forVariant(Product $baseProduct, array $options): string
+    {
+        return 'CUSTOM-VARIANT-' . $baseProduct->getKey();
+    }
+}

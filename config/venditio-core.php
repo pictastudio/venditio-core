@@ -5,6 +5,7 @@ use PictaStudio\VenditioCore\Facades\VenditioCore;
 use PictaStudio\VenditioCore\Managers;
 use PictaStudio\VenditioCore\Enums;
 use PictaStudio\VenditioCore\Discounts;
+use PictaStudio\VenditioCore\Generators;
 use PictaStudio\VenditioCore\Models;
 use PictaStudio\VenditioCore\Pipelines\Cart;
 use PictaStudio\VenditioCore\Pipelines\CartLine;
@@ -259,6 +260,7 @@ return [
     'product' => [
         'status_enum' => Enums\ProductStatus::class,
         'measuring_unit_enum' => Enums\ProductMeasuringUnit::class,
+        'sku_generator' => Generators\ProductSkuGenerator::class,
     ],
 
     /*
