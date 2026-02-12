@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Enums;
+namespace PictaStudio\Venditio\Enums;
 
-use PictaStudio\VenditioCore\Enums\Contracts\CartStatus as CartStatusContract;
+use PictaStudio\Venditio\Enums\Contracts\CartStatus as CartStatusContract;
 
 enum CartStatus: string implements CartStatusContract
 {

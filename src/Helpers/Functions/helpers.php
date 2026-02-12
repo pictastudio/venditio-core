@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Helpers\Functions;
+namespace PictaStudio\Venditio\Helpers\Functions;
 
 use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\Venditio\Managers\Contracts\AuthManager as AuthManagerContract;
+use PictaStudio\Venditio\Models\User;
 
 if (!function_exists('auth_manager')) {
     /**
@@ -32,7 +32,7 @@ if (!function_exists('resolve_model')) {
      */
     function resolve_model(string $model): string
     {
-        return config('venditio-core.models.' . $model);
+        return config('venditio.models.' . $model);
     }
 }
 
@@ -85,10 +85,10 @@ if (!function_exists('resolve_dto')) {
     function resolve_dto(string $dto): string
     {
         return match ($dto) {
-            'order' => config('venditio-core.order.dto'),
-            'cart' => config('venditio-core.cart.dto'),
-            'cart_line' => config('venditio-core.cart_line.dto'),
-            'address' => config('venditio-core.addresses.dto'),
+            'order' => config('venditio.order.dto'),
+            'cart' => config('venditio.cart.dto'),
+            'cart_line' => config('venditio.cart_line.dto'),
+            'address' => config('venditio.addresses.dto'),
         };
     }
 }
@@ -104,10 +104,10 @@ if (!function_exists('resolve_enum')) {
     function resolve_enum(string $enum): string
     {
         return match ($enum) {
-            'order_status' => config('venditio-core.order.status_enum'),
-            'cart_status' => config('venditio-core.cart.status_enum'),
-            'cart_line_status' => config('venditio-core.cart_line.status_enum'),
-            'address_type' => config('venditio-core.addresses.type_enum'),
+            'order_status' => config('venditio.order.status_enum'),
+            'cart_status' => config('venditio.cart.status_enum'),
+            'cart_line_status' => config('venditio.cart_line.status_enum'),
+            'address_type' => config('venditio.addresses.type_enum'),
         };
     }
 }

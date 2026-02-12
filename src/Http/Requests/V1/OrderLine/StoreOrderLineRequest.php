@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\OrderLine;
+namespace PictaStudio\Venditio\Http\Requests\V1\OrderLine;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class StoreOrderLineRequest extends FormRequest
 {

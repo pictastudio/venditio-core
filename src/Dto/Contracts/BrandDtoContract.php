@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto\Contracts;
+namespace PictaStudio\Venditio\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\Venditio\Models\Brand;
 
 interface BrandDtoContract extends Dto
 {

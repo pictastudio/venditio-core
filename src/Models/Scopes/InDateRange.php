@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models\Scopes;
+namespace PictaStudio\Venditio\Models\Scopes;
 
 use Illuminate\Database\Eloquent\{Builder, Model, Scope};
 
@@ -16,15 +16,15 @@ class InDateRange implements Scope
         $this->startColumn ??= 'starts_at';
         $this->endColumn ??= 'ends_at';
 
-        $this->includeStartDate ??= config('venditio-core.scopes.in_date_range.include_start_date', true);
-        $this->includeEndDate ??= config('venditio-core.scopes.in_date_range.include_end_date', true);
+        $this->includeStartDate ??= config('venditio.scopes.in_date_range.include_start_date', true);
+        $this->includeEndDate ??= config('venditio.scopes.in_date_range.include_end_date', true);
 
-        $this->allowNull ??= config('venditio-core.scopes.in_date_range.allow_null', true);
+        $this->allowNull ??= config('venditio.scopes.in_date_range.allow_null', true);
     }
 
     public function apply(Builder $builder, Model $model): void
     {
-        if (request()->routeIs(config('venditio-core.scopes.routes_to_exclude'))) {
+        if (request()->routeIs(config('venditio.scopes.routes_to_exclude'))) {
             return;
         }
 

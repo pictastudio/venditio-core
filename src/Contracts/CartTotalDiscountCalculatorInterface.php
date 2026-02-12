@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Contracts;
+namespace PictaStudio\Venditio\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Discounts\DiscountContext;
+use PictaStudio\Venditio\Discounts\DiscountContext;
 
 interface CartTotalDiscountCalculatorInterface
 {

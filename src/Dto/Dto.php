@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto;
+namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Contracts\Support\{Arrayable, Jsonable};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\{Collection, Str};
 use JsonSerializable;
-use PictaStudio\VenditioCore\Dto\Contracts\Dto as DtoContract;
+use PictaStudio\Venditio\Dto\Contracts\Dto as DtoContract;
 
 class Dto implements Arrayable, DtoContract, Jsonable, JsonSerializable
 {

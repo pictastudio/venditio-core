@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Discounts\Rules;
+namespace PictaStudio\Venditio\Discounts\Rules;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\DiscountRuleInterface;
-use PictaStudio\VenditioCore\Discounts\DiscountContext;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\Venditio\Contracts\DiscountRuleInterface;
+use PictaStudio\Venditio\Discounts\DiscountContext;
+use PictaStudio\Venditio\Models\Discount;
 
 class MaxUsesRule implements DiscountRuleInterface
 {

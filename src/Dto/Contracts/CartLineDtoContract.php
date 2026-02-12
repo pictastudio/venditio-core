@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto\Contracts;
+namespace PictaStudio\Venditio\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\{Cart, CartLine};
+use PictaStudio\Venditio\Models\{Cart, CartLine};
 
 interface CartLineDtoContract extends Dto
 {

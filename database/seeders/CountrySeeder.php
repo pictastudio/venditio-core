@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Seeders;
+namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
-use PictaStudio\VenditioCore\Models\Country;
+use PictaStudio\Venditio\Models\Country;
 
 class CountrySeeder extends Seeder
 {

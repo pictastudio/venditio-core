@@ -1,6 +1,6 @@
 <?php
 
-use PictaStudio\VenditioCore\Actions\Taxes\ExtractTaxFromGrossPrice;
+use PictaStudio\Venditio\Actions\Taxes\ExtractTaxFromGrossPrice;
 
 it('extracts taxable amount and tax from gross price', function () {
     $result = app(ExtractTaxFromGrossPrice::class)->handle(122.00, 22.00);

@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Factories;
+namespace PictaStudio\Venditio\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Models\ProductType;
+use PictaStudio\Venditio\Models\ProductType;
 
 class ProductCustomFieldFactory extends Factory
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Pipes;
 
 use Closure;
 

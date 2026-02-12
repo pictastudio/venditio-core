@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Traits;
+namespace PictaStudio\Venditio\Traits;
 
 trait HasMakeConstructor
 {

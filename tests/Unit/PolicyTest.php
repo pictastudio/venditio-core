@@ -1,23 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Gate;
-use PictaStudio\VenditioCore\VenditioCore;
+use PictaStudio\Venditio\Venditio;
 
 it('registers the policy correctly', function () {
-    if (!config('venditio-core.policies.register')) {
+    if (!config('venditio.policies.register')) {
         return;
     }
 
-    VenditioCore::registerPolicies();
+    Venditio::registerPolicies();
 
-    foreach (config('venditio-core.models') as $contract => $model) {
+    foreach (config('venditio.models') as $contract => $model) {
         $model = class_basename($model);
 
-        if (!class_exists("PictaStudio\VenditioCore\Policies\\{$model}Policy")) {
+        if (!class_exists("PictaStudio\Venditio\Policies\\{$model}Policy")) {
             continue;
         }
 
-        expect(Gate::getPolicyFor("PictaStudio\VenditioCore\Models\\{$model}")::class)
-            ->toBe("PictaStudio\VenditioCore\Policies\\{$model}Policy");
+        expect(Gate::getPolicyFor("PictaStudio\Venditio\Models\\{$model}")::class)
+            ->toBe("PictaStudio\Venditio\Policies\\{$model}Policy");
     }
 })->group('policy');

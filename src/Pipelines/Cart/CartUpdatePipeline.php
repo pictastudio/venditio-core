@@ -1,18 +1,18 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart;
+namespace PictaStudio\Venditio\Pipelines\Cart;
 
-use PictaStudio\VenditioCore\Pipelines\Pipeline;
+use PictaStudio\Venditio\Pipelines\Pipeline;
 
 /**
  * Pipeline for updating a cart.
  *
- * the expected payload is an instance of PictaStudio\VenditioCore\Dto\CartDto
+ * the expected payload is an instance of PictaStudio\Venditio\Dto\CartDto
  */
 class CartUpdatePipeline extends Pipeline
 {
     public function getPipes(): array
     {
-        return config('venditio-core.cart.pipelines.update.pipes');
+        return config('venditio.cart.pipelines.update.pipes');
     }
 }

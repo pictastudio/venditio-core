@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto;
+namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\{Collection, Fluent};
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
+use PictaStudio\Venditio\Dto\Contracts\OrderDtoContract;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
 
 class OrderDto extends Dto implements OrderDtoContract
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\TaxClass;
+namespace PictaStudio\Venditio\Http\Requests\V1\TaxClass;
 
 use Illuminate\Foundation\Http\FormRequest;
 

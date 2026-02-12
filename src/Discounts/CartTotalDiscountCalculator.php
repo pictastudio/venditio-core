@@ -1,14 +1,14 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Discounts;
+namespace PictaStudio\Venditio\Discounts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Contracts\{CartTotalDiscountCalculatorInterface, DiscountRuleInterface, DiscountablesResolverInterface};
-use PictaStudio\VenditioCore\Enums\DiscountType;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\Venditio\Contracts\{CartTotalDiscountCalculatorInterface, DiscountRuleInterface, DiscountablesResolverInterface};
+use PictaStudio\Venditio\Enums\DiscountType;
+use PictaStudio\Venditio\Models\Discount;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterface
 {
@@ -96,7 +96,7 @@ class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterfac
 
     private function passesRules(Discount $discount, Model $target, DiscountContext $context): bool
     {
-        $ruleClasses = config('venditio-core.discounts.cart_total.rules', []);
+        $ruleClasses = config('venditio.discounts.cart_total.rules', []);
 
         foreach ($ruleClasses as $ruleClass) {
             /** @var DiscountRuleInterface $rule */
@@ -112,7 +112,7 @@ class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterfac
 
     private function resolveBaseAmount(Model $target, Collection $lines): float
     {
-        $base = config('venditio-core.discounts.cart_total.base', 'subtotal');
+        $base = config('venditio.discounts.cart_total.base', 'subtotal');
 
         $subTotal = (float) $lines->sum('total_final_price');
         $shippingFee = (float) ($target->getAttribute('shipping_fee') ?? 0);

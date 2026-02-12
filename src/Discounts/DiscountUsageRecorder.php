@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Discounts;
+namespace PictaStudio\Venditio\Discounts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Contracts\DiscountUsageRecorderInterface;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\Venditio\Contracts\DiscountUsageRecorderInterface;
+use PictaStudio\Venditio\Models\Discount;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class DiscountUsageRecorder implements DiscountUsageRecorderInterface
 {

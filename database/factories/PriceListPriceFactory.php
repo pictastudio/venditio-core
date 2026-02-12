@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Factories;
+namespace PictaStudio\Venditio\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Models\{PriceList, PriceListPrice, Product};
+use PictaStudio\Venditio\Models\{PriceList, PriceListPrice, Product};
 
 class PriceListPriceFactory extends Factory
 {

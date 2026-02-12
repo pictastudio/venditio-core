@@ -3,11 +3,11 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Dto\{CartDto, OrderDto};
-use PictaStudio\VenditioCore\Enums\{DiscountType, ProductStatus};
-use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, DiscountApplication, Product, ProductCategory, TaxClass, User};
-use PictaStudio\VenditioCore\Pipelines\Cart\{CartCreationPipeline, CartUpdatePipeline};
-use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
+use PictaStudio\Venditio\Dto\{CartDto, OrderDto};
+use PictaStudio\Venditio\Enums\{DiscountType, ProductStatus};
+use PictaStudio\Venditio\Models\{Country, CountryTaxClass, DiscountApplication, Product, ProductCategory, TaxClass, User};
+use PictaStudio\Venditio\Pipelines\Cart\{CartCreationPipeline, CartUpdatePipeline};
+use PictaStudio\Venditio\Pipelines\Order\OrderCreationPipeline;
 
 uses(RefreshDatabase::class);
 
@@ -204,7 +204,7 @@ it('applies cart total discount code at checkout', function () {
 
     $product = createProduct(100, $taxClass);
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,
@@ -253,7 +253,7 @@ it('applies discounts only to the configured user', function () {
     ]);
     $product = createProduct(80, $taxClass);
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'type' => DiscountType::Fixed,
         'value' => 10,
@@ -319,7 +319,7 @@ it('applies free shipping when cart total discount enables it', function () {
     ]);
     $product = createProduct(100, $taxClass);
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,

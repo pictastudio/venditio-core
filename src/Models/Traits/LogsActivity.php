@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models\Traits;
+namespace PictaStudio\Venditio\Models\Traits;
 
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity as SpatieLogsActivity;
@@ -13,7 +13,7 @@ trait LogsActivity
 
     protected static function bootLogsActivity(): void
     {
-        if (!config('venditio-core.activity_log.enabled')) {
+        if (!config('venditio.activity_log.enabled')) {
             return;
         }
 
@@ -23,9 +23,9 @@ trait LogsActivity
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(config('venditio-core.activity_log.log_name'))
+            ->useLogName(config('venditio.activity_log.log_name'))
             ->logAll()
             ->dontSubmitEmptyLogs()
-            ->logExcept(config('venditio-core.activity_log.log_except'));
+            ->logExcept(config('venditio.activity_log.log_except'));
     }
 }

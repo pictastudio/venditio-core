@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
-use PictaStudio\VenditioCore\Validations\Contracts\BrandValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\BrandValidationRules;
 
 class BrandValidation implements BrandValidationRules
 {

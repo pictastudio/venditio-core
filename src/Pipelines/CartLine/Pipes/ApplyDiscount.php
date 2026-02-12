@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
+namespace PictaStudio\Venditio\Pipelines\CartLine\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\DiscountCalculatorInterface;
-use PictaStudio\VenditioCore\Discounts\DiscountContext;
+use PictaStudio\Venditio\Contracts\DiscountCalculatorInterface;
+use PictaStudio\Venditio\Discounts\DiscountContext;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ApplyDiscount
 {

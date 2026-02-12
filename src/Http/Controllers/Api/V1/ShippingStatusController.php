@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\ShippingStatus\{StoreShippingStatusRequest, UpdateShippingStatusRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\GenericModelResource;
-use PictaStudio\VenditioCore\Models\ShippingStatus;
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\ShippingStatus\{StoreShippingStatusRequest, UpdateShippingStatusRequest};
+use PictaStudio\Venditio\Http\Resources\V1\GenericModelResource;
+use PictaStudio\Venditio\Models\ShippingStatus;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ShippingStatusController extends Controller
 {

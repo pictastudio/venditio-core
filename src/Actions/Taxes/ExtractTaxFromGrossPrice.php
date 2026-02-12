@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\Taxes;
+namespace PictaStudio\Venditio\Actions\Taxes;
 
 class ExtractTaxFromGrossPrice
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Seeders;
+namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\{Country, Currency};
+use PictaStudio\Venditio\Models\{Country, Currency};
 
 class CurrencySeeder extends Seeder
 {

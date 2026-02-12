@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
-use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\CartLineValidationRules;
 
 class CartLineValidation implements CartLineValidationRules
 {

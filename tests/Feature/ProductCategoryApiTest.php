@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Models\ProductCategory;
+use PictaStudio\Venditio\Models\ProductCategory;
 
 use function Pest\Laravel\{assertDatabaseHas, getJson, patchJson, postJson};
 
@@ -14,7 +14,7 @@ it('creates a product category', function () {
         'sort_order' => 1,
     ];
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/product_categories', $payload)
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/product_categories', $payload)
         ->assertCreated()
         ->assertJsonFragment([
             'name' => 'Shoes',
@@ -34,7 +34,7 @@ it('updates a product category', function () {
         'sort_order' => 1,
     ]);
 
-    patchJson(config('venditio-core.routes.api.v1.prefix') . "/product_categories/{$category->getKey()}", [
+    patchJson(config('venditio.routes.api.v1.prefix') . "/product_categories/{$category->getKey()}", [
         'name' => 'New Name',
         'sort_order' => 2,
     ])->assertOk()
@@ -67,7 +67,7 @@ it('returns product categories as a tree when as_tree is true', function () {
         'sort_order' => 3,
     ]);
 
-    getJson(config('venditio-core.routes.api.v1.prefix') . '/product_categories?as_tree=1')
+    getJson(config('venditio.routes.api.v1.prefix') . '/product_categories?as_tree=1')
         ->assertOk()
         ->assertJsonCount(2)
         ->assertJsonPath('0.name', 'Root')

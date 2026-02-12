@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\Brand;
+namespace PictaStudio\Venditio\Http\Requests\V1\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\VenditioCore\Validations\Contracts\BrandValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\BrandValidationRules;
 
 class UpdateBrandRequest extends FormRequest
 {

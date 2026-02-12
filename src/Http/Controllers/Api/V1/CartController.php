@@ -1,20 +1,20 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Cart\{StoreCartRequest, UpdateCartRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
-use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Pipelines\Cart\{CartCreationPipeline, CartUpdatePipeline};
-use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\Cart\{StoreCartRequest, UpdateCartRequest};
+use PictaStudio\Venditio\Http\Resources\V1\CartResource;
+use PictaStudio\Venditio\Models\Cart;
+use PictaStudio\Venditio\Pipelines\Cart\{CartCreationPipeline, CartUpdatePipeline};
+use PictaStudio\Venditio\Validations\Contracts\CartLineValidationRules;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_dto};
+use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_dto};
 
 class CartController extends Controller
 {
@@ -26,7 +26,7 @@ class CartController extends Controller
             'user_id' => [
                 'sometimes',
                 'integer',
-                Rule::exists((new (config('venditio-core.models.user')))->getTable(), 'id'),
+                Rule::exists((new (config('venditio.models.user')))->getTable(), 'id'),
             ],
         ]);
 
@@ -124,7 +124,7 @@ class CartController extends Controller
             'line_ids' => 'required|array|min:1',
             'line_ids.*' => [
                 'integer',
-                Rule::exists((new (config('venditio-core.models.cart_line')))->getTable(), 'id'),
+                Rule::exists((new (config('venditio.models.cart_line')))->getTable(), 'id'),
             ],
         ]);
 

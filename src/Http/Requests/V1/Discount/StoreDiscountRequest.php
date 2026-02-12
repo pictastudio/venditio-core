@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\Discount;
+namespace PictaStudio\Venditio\Http\Requests\V1\Discount;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Enums\DiscountType;
+use PictaStudio\Venditio\Enums\DiscountType;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class StoreDiscountRequest extends FormRequest
 {

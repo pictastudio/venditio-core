@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Factories;
+namespace PictaStudio\Venditio\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Enums\{ProductMeasuringUnit, ProductStatus};
-use PictaStudio\VenditioCore\Models\{Brand, Product, ProductType, TaxClass};
+use PictaStudio\Venditio\Enums\{ProductMeasuringUnit, ProductStatus};
+use PictaStudio\Venditio\Models\{Brand, Product, ProductType, TaxClass};
 
 class ProductFactory extends Factory
 {

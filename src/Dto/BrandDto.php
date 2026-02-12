@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto;
+namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Dto\Contracts\BrandDtoContract;
-use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\Venditio\Dto\Contracts\BrandDtoContract;
+use PictaStudio\Venditio\Models\Brand;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
 
 class BrandDto extends Dto implements BrandDtoContract
 {

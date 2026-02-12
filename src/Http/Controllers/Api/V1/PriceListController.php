@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\PriceList\{StorePriceListRequest, UpdatePriceListRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\PriceListResource;
-use PictaStudio\VenditioCore\Models\PriceList;
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\PriceList\{StorePriceListRequest, UpdatePriceListRequest};
+use PictaStudio\Venditio\Http\Resources\V1\PriceListResource;
+use PictaStudio\Venditio\Models\PriceList;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_model};
+use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_model};
 
 class PriceListController extends Controller
 {
@@ -68,6 +68,6 @@ class PriceListController extends Controller
 
     private function ensureFeatureIsEnabled(): void
     {
-        abort_unless(config('venditio-core.price_lists.enabled', false), 404);
+        abort_unless(config('venditio.price_lists.enabled', false), 404);
     }
 }

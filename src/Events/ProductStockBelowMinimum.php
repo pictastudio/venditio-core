@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Events;
+namespace PictaStudio\Venditio\Events;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Models\Product;
 
 class ProductStockBelowMinimum
 {

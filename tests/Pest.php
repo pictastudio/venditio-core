@@ -1,5 +1,5 @@
 <?php
 
-use PictaStudio\VenditioCore\Tests\TestCase;
+use PictaStudio\Venditio\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Models\{Brand, Inventory, Product, ProductCategory, ProductType, ProductVariant, ProductVariantOption, TaxClass};
+use PictaStudio\Venditio\Enums\ProductStatus;
+use PictaStudio\Venditio\Models\{Brand, Inventory, Product, ProductCategory, ProductType, ProductVariant, ProductVariantOption, TaxClass};
 
 use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, getJson, patchJson, postJson};
 
@@ -22,7 +22,7 @@ it('creates a product with categories', function () {
         'category_ids' => [$category->getKey()],
     ];
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/products', $payload)
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/products', $payload)
         ->assertCreated()
         ->assertJsonFragment([
             'name' => 'Sample Product',
@@ -40,7 +40,7 @@ it('creates a product with categories', function () {
 });
 
 it('validates product creation', function () {
-    postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [])
+    postJson(config('venditio.routes.api.v1.prefix') . '/products', [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['tax_class_id', 'name', 'status']);
 });
@@ -61,7 +61,7 @@ it('updates product categories when provided', function () {
 
     $product->categories()->sync([$category->getKey()]);
 
-    patchJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+    patchJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
         'category_ids' => [$otherCategory->getKey()],
     ])->assertOk();
 
@@ -79,7 +79,7 @@ it('creates a product with qty_for_unit', function () {
     $brand = Brand::factory()->create();
     $taxClass = TaxClass::factory()->create();
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
         'brand_id' => $brand->getKey(),
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Product with unit qty',
@@ -104,7 +104,7 @@ it('updates a product qty_for_unit', function () {
         'qty_for_unit' => null,
     ]);
 
-    patchJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+    patchJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
         'qty_for_unit' => 12,
     ])->assertOk()
         ->assertJsonFragment(['qty_for_unit' => 12]);
@@ -116,7 +116,7 @@ it('creates a product with nested inventory fields', function () {
     $brand = Brand::factory()->create();
     $taxClass = TaxClass::factory()->create();
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . '/products', [
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
         'brand_id' => $brand->getKey(),
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Inventory Product',
@@ -160,7 +160,7 @@ it('updates nested inventory fields via product api', function () {
         'price' => 30,
     ]);
 
-    patchJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+    patchJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
         'inventory' => [
             'stock' => 75,
             'stock_reserved' => 5,
@@ -249,7 +249,7 @@ it('includes variants and variants options table when requested', function () {
     ]);
     $variantB->variantOptions()->sync([$medium->getKey(), $blue->getKey()]);
 
-    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")
+    getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")
         ->assertOk()
         ->assertJsonCount(2, 'variants')
         ->assertJsonPath('variants_options_table.0.id', $size->getKey())
@@ -269,7 +269,7 @@ it('rejects unknown includes on products api', function () {
         'visible_until' => null,
     ]);
 
-    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=unknown")
+    getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=unknown")
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['include.0']);
 });
@@ -287,7 +287,7 @@ it('always exposes price_calculated on product payloads', function () {
         'price_includes_tax' => false,
     ]);
 
-    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}")
+    getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}")
         ->assertOk()
         ->assertJsonPath('price_calculated.price', 42.5)
         ->assertJsonPath('price_calculated.purchase_price', 20)

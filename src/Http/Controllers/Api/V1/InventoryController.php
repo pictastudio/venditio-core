@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Inventory\{StoreInventoryRequest, UpdateInventoryRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\InventoryResource;
-use PictaStudio\VenditioCore\Models\Inventory;
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\Inventory\{StoreInventoryRequest, UpdateInventoryRequest};
+use PictaStudio\Venditio\Http\Resources\V1\InventoryResource;
+use PictaStudio\Venditio\Models\Inventory;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class InventoryController extends Controller
 {

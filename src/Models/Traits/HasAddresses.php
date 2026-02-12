@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models\Traits;
+namespace PictaStudio\Venditio\Models\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use PictaStudio\VenditioCore\Models\Address;
+use PictaStudio\Venditio\Models\Address;
 
 trait HasAddresses
 {

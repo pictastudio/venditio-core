@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Cart\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Models\CartLine;
-use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineUpdatePipeline;
+use PictaStudio\Venditio\Dto\Contracts\CartLineDtoContract;
+use PictaStudio\Venditio\Models\CartLine;
+use PictaStudio\Venditio\Pipelines\CartLine\CartLineUpdatePipeline;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_dto;
 
 class UpdateLines
 {

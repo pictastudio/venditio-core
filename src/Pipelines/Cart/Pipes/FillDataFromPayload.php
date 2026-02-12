@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Cart\Pipes;
 
 use BackedEnum;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
+use PictaStudio\Venditio\Dto\Contracts\CartDtoContract;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{resolve_enum};
+use function PictaStudio\Venditio\Helpers\Functions\resolve_enum;
 
 class FillDataFromPayload
 {
@@ -17,7 +17,7 @@ class FillDataFromPayload
 
         if (blank($addresses)) {
             /** @var BackedEnum $addressTypeEnum */
-            $addressTypeEnum = config('venditio-core.addresses.type_enum');
+            $addressTypeEnum = config('venditio.addresses.type_enum');
 
             foreach ($addressTypeEnum::cases() as $case) {
                 $addresses[$case->value] = [];

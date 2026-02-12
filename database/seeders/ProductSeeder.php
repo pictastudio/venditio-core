@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Seeders;
+namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\{Brand, Inventory, Product, TaxClass};
+use PictaStudio\Venditio\Models\{Brand, Inventory, Product, TaxClass};
 
 class ProductSeeder extends Seeder
 {

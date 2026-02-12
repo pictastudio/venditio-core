@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models;
+namespace PictaStudio\Venditio\Models;
 
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, Pivot};
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class CountryTaxClass extends Pivot
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations\Contracts;
+namespace PictaStudio\Venditio\Validations\Contracts;
 
 interface ProvidesValidationRules
 {

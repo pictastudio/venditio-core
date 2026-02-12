@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\Product;
+namespace PictaStudio\Venditio\Http\Requests\V1\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\ProductValidationRules;
 
 class UpdateProductRequest extends FormRequest
 {

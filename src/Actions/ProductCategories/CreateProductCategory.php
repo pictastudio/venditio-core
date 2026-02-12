@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\ProductCategories;
+namespace PictaStudio\Venditio\Actions\ProductCategories;
 
-use PictaStudio\VenditioCore\Models\ProductCategory;
+use PictaStudio\Venditio\Models\ProductCategory;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class CreateProductCategory
 {

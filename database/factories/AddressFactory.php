@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Factories;
+namespace PictaStudio\Venditio\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Models\Address;
+use PictaStudio\Venditio\Models\Address;
 
 class AddressFactory extends Factory
 {
@@ -12,7 +12,7 @@ class AddressFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => fake()->randomElement(config('venditio-core.addresses.type_enum')::cases())->value,
+            'type' => fake()->randomElement(config('venditio.addresses.type_enum')::cases())->value,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->safeEmail(),

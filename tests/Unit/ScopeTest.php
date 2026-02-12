@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Models\Product;
 
 use function Pest\Laravel\getJson;
 
@@ -16,6 +16,6 @@ describe('applies scopes correctly', function () {
 
         expect($products)->not->toContain($productInactive);
 
-        getJson(config('venditio-core.routes.api.v1.prefix'))->assertJsonMissing(['id' => $productInactive->getKey()]);
+        getJson(config('venditio.routes.api.v1.prefix'))->assertJsonMissing(['id' => $productInactive->getKey()]);
     })->todo()->skip();
 });

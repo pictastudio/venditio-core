@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Discounts;
+namespace PictaStudio\Venditio\Discounts;
 
 use Illuminate\Validation\ValidationException;
 

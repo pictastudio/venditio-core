@@ -4,10 +4,10 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Dto\CartDto;
-use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
-use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
+use PictaStudio\Venditio\Dto\CartDto;
+use PictaStudio\Venditio\Enums\ProductStatus;
+use PictaStudio\Venditio\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
+use PictaStudio\Venditio\Pipelines\Cart\CartCreationPipeline;
 
 use function Pest\Laravel\artisan;
 
@@ -87,8 +87,8 @@ function createCartForAbandonmentTest(User $user, Product $product, int $qty): C
 }
 
 it('marks stale pending carts as abandoned and releases reserved stock', function () {
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true);
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.enabled', true);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440);
 
     $taxClass = TaxClass::factory()->create();
     setupAbandonedCartTaxEnvironment($taxClass);
@@ -111,15 +111,15 @@ it('marks stale pending carts as abandoned and releases reserved stock', functio
     $cart->refresh();
     $product->inventory->refresh();
 
-    expect($cart->status->value)->toBe(config('venditio-core.cart.status_enum')::getAbandonedStatus()->value)
+    expect($cart->status->value)->toBe(config('venditio.cart.status_enum')::getAbandonedStatus()->value)
         ->and($cart->trashed())->toBeFalse()
         ->and($cart->lines()->count())->toBe(1)
         ->and($product->inventory->stock_reserved)->toBe(0);
 });
 
 it('does not abandon carts updated inside the configured inactivity window', function () {
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true);
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.enabled', true);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440);
 
     $taxClass = TaxClass::factory()->create();
     setupAbandonedCartTaxEnvironment($taxClass);
@@ -146,8 +146,8 @@ it('does not abandon carts updated inside the configured inactivity window', fun
 });
 
 it('does nothing when abandoned carts command is disabled', function () {
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.enabled', false);
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.enabled', false);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440);
 
     $taxClass = TaxClass::factory()->create();
     setupAbandonedCartTaxEnvironment($taxClass);
@@ -174,8 +174,8 @@ it('does nothing when abandoned carts command is disabled', function () {
 });
 
 it('registers abandoned carts command in scheduler only when enabled', function () {
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true);
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.schedule_every_minutes', 15);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.enabled', true);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.schedule_every_minutes', 15);
 
     app()->forgetInstance(Schedule::class);
     $enabledSchedule = app(Schedule::class);
@@ -188,7 +188,7 @@ it('registers abandoned carts command in scheduler only when enabled', function 
 });
 
 it('does not register abandoned carts command in scheduler when disabled', function () {
-    config()->set('venditio-core.commands.release_stock_for_abandoned_carts.enabled', false);
+    config()->set('venditio.commands.release_stock_for_abandoned_carts.enabled', false);
 
     app()->forgetInstance(Schedule::class);
     $disabledSchedule = app(Schedule::class);

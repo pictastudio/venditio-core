@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\ProductCategory;
+namespace PictaStudio\Venditio\Http\Requests\V1\ProductCategory;
 
 use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductCategoryValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\ProductCategoryValidationRules;
 
 class StoreProductCategoryRequest extends FormRequest
 {

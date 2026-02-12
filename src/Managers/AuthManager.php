@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Managers;
+namespace PictaStudio\Venditio\Managers;
 
 use Closure;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\Venditio\Managers\Contracts\AuthManager as AuthManagerContract;
+use PictaStudio\Venditio\Models\User;
 
 class AuthManager implements AuthManagerContract
 {
@@ -36,8 +36,8 @@ class AuthManager implements AuthManagerContract
 
     public static function getPermissions(?string $resource = null): array
     {
-        $resources = config('venditio-core.auth.resources');
-        $actions = config('venditio-core.auth.actions');
+        $resources = config('venditio.auth.resources');
+        $actions = config('venditio.auth.actions');
 
         if ($resource) {
             return static::generatePermission($resource, $actions);
@@ -52,7 +52,7 @@ class AuthManager implements AuthManagerContract
 
     private static function getExtraPermissions(): array
     {
-        return collect(config('venditio-core.auth.extra_permissions', []))
+        return collect(config('venditio.auth.extra_permissions', []))
             ->map(fn (array $actions, string $resource) => static::generatePermission($resource, $actions))
             ->flatten()
             ->toArray();

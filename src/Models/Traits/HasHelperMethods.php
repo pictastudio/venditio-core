@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models\Traits;
+namespace PictaStudio\Venditio\Models\Traits;
 
 use Illuminate\Support\Facades\Schema;
 
