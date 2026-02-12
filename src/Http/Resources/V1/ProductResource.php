@@ -2,9 +2,10 @@
 
 namespace PictaStudio\VenditioCore\Http\Resources\V1;
 
-use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
+use PictaStudio\VenditioCore\Contracts\ProductPriceResolverInterface;
 use PictaStudio\VenditioCore\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
 class ProductResource extends JsonResource
@@ -28,12 +29,40 @@ class ProductResource extends JsonResource
     protected function getRelationshipsToInclude(Request $request): array
     {
         $includes = $this->resolveRequestedIncludes($request);
+        $shouldIncludePriceLists = in_array('price_lists', $includes, true);
         $shouldIncludeVariants = in_array('variants', $includes, true) && blank($this->parent_id);
         $shouldIncludeVariantsOptionsTable = in_array('variants_options_table', $includes, true) && blank($this->parent_id);
 
         return [
+            'price_calculated' => $this->resolveCalculatedPrice(),
             'variant_options' => ProductVariantOptionResource::collection($this->whenLoaded('variantOptions')),
             'inventory' => InventoryResource::make($this->whenLoaded('inventory')),
+            'price_lists' => $this->when(
+                $shouldIncludePriceLists && $this->resource->relationLoaded('priceListPrices'),
+                fn () => collect($this->resource->getRelation('priceListPrices'))
+                    ->map(fn ($priceListPrice): array => [
+                        'id' => $priceListPrice->getKey(),
+                        'product_id' => $priceListPrice->product_id,
+                        'price_list_id' => $priceListPrice->price_list_id,
+                        'price' => $priceListPrice->price,
+                        'purchase_price' => $priceListPrice->purchase_price,
+                        'price_includes_tax' => (bool) $priceListPrice->price_includes_tax,
+                        'is_default' => (bool) $priceListPrice->is_default,
+                        'metadata' => $priceListPrice->metadata,
+                        'price_list' => $priceListPrice->relationLoaded('priceList')
+                            ? [
+                                'id' => $priceListPrice->priceList?->getKey(),
+                                'name' => $priceListPrice->priceList?->name,
+                                'code' => $priceListPrice->priceList?->code,
+                                'active' => (bool) ($priceListPrice->priceList?->active ?? true),
+                                'description' => $priceListPrice->priceList?->description,
+                                'metadata' => $priceListPrice->priceList?->metadata,
+                            ]
+                            : null,
+                    ])
+                    ->values()
+                    ->all()
+            ),
             'variants' => $this->when(
                 $shouldIncludeVariants,
                 fn () => self::collection($this->whenLoaded('variants'))
@@ -42,6 +71,18 @@ class ProductResource extends JsonResource
                 $shouldIncludeVariantsOptionsTable,
                 fn () => $this->buildVariantsOptionsTable()
             ),
+        ];
+    }
+
+    protected function resolveCalculatedPrice(): array
+    {
+        $resolved = app(ProductPriceResolverInterface::class)->resolve($this->resource);
+
+        return [
+            'price' => (float) ($resolved['unit_price'] ?? 0),
+            'purchase_price' => isset($resolved['purchase_price']) ? (float) $resolved['purchase_price'] : null,
+            'price_includes_tax' => (bool) ($resolved['price_includes_tax'] ?? false),
+            'price_list' => $resolved['price_list'] ?? null,
         ];
     }
 
@@ -89,7 +130,7 @@ class ProductResource extends JsonResource
 
         return collect(is_array($rawIncludes) ? $rawIncludes : [$rawIncludes])
             ->flatMap(fn (mixed $include) => is_string($include) ? explode(',', $include) : [])
-            ->map(fn (string $include) => trim($include))
+            ->map(fn (string $include) => mb_trim($include))
             ->filter(fn (string $include) => filled($include))
             ->unique()
             ->values()

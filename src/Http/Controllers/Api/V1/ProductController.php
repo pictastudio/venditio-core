@@ -117,11 +117,17 @@ class ProductController extends Controller
             ->flatMap(
                 fn (mixed $include) => is_string($include) ? explode(',', $include) : []
             )
-            ->map(fn (string $include) => trim($include))
+            ->map(fn (string $include) => mb_trim($include))
             ->filter(fn (string $include) => filled($include))
             ->unique()
             ->values()
             ->all();
+
+        $allowedIncludes = ['variants', 'variants_options_table'];
+
+        if (config('venditio-core.price_lists.enabled', false)) {
+            $allowedIncludes[] = 'price_lists';
+        }
 
         $this->validateData([
             'include' => $includes,
@@ -129,7 +135,7 @@ class ProductController extends Controller
             'include' => ['array'],
             'include.*' => [
                 'string',
-                Rule::in(['variants', 'variants_options_table']),
+                Rule::in($allowedIncludes),
             ],
         ]);
 
@@ -140,9 +146,17 @@ class ProductController extends Controller
     {
         $relations = ['variantOptions.productVariant', 'inventory'];
 
+        if (config('venditio-core.price_lists.enabled', false)) {
+            $relations[] = 'priceListPrices.priceList';
+        }
+
         if (in_array('variants', $includes, true) || in_array('variants_options_table', $includes, true)) {
             $relations[] = 'variants.variantOptions.productVariant';
             $relations[] = 'variants.inventory';
+
+            if (config('venditio-core.price_lists.enabled', false)) {
+                $relations[] = 'variants.priceListPrices.priceList';
+            }
         }
 
         return $relations;

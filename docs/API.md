@@ -23,6 +23,8 @@ The following filters apply to most index endpoints via `applyBaseFilters`.
 Some endpoints add extra filters.
 - `product_type_id` for `/product_variants`
 - `product_variant_id` for `/product_variant_options`
+- `product_id` for `/price_list_prices`
+- `price_list_id` for `/price_list_prices`
 - `as_tree` boolean for `/product_categories` (returns nested categories with `children`; forces full, non-paginated result)
 
 ## Response Shape
@@ -42,6 +44,8 @@ Payload notes:
 - `category_ids` can be used to attach categories on create or update.
 - `product_type_id` is required for variant generation.
 - `measuring_unit` and `qty_for_unit` (optional) define unit of measure and quantity per unit (e.g. box of 6).
+- `price_calculated` is always returned and contains the resolved frontend price payload.
+- `include=price_lists` is available only when `venditio-core.price_lists.enabled` is true.
 
 ### Product Categories
 - `GET /product_categories`
@@ -133,6 +137,23 @@ Discounts expose first-level rule columns:
 - `POST /products/{product}/variants`
 
 This endpoint generates concrete variant products from variant option combinations.
+
+### Price Lists (Optional Feature)
+- `GET /price_lists`
+- `GET /price_lists/{price_list}`
+- `POST /price_lists`
+- `PATCH /price_lists/{price_list}`
+- `DELETE /price_lists/{price_list}`
+
+### Price List Prices (Optional Feature)
+- `GET /price_list_prices`
+- `GET /price_list_prices/{price_list_price}`
+- `POST /price_list_prices`
+- `PATCH /price_list_prices/{price_list_price}`
+- `DELETE /price_list_prices/{price_list_price}`
+
+Feature flag:
+- `venditio-core.price_lists.enabled` must be true.
 
 ## Variant Workflow
 1. Create a product type.
@@ -300,3 +321,5 @@ See `config/venditio-core.php` for:
 - Pagination defaults
 - Product variant naming and copy behavior
 - Model overrides
+- Price lists feature flag (`price_lists.enabled`)
+- Price resolver binding (`price_lists.resolver`)

@@ -98,6 +98,26 @@ class Product extends Model
         return $this->hasOne(resolve_model('inventory'));
     }
 
+    public function priceLists(): HasMany
+    {
+        return $this->belongsToMany(resolve_model('price_list'), 'price_list_prices')
+            ->withPivot([
+                'id',
+                'price',
+                'purchase_price',
+                'price_includes_tax',
+                'is_default',
+                'metadata',
+                'created_at',
+                'updated_at',
+            ]);
+    }
+
+    public function priceListPrices(): HasMany
+    {
+        return $this->hasMany(resolve_model('price_list_price'));
+    }
+
     public function variantOptions(): BelongsToMany
     {
         return $this->belongsToMany(resolve_model('product_variant_option'), 'product_configuration')

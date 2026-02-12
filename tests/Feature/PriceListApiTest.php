@@ -1,0 +1,243 @@
+<?php
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PictaStudio\VenditioCore\Contracts\ProductPriceResolverInterface;
+use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, PriceList, PriceListPrice, Product, TaxClass};
+
+use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, deleteJson, getJson, patchJson, postJson};
+
+uses(RefreshDatabase::class);
+
+function pl_createProduct(float $inventoryPrice = 100): Product
+{
+    $taxClass = TaxClass::factory()->create();
+    pl_setupTaxEnvironment($taxClass);
+
+    $product = Product::factory()->create([
+        'tax_class_id' => $taxClass->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $product->inventory()->updateOrCreate([], [
+        'stock' => 100,
+        'stock_reserved' => 0,
+        'stock_available' => 100,
+        'stock_min' => 0,
+        'price' => $inventoryPrice,
+        'purchase_price' => 40,
+        'price_includes_tax' => false,
+    ]);
+
+    return $product->refresh();
+}
+
+function pl_setupTaxEnvironment(TaxClass $taxClass): void
+{
+    $country = Country::query()->create([
+        'name' => 'Italy',
+        'iso_2' => 'IT',
+        'iso_3' => 'ITA',
+        'phone_code' => '+39',
+        'currency_code' => 'EUR',
+        'flag_emoji' => 'it',
+        'capital' => 'Rome',
+        'native' => 'Italia',
+    ]);
+
+    CountryTaxClass::query()->create([
+        'country_id' => $country->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'rate' => 22,
+    ]);
+}
+
+it('returns 404 for price list endpoints when feature is disabled', function () {
+    config()->set('venditio-core.price_lists.enabled', false);
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    getJson($prefix . '/price_lists')->assertNotFound();
+    getJson($prefix . '/price_list_prices')->assertNotFound();
+});
+
+it('provides full crud for global price lists when feature is enabled', function () {
+    config()->set('venditio-core.price_lists.enabled', true);
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+
+    $created = postJson($prefix . '/price_lists', [
+        'name' => 'B2B',
+        'code' => 'B2B',
+        'active' => true,
+    ])->assertCreated();
+
+    $priceListId = $created->json('id');
+
+    assertDatabaseHas('price_lists', [
+        'id' => $priceListId,
+        'name' => 'B2B',
+        'code' => 'B2B',
+        'active' => true,
+    ]);
+
+    getJson($prefix . '/price_lists?all=1')
+        ->assertOk()
+        ->assertJsonFragment([
+            'id' => $priceListId,
+            'name' => 'B2B',
+        ]);
+
+    patchJson($prefix . '/price_lists/' . $priceListId, [
+        'name' => 'B2B Updated',
+        'active' => false,
+    ])->assertOk()
+        ->assertJsonPath('name', 'B2B Updated')
+        ->assertJsonPath('active', false);
+
+    assertDatabaseHas('price_lists', [
+        'id' => $priceListId,
+        'name' => 'B2B Updated',
+        'active' => false,
+    ]);
+
+    deleteJson($prefix . '/price_lists/' . $priceListId)->assertNoContent();
+
+    assertDatabaseMissing('price_lists', [
+        'id' => $priceListId,
+        'deleted_at' => null,
+    ]);
+});
+
+it('provides full crud for product prices attached to price lists', function () {
+    config()->set('venditio-core.price_lists.enabled', true);
+    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $product = pl_createProduct();
+    $priceList = PriceList::factory()->create([
+        'name' => 'Retail',
+    ]);
+
+    $created = postJson($prefix . '/price_list_prices', [
+        'product_id' => $product->getKey(),
+        'price_list_id' => $priceList->getKey(),
+        'price' => 89.90,
+        'purchase_price' => 55.10,
+        'price_includes_tax' => true,
+        'is_default' => true,
+    ])->assertCreated();
+
+    $priceListPriceId = $created->json('id');
+
+    assertDatabaseHas('price_list_prices', [
+        'id' => $priceListPriceId,
+        'product_id' => $product->getKey(),
+        'price_list_id' => $priceList->getKey(),
+        'price' => 89.90,
+        'is_default' => true,
+    ]);
+
+    getJson($prefix . '/price_list_prices?all=1&product_id=' . $product->getKey())
+        ->assertOk()
+        ->assertJsonFragment([
+            'id' => $priceListPriceId,
+            'product_id' => $product->getKey(),
+            'price_list_id' => $priceList->getKey(),
+        ]);
+
+    patchJson($prefix . '/price_list_prices/' . $priceListPriceId, [
+        'price' => 79.90,
+    ])->assertOk()
+        ->assertJsonPath('price', 79.9);
+
+    assertDatabaseHas('price_list_prices', [
+        'id' => $priceListPriceId,
+        'price' => 79.90,
+    ]);
+
+    deleteJson($prefix . '/price_list_prices/' . $priceListPriceId)->assertNoContent();
+
+    assertDatabaseMissing('price_list_prices', [
+        'id' => $priceListPriceId,
+        'deleted_at' => null,
+    ]);
+});
+
+it('uses the default price list price in cart line pricing when enabled', function () {
+    config()->set('venditio-core.price_lists.enabled', true);
+
+    $product = pl_createProduct(inventoryPrice: 150);
+    $retail = PriceList::factory()->create(['name' => 'Retail']);
+    $wholesale = PriceList::factory()->create(['name' => 'Wholesale']);
+
+    PriceListPrice::factory()->create([
+        'product_id' => $product->getKey(),
+        'price_list_id' => $retail->getKey(),
+        'price' => 180,
+        'is_default' => false,
+    ]);
+
+    PriceListPrice::factory()->create([
+        'product_id' => $product->getKey(),
+        'price_list_id' => $wholesale->getKey(),
+        'price' => 95,
+        'is_default' => true,
+    ]);
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}")
+        ->assertOk()
+        ->assertJsonPath('price_calculated.price', 95)
+        ->assertJsonPath('price_calculated.price_list.name', 'Wholesale')
+        ->assertJsonMissingPath('price_lists');
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=price_lists")
+        ->assertOk()
+        ->assertJsonPath('price_calculated.price', 95)
+        ->assertJsonPath('price_lists.0.price_list.name', 'Retail')
+        ->assertJsonPath('price_lists.1.price_list.name', 'Wholesale');
+
+    $cartId = postJson(config('venditio-core.routes.api.v1.prefix') . '/carts', [
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()
+        ->json('id');
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . '/carts/' . $cartId)
+        ->assertOk()
+        ->assertJsonPath('lines.0.unit_price', 95)
+        ->assertJsonPath('lines.0.product_data.pricing.price_list.name', 'Wholesale');
+});
+
+it('allows host applications to override price resolver behavior', function () {
+    config()->set('venditio-core.price_lists.enabled', true);
+
+    app()->bind(ProductPriceResolverInterface::class, fn () => new class implements ProductPriceResolverInterface
+    {
+        public function resolve(Model $product): array
+        {
+            return [
+                'unit_price' => 12.34,
+                'purchase_price' => null,
+                'price_includes_tax' => false,
+                'price_list' => [
+                    'id' => 999,
+                    'name' => 'Custom Resolver',
+                ],
+            ];
+        }
+    });
+
+    $product = pl_createProduct(inventoryPrice: 150);
+
+    $cartId = postJson(config('venditio-core.routes.api.v1.prefix') . '/carts', [
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()
+        ->json('id');
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . '/carts/' . $cartId)
+        ->assertOk()
+        ->assertJsonPath('lines.0.unit_price', 12.34)
+        ->assertJsonPath('lines.0.product_data.pricing.price_list.name', 'Custom Resolver');
+});
