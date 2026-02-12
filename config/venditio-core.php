@@ -1,15 +1,8 @@
 <?php
 
-use PictaStudio\VenditioCore\Dto;
+use PictaStudio\VenditioCore\{Discounts, Dto, Enums, Generators, Managers, Models, Pricing};
 use PictaStudio\VenditioCore\Facades\VenditioCore;
-use PictaStudio\VenditioCore\Managers;
-use PictaStudio\VenditioCore\Enums;
-use PictaStudio\VenditioCore\Discounts;
-use PictaStudio\VenditioCore\Generators;
-use PictaStudio\VenditioCore\Models;
-use PictaStudio\VenditioCore\Pipelines\Cart;
-use PictaStudio\VenditioCore\Pipelines\CartLine;
-use PictaStudio\VenditioCore\Pipelines\Order;
+use PictaStudio\VenditioCore\Pipelines\{Cart, CartLine, Order};
 
 return [
 
@@ -50,6 +43,8 @@ return [
             'product-type',
             'product-variant',
             'product-variant-option',
+            'price-list',
+            'price-list-price',
         ],
         'actions' => [
             'view-any',
@@ -120,6 +115,8 @@ return [
         'product_type' => Models\ProductType::class,
         'product_variant' => Models\ProductVariant::class,
         'product_variant_option' => Models\ProductVariantOption::class,
+        'price_list' => Models\PriceList::class,
+        'price_list_price' => Models\PriceListPrice::class,
     ],
 
     /*
@@ -279,6 +276,20 @@ return [
         'status_enum' => Enums\ProductStatus::class,
         'measuring_unit_enum' => Enums\ProductMeasuringUnit::class,
         'sku_generator' => Generators\ProductSkuGenerator::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Price Lists
+    |--------------------------------------------------------------------------
+    |
+    | Enable multi-price support and optionally provide a custom resolver
+    | that picks the right price for a product at runtime.
+    |
+    */
+    'price_lists' => [
+        'enabled' => env('VENDITIO_CORE_PRICE_LISTS_ENABLED', false),
+        'resolver' => Pricing\DefaultProductPriceResolver::class,
     ],
 
     /*

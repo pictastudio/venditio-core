@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Http\Controllers\Api\V1\{AddressController, BrandController, CartController, CartLineController, CountryController, CountryTaxClassController, CurrencyController, DiscountApplicationController, DiscountController, InventoryController, OrderController, OrderLineController, ProductCategoryController, ProductController, ProductCustomFieldController, ProductTypeController, ProductVariantController, ProductVariantOptionController, ShippingStatusController, TaxClassController};
+use PictaStudio\VenditioCore\Http\Controllers\Api\V1\{AddressController, BrandController, CartController, CartLineController, CountryController, CountryTaxClassController, CurrencyController, DiscountApplicationController, DiscountController, InventoryController, OrderController, OrderLineController, PriceListController, PriceListPriceController, ProductCategoryController, ProductController, ProductCustomFieldController, ProductTypeController, ProductVariantController, ProductVariantOptionController, ShippingStatusController, TaxClassController};
 
 /*
 |--------------------------------------------------------------------------
@@ -39,5 +39,7 @@ Route::apiResource('shipping_statuses', ShippingStatusController::class);
 Route::apiResource('discounts', DiscountController::class);
 Route::apiResource('discount_applications', DiscountApplicationController::class);
 Route::apiResource('product_custom_fields', ProductCustomFieldController::class);
+Route::apiResource('price_lists', PriceListController::class);
+Route::apiResource('price_list_prices', PriceListPriceController::class);
 Route::apiResource('cart_lines', CartLineController::class);
 Route::apiResource('order_lines', OrderLineController::class);

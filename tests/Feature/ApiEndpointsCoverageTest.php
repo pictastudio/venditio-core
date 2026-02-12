@@ -33,6 +33,11 @@ it('registers index endpoints for all exposed models', function () {
         '/order_lines',
     ];
 
+    if (config('venditio-core.price_lists.enabled', false)) {
+        $endpoints[] = '/price_lists';
+        $endpoints[] = '/price_list_prices';
+    }
+
     foreach ($endpoints as $endpoint) {
         getJson($prefix . $endpoint)
             ->assertStatus(200);

@@ -273,3 +273,23 @@ it('rejects unknown includes on products api', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['include.0']);
 });
+
+it('always exposes price_calculated on product payloads', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $product->inventory()->updateOrCreate([], [
+        'price' => 42.50,
+        'purchase_price' => 20,
+        'price_includes_tax' => false,
+    ]);
+
+    getJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}")
+        ->assertOk()
+        ->assertJsonPath('price_calculated.price', 42.5)
+        ->assertJsonPath('price_calculated.purchase_price', 20)
+        ->assertJsonPath('price_calculated.price_includes_tax', false);
+});

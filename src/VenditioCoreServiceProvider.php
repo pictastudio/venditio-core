@@ -2,14 +2,14 @@
 
 namespace PictaStudio\VenditioCore;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Console\Commands\{PublishBrunoCollection, ReleaseStockForAbandonedCarts};
-use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductSkuGeneratorInterface};
+use PictaStudio\VenditioCore\Console\Commands\ReleaseStockForAbandonedCarts;
+use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductPriceResolverInterface, ProductSkuGeneratorInterface};
 use PictaStudio\VenditioCore\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
 use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
@@ -18,8 +18,9 @@ use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifie
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
-use PictaStudio\VenditioCore\Validations\{AddressValidation, BrandValidation, CartLineValidation, CartValidation, OrderValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
-use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, BrandValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
+use PictaStudio\VenditioCore\Pricing\DefaultProductPriceResolver;
+use PictaStudio\VenditioCore\Validations\{AddressValidation, BrandValidation, CartLineValidation, CartValidation, OrderValidation, PriceListPriceValidation, PriceListValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
+use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, BrandValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, PriceListPriceValidationRules, PriceListValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
 
 class VenditioCoreServiceProvider extends PackageServiceProvider
@@ -57,6 +58,8 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
                 'create_product_variant_options_table',
                 'create_product_configuration_table',
                 'create_inventories_table',
+                'create_price_lists_table',
+                'create_price_list_prices_table',
                 'create_carts_table',
                 'create_cart_lines_table',
             ]);
@@ -80,6 +83,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $this->registerFactoriesGuessing();
         $this->registerMorphMap();
         $this->bindDiscountClasses();
+        $this->bindPricingClasses();
 
         $this->app->singleton(AuthManagerContract::class, fn () => (
             AuthManager::make(fn () => auth()->guard()->user())
@@ -106,11 +110,21 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
             ProductTypeValidationRules::class => ProductTypeValidation::class,
             ProductVariantValidationRules::class => ProductVariantValidation::class,
             ProductVariantOptionValidationRules::class => ProductVariantOptionValidation::class,
+            PriceListValidationRules::class => PriceListValidation::class,
+            PriceListPriceValidationRules::class => PriceListPriceValidation::class,
         ];
 
         foreach ($validations as $contract => $implementation) {
             $this->app->singleton($contract, $implementation);
         }
+    }
+
+    private function bindPricingClasses(): void
+    {
+        $this->app->singleton(
+            ProductPriceResolverInterface::class,
+            config('venditio-core.price_lists.resolver', DefaultProductPriceResolver::class)
+        );
     }
 
     private function bindDiscountClasses(): void

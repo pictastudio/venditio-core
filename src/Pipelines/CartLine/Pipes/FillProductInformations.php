@@ -6,7 +6,9 @@ use Closure;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use PictaStudio\VenditioCore\Contracts\ProductPriceResolverInterface;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
+
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class FillProductInformations
@@ -20,16 +22,27 @@ class FillProductInformations
         $cartLine = $cartLineDto->getCartLine();
 
         $product = $this->fetchProduct($cartLineDto);
+        $resolvedPricing = app(ProductPriceResolverInterface::class)->resolve($product);
+        $productData = $product->toArray();
+
+        data_set($productData, 'inventory.price_includes_tax', (bool) ($resolvedPricing['price_includes_tax'] ?? false));
+        data_set($productData, 'pricing.price_list', $resolvedPricing['price_list'] ?? null);
+        data_set($productData, 'price_calculated', [
+            'price' => (float) ($resolvedPricing['unit_price'] ?? 0),
+            'purchase_price' => isset($resolvedPricing['purchase_price']) ? (float) $resolvedPricing['purchase_price'] : null,
+            'price_includes_tax' => (bool) ($resolvedPricing['price_includes_tax'] ?? false),
+            'price_list' => $resolvedPricing['price_list'] ?? null,
+        ]);
 
         $cartLine->product()->associate($product);
 
         $cartLine->fill([
-            'unit_price' => $product->inventory->price,
-            'purchase_price' => $product->inventory->purchase_price,
+            'unit_price' => $resolvedPricing['unit_price'] ?? 0,
+            'purchase_price' => $resolvedPricing['purchase_price'] ?? null,
             'product_name' => $product->name,
             'product_sku' => $product->sku,
             'qty' => $cartLineDto->getQty(),
-            'product_data' => $product->toArray(),
+            'product_data' => $productData,
         ]);
 
         return $next($cartLine);
@@ -47,6 +60,7 @@ class FillProductInformations
                 'productType',
                 'variantOptions',
                 'parent',
+                'priceListPrices.priceList',
             ])
             ->firstWhere('id', $productId);
     }
