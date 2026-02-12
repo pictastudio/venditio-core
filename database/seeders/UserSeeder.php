@@ -4,11 +4,11 @@ namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\{Hash};
+use Illuminate\Support\Facades\Hash;
 use PictaStudio\Venditio\Managers\AuthManager;
 use Spatie\Permission\Models\Role;
 
-use function PictaStudio\Venditio\Helpers\Functions\{query};
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class UserSeeder extends Seeder
 {

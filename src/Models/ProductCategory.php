@@ -4,7 +4,7 @@ namespace PictaStudio\Venditio\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use Illuminate\Database\Eloquent\Relations\{BelongsToMany};
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Nevadskiy\Tree\AsTree;
 use PictaStudio\Venditio\Models\Scopes\{Active, Ordered};
 use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};

@@ -5,7 +5,7 @@ namespace PictaStudio\Venditio\Generators;
 use Illuminate\Database\Eloquent\Model;
 use PictaStudio\Venditio\Contracts\OrderIdentifierGeneratorInterface;
 
-use function PictaStudio\Venditio\Helpers\Functions\{query};
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 {

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use PictaStudio\Venditio\Contracts\CartIdentifierGeneratorInterface;
 
-use function PictaStudio\Venditio\Helpers\Functions\{query};
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class CartIdentifierGenerator implements CartIdentifierGeneratorInterface
 {

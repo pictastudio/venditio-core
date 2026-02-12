@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use PictaStudio\Venditio\Dto\Contracts\CartDtoContract;
 
-use function PictaStudio\Venditio\Helpers\Functions\{resolve_enum};
+use function PictaStudio\Venditio\Helpers\Functions\resolve_enum;
 
 class FillDataFromPayload
 {
