@@ -47,7 +47,7 @@ class FillOrderFromCart
                 'qty' => $cartLine->qty,
                 'total_final_price' => $cartLine->total_final_price,
                 'tax_rate' => $cartLine->tax_rate,
-                'product_data' => $cartLine->product,
+                'product_data' => $cartLine->getAttribute('product_data'),
             ]);
         });
     }

@@ -16,7 +16,7 @@ class ReleaseStockForAbandonedCarts extends Command
 
     public function handle(): int
     {
-        if (!config('venditio-core.commands.update_abandoned_carts.enabled', true)) {
+        if (!config('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true)) {
             $this->info('`carts:update-abandoned` is disabled by configuration.');
 
             return self::SUCCESS;
@@ -24,7 +24,7 @@ class ReleaseStockForAbandonedCarts extends Command
 
         $inactiveForMinutes = max(
             1,
-            (int) config('venditio-core.commands.update_abandoned_carts.inactive_for_minutes', 1_440)
+            (int) config('venditio-core.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440)
         );
         $cutoff = now()->subMinutes($inactiveForMinutes);
         $updatedCarts = [];

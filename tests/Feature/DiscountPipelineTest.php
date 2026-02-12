@@ -298,3 +298,42 @@ it('recalculates tax correctly for VAT-inclusive prices after discounts', functi
         ->and((float) $line->unit_final_price_tax)->toBe(20.2)
         ->and((float) $line->total_final_price)->toBe(112.0);
 });
+
+it('preserves VAT-inclusive totals when converting cart to order', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $user = User::query()->create([
+        'first_name' => 'Order',
+        'last_name' => 'Vat',
+        'email' => 'order-vat@example.test',
+        'phone' => '123456789',
+    ]);
+
+    $product = createProduct(122, $taxClass, true);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'user_id' => $user->getKey(),
+            'user_first_name' => $user->first_name,
+            'user_last_name' => $user->last_name,
+            'user_email' => $user->email,
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $order = OrderCreationPipeline::make()->run(OrderDto::fromCart($cart))->load('lines');
+    $orderLine = $order->lines->first();
+
+    expect((float) $cart->total_final)->toBe(122.0)
+        ->and((float) $order->total_final)->toBe(122.0)
+        ->and((float) $orderLine->unit_final_price)->toBe(122.0)
+        ->and((float) $orderLine->unit_final_price_taxable)->toBe(100.0)
+        ->and((float) $orderLine->unit_final_price_tax)->toBe(22.0)
+        ->and((float) $orderLine->total_final_price)->toBe(122.0);
+});
