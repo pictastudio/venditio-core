@@ -31,7 +31,7 @@ class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterfac
             return $this->emptyResult();
         }
 
-        if (!$discount->getRule('apply_to_cart_total', false)) {
+        if (!$discount->apply_to_cart_total) {
             return $this->emptyResult();
         }
 
@@ -39,14 +39,19 @@ class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterfac
             return $this->emptyResult();
         }
 
+        $baseAmount = $this->resolveBaseAmount($target, $lines);
+
+        if (!$this->meetsMinimumOrderTotal($discount, $baseAmount)) {
+            return $this->emptyResult();
+        }
+
         if (!$this->passesRules($discount, $target, $context)) {
             return $this->emptyResult();
         }
 
-        $baseAmount = $this->resolveBaseAmount($target, $lines);
         $discountAmount = $this->calculateDiscountAmount($discount, $baseAmount);
 
-        if ($discountAmount <= 0) {
+        if ($discountAmount <= 0 && !$discount->free_shipping) {
             return $this->emptyResult();
         }
 
@@ -54,6 +59,7 @@ class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterfac
             'discount_id' => $discount->getKey(),
             'discount_code' => $discount->code,
             'discount_amount' => $discountAmount,
+            'free_shipping' => (bool) $discount->free_shipping,
         ];
     }
 
@@ -133,12 +139,24 @@ class CartTotalDiscountCalculator implements CartTotalDiscountCalculatorInterfac
         return round(min($baseAmount, max(0, $rawDiscount)), 2);
     }
 
+    private function meetsMinimumOrderTotal(Discount $discount, float $baseAmount): bool
+    {
+        $minimumOrderTotal = (float) ($discount->minimum_order_total ?? 0);
+
+        if ($minimumOrderTotal <= 0) {
+            return true;
+        }
+
+        return $baseAmount >= $minimumOrderTotal;
+    }
+
     private function emptyResult(): array
     {
         return [
             'discount_id' => null,
             'discount_code' => null,
             'discount_amount' => 0.0,
+            'free_shipping' => false,
         ];
     }
 }

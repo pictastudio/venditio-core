@@ -187,6 +187,7 @@ return [
                     Cart\Pipes\GenerateIdentifier::class,
                     Cart\Pipes\CalculateLines::class,
                     Cart\Pipes\ReserveStock::class,
+                    Cart\Pipes\CalculateShippingFees::class,
                     Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
@@ -196,6 +197,7 @@ return [
                     Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\UpdateLines::class,
                     Cart\Pipes\ReserveStock::class,
+                    Cart\Pipes\CalculateShippingFees::class,
                     Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
@@ -298,6 +300,7 @@ return [
             Discounts\Rules\ActiveWindowRule::class,
             Discounts\Rules\MaxUsesRule::class,
             Discounts\Rules\MaxUsesPerUserRule::class,
+            Discounts\Rules\MinimumOrderTotalRule::class,
             Discounts\Rules\OncePerCartRule::class,
         ],
         'cart_total' => [

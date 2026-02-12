@@ -11,7 +11,7 @@ class OncePerCartRule implements DiscountRuleInterface
 {
     public function passes(Discount $discount, Model $line, DiscountContext $context): bool
     {
-        if (!$discount->getRule('apply_once_per_cart', false)) {
+        if (!$discount->apply_once_per_cart) {
             return true;
         }
 

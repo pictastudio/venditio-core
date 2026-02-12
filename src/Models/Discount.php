@@ -35,7 +35,12 @@ class Discount extends Model
             'active' => 'boolean',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
-            'rules' => 'array',
+            'apply_to_cart_total' => 'boolean',
+            'apply_once_per_cart' => 'boolean',
+            'max_uses_per_user' => 'integer',
+            'one_per_user' => 'boolean',
+            'free_shipping' => 'boolean',
+            'minimum_order_total' => 'decimal:2',
         ];
     }
 
@@ -55,11 +60,6 @@ class Discount extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(resolve_model('discount_application'));
-    }
-
-    public function getRule(string $rule, mixed $default = null): mixed
-    {
-        return data_get($this->rules ?? [], $rule, $default);
     }
 
     #[Scope]

@@ -62,6 +62,12 @@ class ApplyDiscounts
             'discount_code' => $cartTotalDiscount['discount_code'],
         ]);
 
+        if ((bool) ($cartTotalDiscount['free_shipping'] ?? false)) {
+            $cart->fill([
+                'shipping_fee' => 0,
+            ]);
+        }
+
         return $next($cart);
     }
 

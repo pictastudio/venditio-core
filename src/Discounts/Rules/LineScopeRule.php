@@ -11,6 +11,6 @@ class LineScopeRule implements DiscountRuleInterface
 {
     public function passes(Discount $discount, Model $line, DiscountContext $context): bool
     {
-        return !$discount->getRule('apply_to_cart_total', false);
+        return !$discount->apply_to_cart_total;
     }
 }

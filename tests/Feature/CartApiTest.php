@@ -339,9 +339,7 @@ it('adds a discount code to an existing cart through api and recalculates totals
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => [
-            'apply_to_cart_total' => true,
-        ],
+        'apply_to_cart_total' => true,
     ]);
 
     $prefix = config('venditio-core.routes.api.v1.prefix');
@@ -381,7 +379,6 @@ it('returns 422 when adding a cart total discount code not eligible for cart tot
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => null,
     ]);
 
     $cartId = postJson($prefix . '/carts', [
@@ -417,7 +414,6 @@ it('returns 422 when creating a cart with a non eligible cart total discount cod
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => null,
     ]);
 
     postJson($prefix . '/carts', [
@@ -450,7 +446,6 @@ it('returns 422 when updating a cart with a non eligible cart total discount cod
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => null,
     ]);
 
     $cartId = postJson($prefix . '/carts', [

@@ -56,6 +56,60 @@ Key actions include:
 - Variant generation from option combinations
 - Product type, variant, and option CRUD
 
+## Discounts
+
+Discount handling is pipeline-based and API-first:
+
+- `DiscountCalculator` applies line-level discounts.
+- `CartTotalDiscountCalculator` resolves cart/order-level discount codes.
+- `DiscountUsageRecorder` persists usages in `discount_applications` and increments `discounts.uses`.
+
+Discount rule fields are first-level columns on `discounts`:
+
+- Scope and targeting: `apply_to_cart_total`, `apply_once_per_cart`, `discountable_type`, `discountable_id`
+- Usage limits: `max_uses`, `max_uses_per_user`, `one_per_user`, `uses`
+- Eligibility: `minimum_order_total`, `active`, `starts_at`, `ends_at`
+- Effects: `type`, `value`, `free_shipping`
+
+Rule evaluation is configurable from `config/venditio-core.php`:
+
+- `venditio-core.discounts.rules` for line discounts
+- `venditio-core.discounts.cart_total.rules` for cart/order discounts
+
+Host apps can add/replace rule classes by implementing `DiscountRuleInterface`
+and overriding those config arrays. This allows introducing custom discount
+eligibility logic without changing package internals.
+
+### Custom Rule Example
+
+```php
+namespace App\Discounts\Rules;
+
+use Illuminate\Database\Eloquent\Model;
+use PictaStudio\VenditioCore\Contracts\DiscountRuleInterface;
+use PictaStudio\VenditioCore\Discounts\DiscountContext;
+use PictaStudio\VenditioCore\Models\Discount;
+
+class WeekendOnlyRule implements DiscountRuleInterface
+{
+    public function passes(Discount $discount, Model $line, DiscountContext $context): bool
+    {
+        return now()->isWeekend();
+    }
+}
+```
+
+Register it in host app config:
+
+```php
+'discounts' => [
+    'rules' => [
+        // keep existing rules or replace them entirely
+        App\Discounts\Rules\WeekendOnlyRule::class,
+    ],
+],
+```
+
 ## Validation
 
 Validation is decoupled using contracts so host apps can override rule sources.

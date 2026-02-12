@@ -13,7 +13,9 @@ class MaxUsesPerUserRule implements DiscountRuleInterface
 {
     public function passes(Discount $discount, Model $line, DiscountContext $context): bool
     {
-        $maxUsesPerUser = (int) $discount->getRule('max_uses_per_user', 0);
+        $maxUsesPerUser = $discount->one_per_user
+            ? 1
+            : (int) ($discount->max_uses_per_user ?? 0);
 
         if ($maxUsesPerUser <= 0) {
             return true;

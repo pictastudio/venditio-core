@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use PictaStudio\VenditioCore\Dto\{CartDto, OrderDto};
 use PictaStudio\VenditioCore\Enums\{DiscountType, ProductStatus};
 use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, DiscountApplication, Product, ProductCategory, TaxClass, User};
-use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
+use PictaStudio\VenditioCore\Pipelines\Cart\{CartCreationPipeline, CartUpdatePipeline};
 use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
 
 uses(RefreshDatabase::class);
@@ -139,9 +139,7 @@ it('applies discounts only once per cart when the rule is enabled', function () 
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => [
-            'apply_once_per_cart' => true,
-        ],
+        'apply_once_per_cart' => true,
     ]);
 
     $cart = CartCreationPipeline::make()->run(
@@ -181,9 +179,7 @@ it('enforces per-user usage limits after order registration', function () {
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => [
-            'max_uses_per_user' => 1,
-        ],
+        'one_per_user' => true,
     ]);
 
     $firstCart = createCartForUser($user, $product->getKey())->load('lines');
@@ -218,9 +214,7 @@ it('applies cart total discount code at checkout', function () {
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => [
-            'apply_to_cart_total' => true,
-        ],
+        'apply_to_cart_total' => true,
     ]);
 
     $cart = CartCreationPipeline::make()->run(
@@ -239,6 +233,119 @@ it('applies cart total discount code at checkout', function () {
         ->and((float) $cart->sub_total)->toBe(244.0)
         ->and((float) $cart->discount_amount)->toBe(24.4)
         ->and((float) $cart->total_final)->toBe(219.6);
+});
+
+it('applies discounts only to the configured user', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $allowedUser = User::query()->create([
+        'first_name' => 'Allowed',
+        'last_name' => 'User',
+        'email' => 'allowed-user@example.test',
+        'phone' => '123456789',
+    ]);
+    $blockedUser = User::query()->create([
+        'first_name' => 'Blocked',
+        'last_name' => 'User',
+        'email' => 'blocked-user@example.test',
+        'phone' => '123456789',
+    ]);
+    $product = createProduct(80, $taxClass);
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 10,
+        'code' => 'USR10',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'discountable_type' => 'user',
+        'discountable_id' => $allowedUser->getKey(),
+    ]);
+
+    $allowedCart = createCartForUser($allowedUser, $product->getKey())->load('lines');
+    $blockedCart = createCartForUser($blockedUser, $product->getKey())->load('lines');
+
+    expect($allowedCart->lines->first()->discount_code)->toBe('USR10')
+        ->and(blank($blockedCart->lines->first()->discount_code))->toBeTrue();
+});
+
+it('enforces minimum order total to apply a discount', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(100, $taxClass);
+    $product->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 15,
+        'code' => 'MIN200',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'minimum_order_total' => 200,
+    ]);
+
+    $singleQtyCart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                ['product_id' => $product->getKey(), 'qty' => 1],
+            ],
+        ])
+    )->load('lines');
+
+    $doubleQtyCart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                ['product_id' => $product->getKey(), 'qty' => 2],
+            ],
+        ])
+    )->load('lines');
+
+    expect(blank($singleQtyCart->lines->first()->discount_code))->toBeTrue()
+        ->and($doubleQtyCart->lines->first()->discount_code)->toBe('MIN200');
+});
+
+it('applies free shipping when cart total discount enables it', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $user = User::query()->create([
+        'first_name' => 'Shipping',
+        'last_name' => 'Free',
+        'email' => 'free-shipping@example.test',
+        'phone' => '123456789',
+    ]);
+    $product = createProduct(100, $taxClass);
+
+    $discountModel = config('venditio-core.models.discount');
+    $discountModel::query()->create([
+        'discountable_type' => null,
+        'discountable_id' => null,
+        'type' => DiscountType::Fixed,
+        'value' => 0,
+        'code' => 'SHIPFREE',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'apply_to_cart_total' => true,
+        'free_shipping' => true,
+    ]);
+
+    $cart = createCartForUser($user, $product->getKey());
+    $cart->fill(['shipping_fee' => 20])->save();
+
+    $updatedCart = CartUpdatePipeline::make()->run(
+        CartDto::fromArray([
+            'cart' => $cart->refresh(),
+            'discount_code' => 'SHIPFREE',
+        ])
+    );
+
+    expect($updatedCart->discount_code)->toBe('SHIPFREE')
+        ->and((float) $updatedCart->shipping_fee)->toBe(0.0)
+        ->and((float) $updatedCart->discount_amount)->toBe(0.0);
 });
 
 it('removes tax from VAT-inclusive inventory price when calculating cart line totals', function () {

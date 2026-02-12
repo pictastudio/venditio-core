@@ -79,6 +79,34 @@ Payload notes:
 - `POST /orders`
 - `PATCH /orders/{order}`
 
+### Discounts
+- `GET /discounts`
+- `GET /discounts/{discount}`
+- `POST /discounts`
+- `PATCH /discounts/{discount}`
+- `DELETE /discounts/{discount}`
+
+Discounts expose first-level rule columns:
+- `type`: `percentage` or `fixed`
+- `value`: discount amount
+- `code`: unique code
+- `active`, `starts_at`, `ends_at`: activation window
+- `max_uses`: max global usages
+- `max_uses_per_user`: max usages per user
+- `one_per_user`: shorthand for one usage per user
+- `discountable_type` + `discountable_id`: optional polymorphic target (for a user-specific discount use `discountable_type: "user"` and that user id)
+- `minimum_order_total`: minimum subtotal required
+- `apply_once_per_cart`: apply to one line only when line-based
+- `apply_to_cart_total`: use as cart-level coupon
+- `free_shipping`: when cart-level discount is applied, shipping is set to 0
+
+### Discount Applications
+- `GET /discount_applications`
+- `GET /discount_applications/{discount_application}`
+- `POST /discount_applications`
+- `PATCH /discount_applications/{discount_application}`
+- `DELETE /discount_applications/{discount_application}`
+
 ### Product Types
 - `GET /product_types`
 - `GET /product_types/{product_type}`
@@ -213,6 +241,58 @@ Response includes the created variant products and a `meta` object with counts.
   - Options belong to their axis
   - Variant ids are unique in the payload
   - The base product is not itself a variant
+
+## Discount Examples
+
+### Example: Create Cart Total Discount With Free Shipping
+```http
+POST /venditio/api/v1/discounts
+Content-Type: application/json
+
+{
+  "name": "Checkout 10 + free shipping",
+  "type": "percentage",
+  "value": 10,
+  "code": "CHECKOUT10FREE",
+  "active": true,
+  "starts_at": "2026-02-12 09:00:00",
+  "apply_to_cart_total": true,
+  "free_shipping": true,
+  "minimum_order_total": 100,
+  "max_uses": 500,
+  "max_uses_per_user": 3
+}
+```
+
+### Example: Create Discount Reserved To One User
+```http
+POST /venditio/api/v1/discounts
+Content-Type: application/json
+
+{
+  "name": "VIP user discount",
+  "type": "fixed",
+  "value": 20,
+  "code": "VIP20",
+  "active": true,
+  "starts_at": "2026-02-12 09:00:00",
+  "discountable_type": "user",
+  "discountable_id": 42,
+  "one_per_user": true
+}
+```
+
+### Example: Update Discount Limits
+```http
+PATCH /venditio/api/v1/discounts/10
+Content-Type: application/json
+
+{
+  "max_uses": 1000,
+  "max_uses_per_user": 5,
+  "minimum_order_total": 150
+}
+```
 
 ## Configuration Highlights
 See `config/venditio-core.php` for:

@@ -22,7 +22,12 @@ class DiscountFactory extends Factory
             'active' => true,
             'starts_at' => now()->subHour(),
             'ends_at' => now()->addDay(),
-            'rules' => [],
+            'apply_to_cart_total' => false,
+            'apply_once_per_cart' => false,
+            'max_uses_per_user' => null,
+            'one_per_user' => false,
+            'free_shipping' => false,
+            'minimum_order_total' => null,
         ];
     }
 

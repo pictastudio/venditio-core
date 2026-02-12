@@ -102,7 +102,6 @@ it('returns 422 when creating an order from a cart with a non eligible cart tota
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'rules' => null,
     ]);
 
     $cartId = postJson($prefix . '/carts', [
