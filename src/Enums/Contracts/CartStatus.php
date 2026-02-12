@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Enums\Contracts;
+namespace PictaStudio\Venditio\Enums\Contracts;
 
 interface CartStatus
 {

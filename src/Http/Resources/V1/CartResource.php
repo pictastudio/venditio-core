@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Resources\V1;
+namespace PictaStudio\Venditio\Http\Resources\V1;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
-use PictaStudio\VenditioCore\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
+use PictaStudio\Venditio\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
 class CartResource extends JsonResource
 {

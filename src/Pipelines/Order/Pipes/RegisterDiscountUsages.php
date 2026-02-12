@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\DiscountUsageRecorderInterface;
+use PictaStudio\Venditio\Contracts\DiscountUsageRecorderInterface;
 
 class RegisterDiscountUsages
 {

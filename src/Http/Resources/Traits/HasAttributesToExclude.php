@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Resources\Traits;
+namespace PictaStudio\Venditio\Http\Resources\Traits;
 
 trait HasAttributesToExclude
 {
@@ -8,7 +8,7 @@ trait HasAttributesToExclude
     {
         $attributes = $this->exclude();
 
-        if (!config('venditio-core.routes.api.include_timestamps')) {
+        if (!config('venditio.routes.api.include_timestamps')) {
             $attributes = array_merge($attributes, [
                 // 'created_at',
                 'updated_at',

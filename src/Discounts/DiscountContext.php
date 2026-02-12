@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Discounts;
+namespace PictaStudio\Venditio\Discounts;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\Venditio\Models\Discount;
 
 class DiscountContext
 {

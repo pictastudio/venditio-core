@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines;
+namespace PictaStudio\Venditio\Pipelines;
 
 use Illuminate\Support\Facades\{DB, Pipeline as PipelineFacade};
 use Illuminate\Support\Traits\Conditionable;
-use PictaStudio\VenditioCore\Traits\HasMakeConstructor;
+use PictaStudio\Venditio\Traits\HasMakeConstructor;
 
 abstract class Pipeline
 {

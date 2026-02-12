@@ -13,7 +13,7 @@ Venditio Core is a Laravel package that exposes API-only ecommerce primitives. I
 
 - `src/Contracts`: public interfaces and contracts
 - `src/Http`: controllers, requests, resources
-- `src/Packages`: internal domain packages (core models, enums, validations, factories, variant system)
+- `src`: internal domain packages (models, enums, validations, factories, variant system)
 - `src/Actions`: application-like operations isolated from controllers
 - `src/Policies`: policy-based authorization hooks
 - `src/Pipelines`: order/cart pipelines
@@ -21,7 +21,7 @@ Venditio Core is a Laravel package that exposes API-only ecommerce primitives. I
 
 ## Service Provider
 
-`VenditioCoreServiceProvider` is the primary entry point. It registers:
+`VenditioServiceProvider` is the primary entry point. It registers:
 
 - Config file
 - Routes (optional)
@@ -29,7 +29,7 @@ Venditio Core is a Laravel package that exposes API-only ecommerce primitives. I
 - Factory guessing
 - Morph map
 
-Routes are loaded only when `venditio-core.routes.api.enable` is true, and are versioned/prefixed via config.
+Routes are loaded only when `venditio.routes.api.enable` is true, and are versioned/prefixed via config.
 
 ## HTTP Layer
 
@@ -71,10 +71,10 @@ Discount rule fields are first-level columns on `discounts`:
 - Eligibility: `minimum_order_total`, `active`, `starts_at`, `ends_at`
 - Effects: `type`, `value`, `free_shipping`
 
-Rule evaluation is configurable from `config/venditio-core.php`:
+Rule evaluation is configurable from `config/venditio.php`:
 
-- `venditio-core.discounts.rules` for line discounts
-- `venditio-core.discounts.cart_total.rules` for cart/order discounts
+- `venditio.discounts.rules` for line discounts
+- `venditio.discounts.cart_total.rules` for cart/order discounts
 
 Host apps can add/replace rule classes by implementing `DiscountRuleInterface`
 and overriding those config arrays. This allows introducing custom discount
@@ -86,9 +86,9 @@ eligibility logic without changing package internals.
 namespace App\Discounts\Rules;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\DiscountRuleInterface;
-use PictaStudio\VenditioCore\Discounts\DiscountContext;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\Venditio\Contracts\DiscountRuleInterface;
+use PictaStudio\Venditio\Discounts\DiscountContext;
+use PictaStudio\Venditio\Models\Discount;
 
 class WeekendOnlyRule implements DiscountRuleInterface
 {
@@ -121,7 +121,7 @@ Validation is decoupled using contracts so host apps can override rule sources.
 
 Authorization is optional and policy-based.
 
-- Policies are registered if `venditio-core.policies.register` is true.
+- Policies are registered if `venditio.policies.register` is true.
 - Controllers call `authorizeIfConfigured()` to avoid enforcing auth by default.
 - Requests use permissive defaults and defer to the host app.
 
@@ -143,7 +143,7 @@ Variant generation is handled by the `CreateProductVariants` action and uses:
 
 ## Configuration
 
-All behavior is controlled via `config/venditio-core.php`.
+All behavior is controlled via `config/venditio.php`.
 Important sections:
 
 - `routes.api` for prefix, version, middleware, pagination, and wrapping

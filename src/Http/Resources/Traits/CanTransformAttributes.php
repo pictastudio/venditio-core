@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Resources\Traits;
+namespace PictaStudio\Venditio\Http\Resources\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;

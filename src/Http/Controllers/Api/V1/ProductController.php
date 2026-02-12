@@ -1,17 +1,17 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Actions\Products\{CreateProduct, CreateProductVariants, UpdateProduct};
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Product\{GenerateProductVariantsRequest, StoreProductRequest, UpdateProductRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\ProductResource;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Actions\Products\{CreateProduct, CreateProductVariants, UpdateProduct};
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\Product\{GenerateProductVariantsRequest, StoreProductRequest, UpdateProductRequest};
+use PictaStudio\Venditio\Http\Resources\V1\ProductResource;
+use PictaStudio\Venditio\Models\Product;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ProductController extends Controller
 {
@@ -125,7 +125,7 @@ class ProductController extends Controller
 
         $allowedIncludes = ['variants', 'variants_options_table'];
 
-        if (config('venditio-core.price_lists.enabled', false)) {
+        if (config('venditio.price_lists.enabled', false)) {
             $allowedIncludes[] = 'price_lists';
         }
 
@@ -146,7 +146,7 @@ class ProductController extends Controller
     {
         $relations = ['variantOptions.productVariant', 'inventory'];
 
-        if (config('venditio-core.price_lists.enabled', false)) {
+        if (config('venditio.price_lists.enabled', false)) {
             $relations[] = 'priceListPrices.priceList';
         }
 
@@ -154,7 +154,7 @@ class ProductController extends Controller
             $relations[] = 'variants.variantOptions.productVariant';
             $relations[] = 'variants.inventory';
 
-            if (config('venditio-core.price_lists.enabled', false)) {
+            if (config('venditio.price_lists.enabled', false)) {
                 $relations[] = 'variants.priceListPrices.priceList';
             }
         }

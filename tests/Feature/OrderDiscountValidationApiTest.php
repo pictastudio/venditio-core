@@ -3,8 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Enums\{DiscountType, ProductStatus};
-use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, TaxClass, User};
+use PictaStudio\Venditio\Enums\{DiscountType, ProductStatus};
+use PictaStudio\Venditio\Models\{Country, CountryTaxClass, TaxClass, User};
 
 use function Pest\Laravel\postJson;
 
@@ -55,9 +55,9 @@ function createOrderDiscountValidationUser(string $email): User
     ]);
 }
 
-function createOrderDiscountValidationProduct(TaxClass $taxClass): PictaStudio\VenditioCore\Models\Product
+function createOrderDiscountValidationProduct(TaxClass $taxClass): PictaStudio\Venditio\Models\Product
 {
-    $product = config('venditio-core.models.product')::query()->create([
+    $product = config('venditio.models.product')::query()->create([
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Order Discount Product',
         'slug' => 'order-discount-product',
@@ -89,9 +89,9 @@ it('returns 422 when creating an order from a cart with a non eligible cart tota
     $user = createOrderDiscountValidationUser('user-invalid-order-discount@example.test');
     $product = createOrderDiscountValidationProduct($taxClass);
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,
@@ -113,7 +113,7 @@ it('returns 422 when creating an order from a cart with a non eligible cart tota
         ],
     ])->assertCreated()->json('id');
 
-    $cartModel = config('venditio-core.models.cart');
+    $cartModel = config('venditio.models.cart');
     $cart = $cartModel::query()->findOrFail($cartId);
     $cart->discount_code = 'TEST10';
     $cart->save();

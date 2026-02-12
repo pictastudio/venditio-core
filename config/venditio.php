@@ -1,19 +1,19 @@
 <?php
 
-use PictaStudio\VenditioCore\{Discounts, Dto, Enums, Generators, Managers, Models, Pricing};
-use PictaStudio\VenditioCore\Facades\VenditioCore;
-use PictaStudio\VenditioCore\Pipelines\{Cart, CartLine, Order};
+use PictaStudio\Venditio\{Discounts, Dto, Enums, Generators, Managers, Models, Pricing};
+use PictaStudio\Venditio\Facades\Venditio;
+use PictaStudio\Venditio\Pipelines\{Cart, CartLine, Order};
 
 return [
 
     'activity_log' => [
-        'enabled' => env('VENDITIO_CORE_ACTIVITY_LOG_ENABLED', false),
-        'log_name' => env('VENDITIO_CORE_ACTIVITY_LOG_NAME', 'venditio-core'),
-        'log_except' => env('VENDITIO_CORE_ACTIVITY_LOG_EXCEPT', ['updated_at']),
+        'enabled' => env('VENDITIO_ACTIVITY_LOG_ENABLED', false),
+        'log_name' => env('VENDITIO_ACTIVITY_LOG_NAME', 'venditio'),
+        'log_except' => env('VENDITIO_ACTIVITY_LOG_EXCEPT', ['updated_at']),
     ],
 
     'policies' => [
-        'register' => env('VENDITIO_CORE_POLICIES_REGISTER', true),
+        'register' => env('VENDITIO_POLICIES_REGISTER', true),
     ],
 
     /*
@@ -62,8 +62,8 @@ return [
             // ],
         ],
         'root_user' => [
-            'email' => env('VENDITIO_CORE_ROOT_USER_EMAIL'),
-            'password' => env('VENDITIO_CORE_ROOT_USER_PASSWORD'),
+            'email' => env('VENDITIO_ROOT_USER_EMAIL'),
+            'password' => env('VENDITIO_ROOT_USER_PASSWORD'),
         ],
     ],
 
@@ -77,9 +77,9 @@ return [
     */
     'commands' => [
         'release_stock_for_abandoned_carts' => [
-            'enabled' => env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_ENABLED', true),
-            'inactive_for_minutes' => (int) env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_INACTIVE_FOR_MINUTES', 1_440),
-            'schedule_every_minutes' => (int) env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_SCHEDULE_EVERY_MINUTES', 60),
+            'enabled' => env('VENDITIO_RELEASE_STOCK_FOR_ABANDONED_CARTS_ENABLED', true),
+            'inactive_for_minutes' => (int) env('VENDITIO_RELEASE_STOCK_FOR_ABANDONED_CARTS_INACTIVE_FOR_MINUTES', 1_440),
+            'schedule_every_minutes' => (int) env('VENDITIO_RELEASE_STOCK_FOR_ABANDONED_CARTS_SCHEDULE_EVERY_MINUTES', 60),
         ],
     ],
 
@@ -288,7 +288,7 @@ return [
     |
     */
     'price_lists' => [
-        'enabled' => env('VENDITIO_CORE_PRICE_LISTS_ENABLED', false),
+        'enabled' => env('VENDITIO_PRICE_LISTS_ENABLED', false),
         'resolver' => Pricing\DefaultProductPriceResolver::class,
     ],
 
@@ -388,7 +388,7 @@ return [
                     // 'auth:sanctum',
                 ],
                 // 'rate_limit' => [
-                //     'configure' => fn () => VenditioCore::configureRateLimiting('venditio/api/v1'),
+                //     'configure' => fn () => Venditio::configureRateLimiting('venditio/api/v1'),
                 // ],
                 'pagination' => [
                     'per_page' => 15,

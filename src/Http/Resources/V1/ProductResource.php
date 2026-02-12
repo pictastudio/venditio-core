@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Resources\V1;
+namespace PictaStudio\Venditio\Http\Resources\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Contracts\ProductPriceResolverInterface;
-use PictaStudio\VenditioCore\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
+use PictaStudio\Venditio\Contracts\ProductPriceResolverInterface;
+use PictaStudio\Venditio\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
 class ProductResource extends JsonResource
 {

@@ -1,16 +1,16 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Actions\ProductTypes\{CreateProductType, UpdateProductType};
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductType\{StoreProductTypeRequest, UpdateProductTypeRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\ProductTypeResource;
-use PictaStudio\VenditioCore\Models\ProductType;
+use PictaStudio\Venditio\Actions\ProductTypes\{CreateProductType, UpdateProductType};
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\ProductType\{StoreProductTypeRequest, UpdateProductTypeRequest};
+use PictaStudio\Venditio\Http\Resources\V1\ProductTypeResource;
+use PictaStudio\Venditio\Models\ProductType;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ProductTypeController extends Controller
 {

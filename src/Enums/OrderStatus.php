@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Enums;
+namespace PictaStudio\Venditio\Enums;
 
-use PictaStudio\VenditioCore\Enums\Contracts\OrderStatus as OrderStatusContract;
+use PictaStudio\Venditio\Enums\Contracts\OrderStatus as OrderStatusContract;
 
 enum OrderStatus: string implements OrderStatusContract
 {

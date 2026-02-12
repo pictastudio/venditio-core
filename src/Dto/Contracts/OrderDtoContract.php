@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto\Contracts;
+namespace PictaStudio\Venditio\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;

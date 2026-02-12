@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Policies;
+namespace PictaStudio\Venditio\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
-use PictaStudio\VenditioCore\Models\ProductCategory;
-use PictaStudio\VenditioCore\Policies\Traits\VenditioPolicyPermissions;
+use PictaStudio\Venditio\Models\ProductCategory;
+use PictaStudio\Venditio\Policies\Traits\VenditioPolicyPermissions;
 
 class ProductCategoryPolicy
 {

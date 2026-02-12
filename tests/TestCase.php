@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Tests;
+namespace PictaStudio\Venditio\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase as Orchestra;
-use PictaStudio\VenditioCore\VenditioCoreServiceProvider;
+use PictaStudio\Venditio\VenditioServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -16,7 +16,7 @@ class TestCase extends Orchestra
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'PictaStudio\\VenditioCore\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'PictaStudio\\Venditio\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
@@ -24,7 +24,7 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        // $migration = include __DIR__.'/../database/migrations/create_venditio-core_table.php.stub';
+        // $migration = include __DIR__.'/../database/migrations/create_venditio_table.php.stub';
         // $migration->up();
 
         // $migrations = collect(scandir(__DIR__ . '/../database/migrations'))
@@ -38,7 +38,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            VenditioCoreServiceProvider::class,
+            VenditioServiceProvider::class,
         ];
     }
 }

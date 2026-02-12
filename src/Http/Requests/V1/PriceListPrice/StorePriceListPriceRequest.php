@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\PriceListPrice;
+namespace PictaStudio\Venditio\Http\Requests\V1\PriceListPrice;
 
 use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\VenditioCore\Validations\Contracts\PriceListPriceValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\PriceListPriceValidationRules;
 
 class StorePriceListPriceRequest extends FormRequest
 {

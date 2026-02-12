@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Contracts;
+namespace PictaStudio\Venditio\Contracts;
 
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Models\Product;
 
 interface ProductSkuGeneratorInterface
 {

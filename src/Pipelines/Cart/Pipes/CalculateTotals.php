@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Cart\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +24,7 @@ class CalculateTotals
         $totalFinal = max(0, $subTotal + $cart->shipping_fee + $cart->payment_fee - $cart->discount_amount);
 
         $cart->fill([
-            'status' => config('venditio-core.cart.status_enum')::getActiveStatus(),
+            'status' => config('venditio.cart.status_enum')::getActiveStatus(),
             'sub_total_taxable' => $subTotalTaxable,
             'sub_total_tax' => $subTotalTax,
             'sub_total' => $subTotal,

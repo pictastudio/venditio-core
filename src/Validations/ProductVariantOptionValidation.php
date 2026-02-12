@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductVariantOptionValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\ProductVariantOptionValidationRules;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductVariantOptionValidation implements ProductVariantOptionValidationRules
 {

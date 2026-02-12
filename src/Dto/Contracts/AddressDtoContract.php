@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto\Contracts;
+namespace PictaStudio\Venditio\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
-use PictaStudio\VenditioCore\Models\Address;
+use PictaStudio\Venditio\Models\Address;
 
 interface AddressDtoContract extends Dto
 {

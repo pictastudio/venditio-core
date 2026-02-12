@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Brand\{StoreBrandRequest, UpdateBrandRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\BrandResource;
-use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\Brand\{StoreBrandRequest, UpdateBrandRequest};
+use PictaStudio\Venditio\Http\Resources\V1\BrandResource;
+use PictaStudio\Venditio\Models\Brand;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_model};
+use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_model};
 
 class BrandController extends Controller
 {

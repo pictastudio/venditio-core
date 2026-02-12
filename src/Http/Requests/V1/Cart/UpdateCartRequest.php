@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\Cart;
+namespace PictaStudio\Venditio\Http\Requests\V1\Cart;
 
 use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\CartValidationRules;
 
 class UpdateCartRequest extends FormRequest
 {

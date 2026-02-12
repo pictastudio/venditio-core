@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\Products;
+namespace PictaStudio\Venditio\Actions\Products;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
-use PictaStudio\VenditioCore\Contracts\ProductSkuGeneratorInterface;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Contracts\ProductSkuGeneratorInterface;
+use PictaStudio\Venditio\Models\Product;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class CreateProductVariants
 {
@@ -168,7 +168,7 @@ class CreateProductVariants
 
     private function createVariantProduct(Product $product, array $options): Product
     {
-        $excluded = config('venditio-core.product_variants.copy_attributes_exclude', [
+        $excluded = config('venditio.product_variants.copy_attributes_exclude', [
             'id',
             'slug',
             'sku',
@@ -189,7 +189,7 @@ class CreateProductVariants
         $variant = $product->newInstance($attributes);
         $variant->save();
 
-        if (config('venditio-core.product_variants.copy_categories', true)) {
+        if (config('venditio.product_variants.copy_categories', true)) {
             $categoryTable = $product->categories()->getRelated()->getTable();
             $variant->categories()->sync($product->categories()->pluck("{$categoryTable}.id")->all());
         }
@@ -201,8 +201,8 @@ class CreateProductVariants
 
     private function buildVariantName(Product $product, array $options): string
     {
-        $separator = config('venditio-core.product_variants.name_separator', ' / ');
-        $suffixSeparator = config('venditio-core.product_variants.name_suffix_separator', ' - ');
+        $separator = config('venditio.product_variants.name_separator', ' / ');
+        $suffixSeparator = config('venditio.product_variants.name_suffix_separator', ' - ');
 
         $optionLabel = collect($options)
             ->map(fn ($option) => $this->formatOptionLabel($option->name))

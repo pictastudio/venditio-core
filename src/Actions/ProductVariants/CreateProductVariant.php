@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\ProductVariants;
+namespace PictaStudio\Venditio\Actions\ProductVariants;
 
-use PictaStudio\VenditioCore\Models\ProductVariant;
+use PictaStudio\Venditio\Models\ProductVariant;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class CreateProductVariant
 {

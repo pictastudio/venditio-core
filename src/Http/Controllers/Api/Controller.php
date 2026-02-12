@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api;
+namespace PictaStudio\Venditio\Http\Controllers\Api;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\{Builder, Collection};
@@ -10,9 +10,9 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\{JsonResponse, Response};
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Traits\ValidatesData;
+use PictaStudio\Venditio\Traits\ValidatesData;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class Controller extends BaseController
 {
@@ -53,7 +53,7 @@ class Controller extends BaseController
                 isset($filters['all']),
                 fn (Builder $query) => $query->get(),
                 fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
+                    request('per_page', config('venditio.routes.api.v1.pagination.per_page'))
                 ),
             );
     }
@@ -88,7 +88,7 @@ class Controller extends BaseController
 
     protected function authorizeIfConfigured(string $ability, mixed $arguments): void
     {
-        if (!config('venditio-core.policies.register')) {
+        if (!config('venditio.policies.register')) {
             return;
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models\Traits;
+namespace PictaStudio\Venditio\Models\Traits;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;

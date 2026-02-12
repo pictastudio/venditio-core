@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Contracts\ProductSkuGeneratorInterface;
-use PictaStudio\VenditioCore\Models\{Brand, Product, ProductType, ProductVariant, ProductVariantOption, TaxClass};
+use PictaStudio\Venditio\Contracts\ProductSkuGeneratorInterface;
+use PictaStudio\Venditio\Models\{Brand, Product, ProductType, ProductVariant, ProductVariantOption, TaxClass};
 
 use function Pest\Laravel\postJson;
 
@@ -48,7 +48,7 @@ it('generates product variants from variant options', function () {
         'visible_until' => null,
     ]);
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    $response = postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $colorVariant->getKey(),
@@ -95,7 +95,7 @@ it('skips existing variant combinations', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $colorVariant->getKey(),
@@ -104,7 +104,7 @@ it('skips existing variant combinations', function () {
         ],
     ])->assertCreated();
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    $response = postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $colorVariant->getKey(),
@@ -157,7 +157,7 @@ it('creates only new combinations when adding options later', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $colorVariant->getKey(),
@@ -177,7 +177,7 @@ it('creates only new combinations when adding options later', function () {
         'name' => 'l',
     ]);
 
-    $response = postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    $response = postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $colorVariant->getKey(),
@@ -230,7 +230,7 @@ it('rejects variant generation when product has no type', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $variant->getKey(),
@@ -272,7 +272,7 @@ it('rejects variant generation for a variant product', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$variantProduct->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$variantProduct->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $variant->getKey(),
@@ -305,7 +305,7 @@ it('rejects variants that do not belong to the product type', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $variant->getKey(),
@@ -340,7 +340,7 @@ it('rejects options that do not belong to their variant', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $variant->getKey(),
@@ -372,7 +372,7 @@ it('rejects duplicate variant ids in the payload', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $variant->getKey(),
@@ -413,7 +413,7 @@ it('uses a custom product sku generator when creating variants', function () {
         'visible_until' => null,
     ]);
 
-    postJson(config('venditio-core.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
+    postJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/variants", [
         'variants' => [
             [
                 'variant_id' => $colorVariant->getKey(),

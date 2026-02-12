@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Generators;
+namespace PictaStudio\Venditio\Generators;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\OrderIdentifierGeneratorInterface;
+use PictaStudio\Venditio\Contracts\OrderIdentifierGeneratorInterface;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query};
+use function PictaStudio\Venditio\Helpers\Functions\{query};
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 {

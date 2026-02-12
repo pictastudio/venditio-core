@@ -1,21 +1,21 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Seeders;
+namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\{Hash};
-use PictaStudio\VenditioCore\Managers\AuthManager;
+use PictaStudio\Venditio\Managers\AuthManager;
 use Spatie\Permission\Models\Role;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query};
+use function PictaStudio\Venditio\Helpers\Functions\{query};
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = config('venditio-core.auth.root_user.email');
-        $password = config('venditio-core.auth.root_user.password');
+        $email = config('venditio.auth.root_user.email');
+        $password = config('venditio.auth.root_user.password');
 
         if ($email && $password) {
             $rootUser = query('user')->create([

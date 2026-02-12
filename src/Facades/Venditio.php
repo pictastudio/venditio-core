@@ -1,21 +1,21 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Facades;
+namespace PictaStudio\Venditio\Facades;
 
 use Closure;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see PictaStudio\VenditioCore\VenditioCore
+ * @see PictaStudio\Venditio\Venditio
  *
  * @method static void configureRateLimiting(string $prefix)
  * @method static void configureUsing(Closure $callback)
  * @method static void registerPolicies()
  */
-class VenditioCore extends Facade
+class Venditio extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return 'venditio-core';
+        return 'venditio';
     }
 }

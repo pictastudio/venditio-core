@@ -1,12 +1,12 @@
 {
-    "name": "pictastudio/venditio-core",
-    "description": "ecommerce core package",
+    "name": "pictastudio/venditio",
+    "description": "ecommerce package",
     "keywords": [
         "Picta Studio",
         "laravel",
-        "venditio-core"
+        "venditio"
     ],
-    "homepage": "https://github.com/pictastudio/venditio-core",
+    "homepage": "https://github.com/pictastudio/venditio",
     "license": "MIT",
     "authors": [
         {
@@ -44,19 +44,19 @@
             "src/Helpers/Functions/helpers.php"
         ],
         "psr-4": {
-            "PictaStudio\\VenditioCore\\": "src/",
-            "PictaStudio\\VenditioCore\\Database\\Factories\\": "database/factories/",
-            "PictaStudio\\VenditioCore\\Database\\Seeders\\": "database/seeders/"
+            "PictaStudio\\Venditio\\": "src/",
+            "PictaStudio\\Venditio\\Database\\Factories\\": "database/factories/",
+            "PictaStudio\\Venditio\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PictaStudio\\VenditioCore\\Tests\\": "tests/"
+            "PictaStudio\\Venditio\\Tests\\": "tests/"
         }
     },
     "scripts": {
         "post-autoload-dump": "@composer run prepare",
-        "clear": "@php vendor/bin/testbench package:purge-venditio-core --ansi",
+        "clear": "@php vendor/bin/testbench package:purge-venditio --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": [
             "@composer run prepare",
@@ -82,10 +82,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "PictaStudio\\VenditioCore\\VenditioCoreServiceProvider"
+                "PictaStudio\\Venditio\\VenditioServiceProvider"
             ],
             "aliases": {
-                "VenditioCore": "PictaStudio\\VenditioCore\\Facades\\VenditioCore"
+                "Venditio": "PictaStudio\\Venditio\\Facades\\Venditio"
             }
         }
     },

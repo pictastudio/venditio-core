@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Console\Commands;
+namespace PictaStudio\Venditio\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\Venditio\Models\Cart;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ReleaseStockForAbandonedCarts extends Command
 {
@@ -16,7 +16,7 @@ class ReleaseStockForAbandonedCarts extends Command
 
     public function handle(): int
     {
-        if (!config('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true)) {
+        if (!config('venditio.commands.release_stock_for_abandoned_carts.enabled', true)) {
             $this->info('`carts:update-abandoned` is disabled by configuration.');
 
             return self::SUCCESS;
@@ -24,7 +24,7 @@ class ReleaseStockForAbandonedCarts extends Command
 
         $inactiveForMinutes = max(
             1,
-            (int) config('venditio-core.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440)
+            (int) config('venditio.commands.release_stock_for_abandoned_carts.inactive_for_minutes', 1_440)
         );
         $cutoff = now()->subMinutes($inactiveForMinutes);
         $updatedCarts = [];

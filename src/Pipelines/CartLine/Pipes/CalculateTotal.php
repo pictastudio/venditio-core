@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
+namespace PictaStudio\Venditio\Pipelines\CartLine\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;

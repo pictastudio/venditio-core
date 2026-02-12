@@ -1,14 +1,14 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models;
+namespace PictaStudio\Venditio\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Models\Traits\{HasAddresses, HasDiscounts, HasHelperMethods, LogsActivity};
+use PictaStudio\Venditio\Models\Traits\{HasAddresses, HasDiscounts, HasHelperMethods, LogsActivity};
 use Spatie\Permission\Traits\HasRoles;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class User extends Authenticatable
 {
@@ -37,17 +37,17 @@ class User extends Authenticatable
 
     public function isRoot(): bool
     {
-        return $this->hasRole(config('venditio-core.auth.roles.root'));
+        return $this->hasRole(config('venditio.auth.roles.root'));
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasRole(config('venditio-core.auth.roles.admin'));
+        return $this->hasRole(config('venditio.auth.roles.admin'));
     }
 
     public function isUser(): bool
     {
-        return $this->hasRole(config('venditio-core.auth.roles.user'));
+        return $this->hasRole(config('venditio.auth.roles.user'));
     }
 
     protected function name(): Attribute

@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\ProductVariants;
+namespace PictaStudio\Venditio\Actions\ProductVariants;
 
-use PictaStudio\VenditioCore\Models\ProductVariant;
+use PictaStudio\Venditio\Models\ProductVariant;
 
 class UpdateProductVariant
 {

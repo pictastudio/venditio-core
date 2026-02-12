@@ -1,14 +1,14 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Models\{Brand, Order};
+use PictaStudio\Venditio\Models\{Brand, Order};
 
 use function Pest\Laravel\{deleteJson, getJson, postJson};
 
 uses(RefreshDatabase::class);
 
 it('registers index endpoints for all exposed models', function () {
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $endpoints = [
         '/products',
@@ -33,7 +33,7 @@ it('registers index endpoints for all exposed models', function () {
         '/order_lines',
     ];
 
-    if (config('venditio-core.price_lists.enabled', false)) {
+    if (config('venditio.price_lists.enabled', false)) {
         $endpoints[] = '/price_lists';
         $endpoints[] = '/price_list_prices';
     }
@@ -45,7 +45,7 @@ it('registers index endpoints for all exposed models', function () {
 });
 
 it('supports deleting brands and orders through api resources', function () {
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $brand = Brand::factory()->create();
     deleteJson($prefix . '/brands/' . $brand->getKey())->assertNoContent();
@@ -55,7 +55,7 @@ it('supports deleting brands and orders through api resources', function () {
 });
 
 it('supports creating brands through api resources', function () {
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     postJson($prefix . '/brands', ['name' => 'Acme'])
         ->assertStatus(201)

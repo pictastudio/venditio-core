@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
+namespace PictaStudio\Venditio\Pipelines\CartLine\Pipes;
 
 use Closure;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use PictaStudio\VenditioCore\Contracts\ProductPriceResolverInterface;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
+use PictaStudio\Venditio\Contracts\ProductPriceResolverInterface;
+use PictaStudio\Venditio\Dto\Contracts\CartLineDtoContract;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class FillProductInformations
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Managers\Contracts;
+namespace PictaStudio\Venditio\Managers\Contracts;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\Venditio\Models\User;
 
 interface AuthManager
 {

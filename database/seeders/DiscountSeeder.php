@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Seeders;
+namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\Discount;
+use PictaStudio\Venditio\Models\Discount;
 
 class DiscountSeeder extends Seeder
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto;
+namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\{Collection, Fluent};
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\Venditio\Dto\Contracts\CartDtoContract;
+use PictaStudio\Venditio\Models\Cart;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
 
 class CartDto extends Dto implements CartDtoContract
 {

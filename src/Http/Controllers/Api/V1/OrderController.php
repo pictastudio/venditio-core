@@ -1,17 +1,17 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
+namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Order\{StoreOrderRequest, UpdateOrderRequest};
-use PictaStudio\VenditioCore\Http\Resources\V1\OrderResource;
-use PictaStudio\VenditioCore\Models\Order;
-use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
+use PictaStudio\Venditio\Http\Controllers\Api\Controller;
+use PictaStudio\Venditio\Http\Requests\V1\Order\{StoreOrderRequest, UpdateOrderRequest};
+use PictaStudio\Venditio\Http\Resources\V1\OrderResource;
+use PictaStudio\Venditio\Models\Order;
+use PictaStudio\Venditio\Pipelines\Order\OrderCreationPipeline;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_dto};
+use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_dto};
 
 class OrderController extends Controller
 {
@@ -41,7 +41,7 @@ class OrderController extends Controller
         $order = $pipeline->run(
             resolve_dto('order')::fromCart(
                 query('cart')
-                    ->where('status', config('venditio-core.cart.status_enum')::getActiveStatus())
+                    ->where('status', config('venditio.cart.status_enum')::getActiveStatus())
                     ->findOrFail($request->validated('cart_id'))
             )
         );

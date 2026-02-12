@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\ProductCategories;
+namespace PictaStudio\Venditio\Actions\ProductCategories;
 
-use PictaStudio\VenditioCore\Models\ProductCategory;
+use PictaStudio\Venditio\Models\ProductCategory;
 
 class UpdateProductCategory
 {

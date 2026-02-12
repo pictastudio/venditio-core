@@ -7,12 +7,12 @@ Default base path is:
 - `/venditio/api/v1`
 
 Configure via:
-- `venditio-core.routes.api.v1.prefix`
+- `venditio.routes.api.v1.prefix`
 
 ## Auth and Middleware
 - No authentication is enforced by default.
-- Middleware is configurable via `venditio-core.routes.api.v1.middleware`.
-- Policy checks are optional and enabled by `venditio-core.policies.register`.
+- Middleware is configurable via `venditio.routes.api.v1.middleware`.
+- Policy checks are optional and enabled by `venditio.policies.register`.
 
 ## Common Query Parameters
 The following filters apply to most index endpoints via `applyBaseFilters`.
@@ -29,7 +29,7 @@ Some endpoints add extra filters.
 
 ## Response Shape
 - JSON responses use API Resources.
-- By default, timestamps are excluded unless `venditio-core.routes.api.include_timestamps` is true.
+- By default, timestamps are excluded unless `venditio.routes.api.include_timestamps` is true.
 - Validation errors return Laravel's standard 422 response with error details.
 
 ## Resources
@@ -45,7 +45,7 @@ Payload notes:
 - `product_type_id` is required for variant generation.
 - `measuring_unit` and `qty_for_unit` (optional) define unit of measure and quantity per unit (e.g. box of 6).
 - `price_calculated` is always returned and contains the resolved frontend price payload.
-- `include=price_lists` is available only when `venditio-core.price_lists.enabled` is true.
+- `include=price_lists` is available only when `venditio.price_lists.enabled` is true.
 
 ### Product Categories
 - `GET /product_categories`
@@ -153,7 +153,7 @@ This endpoint generates concrete variant products from variant option combinatio
 - `DELETE /price_list_prices/{price_list_price}`
 
 Feature flag:
-- `venditio-core.price_lists.enabled` must be true.
+- `venditio.price_lists.enabled` must be true.
 
 ## Variant Workflow
 1. Create a product type.
@@ -316,7 +316,7 @@ Content-Type: application/json
 ```
 
 ## Configuration Highlights
-See `config/venditio-core.php` for:
+See `config/venditio.php` for:
 - Routes configuration and versioning
 - Pagination defaults
 - Product variant naming and copy behavior

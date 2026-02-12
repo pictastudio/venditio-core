@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto\Contracts;
+namespace PictaStudio\Venditio\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\Venditio\Models\Cart;
 
 interface CartDtoContract extends Dto
 {

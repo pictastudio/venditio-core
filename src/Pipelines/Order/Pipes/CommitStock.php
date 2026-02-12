@@ -1,13 +1,13 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_enum};
+use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_enum};
 
 class CommitStock
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\Products;
+namespace PictaStudio\Venditio\Actions\Products;
 
 use Illuminate\Support\Arr;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Models\Product;
 
 class UpdateProduct
 {

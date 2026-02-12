@@ -1,12 +1,12 @@
-# Venditio Core Ecommerce
+# Venditio Ecommerce
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/pictastudio/venditio-core.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio-core)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio-core/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/pictastudio/venditio-core/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio-core/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/pictastudio/venditio-core/actions?query=workflow%3A)
-[![Total Downloads](https://img.shields.io/packagist/dt/pictastudio/venditio-core.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio-core)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/pictastudio/venditio.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/pictastudio/venditio/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/pictastudio/venditio/actions?query=workflow%3A)
+[![Total Downloads](https://img.shields.io/packagist/dt/pictastudio/venditio.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio)
 
-**Venditio core** it's a headless e-commerce tool.
-It provides the core functionality for an e-commerce laravel based application, giving you the freedom to choose the frontend stack.
+**Venditio** it's a headless e-commerce tool.
+It provides the functionality for an e-commerce laravel based application, giving you the freedom to choose the frontend stack.
 
 We offer [**Venditio admin**](https://github.com/pictastudio/venditio-admin) a complementary package that provides an admin panel written with [filamentphp](https://filamentphp.com/)
 
@@ -15,12 +15,12 @@ We offer [**Venditio admin**](https://github.com/pictastudio/venditio-admin) a c
 You can install the package via composer:
 
 ```bash
-composer require pictastudio/venditio-core
+composer require pictastudio/venditio
 ```
 
 ## Product Variants
 
-Venditio Core models product variants by treating a base `Product` as the parent and variant products as the purchasable items.
+Venditio models product variants by treating a base `Product` as the parent and variant products as the purchasable items.
 This allows you to represent multiple option combinations while keeping a single product identity.
 
 We have a t-shirt `Product` with id 1 that could have variants in both color and size
@@ -56,7 +56,7 @@ All the variants are computed using `product_variants` and `product_variant_opti
 
 ## Configuration
 
-No edition or mode selection is required. All behavior is configured via the `venditio-core` config file.
+No edition or mode selection is required. All behavior is configured via the `venditio` config file.
 
 ### Seeding Data
 
@@ -67,11 +67,11 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Database\Seeders\CountrySeeder;
-use PictaStudio\VenditioCore\Database\Seeders\CurrencySeeder;
-use PictaStudio\VenditioCore\Database\Seeders\RoleSeeder;
-use PictaStudio\VenditioCore\Database\Seeders\TaxClassSeeder;
-use PictaStudio\VenditioCore\Database\Seeders\UserSeeder;
+use PictaStudio\Venditio\Database\Seeders\CountrySeeder;
+use PictaStudio\Venditio\Database\Seeders\CurrencySeeder;
+use PictaStudio\Venditio\Database\Seeders\RoleSeeder;
+use PictaStudio\Venditio\Database\Seeders\TaxClassSeeder;
+use PictaStudio\Venditio\Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -91,22 +91,22 @@ class DatabaseSeeder extends Seeder
 ### Auth
 
 Add the `HasApiTokens` trait to your user model if not already present and then update the model in the config so the package can use the correct one
-Also extend the User model from VenditioCore
+Also extend the User model from Venditio
 
 ```php
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
-use PictaStudio\VenditioCore\Models\User as VenditioCoreUser;
+use PictaStudio\Venditio\Models\User as VenditioUser;
 
-class User extends VenditioCoreUser
+class User extends VenditioUser
 {
     use HasApiTokens;
 }
 
 ```
 
-then update the class in `config/venditio-core`
+then update the class in `config/venditio`
 
 ```php
 'models' => [
@@ -118,8 +118,8 @@ then update the class in `config/venditio-core`
 If you want the package to create a root user then provide inside the `.env` file the following variables
 
 ```env
-VENDITIO_CORE_ROOT_USER_EMAIL=mail_here
-VENDITIO_CORE_ROOT_USER_PASSWORD=password_here
+VENDITIO_ROOT_USER_EMAIL=mail_here
+VENDITIO_ROOT_USER_PASSWORD=password_here
 ```
 
 ```php
@@ -164,8 +164,8 @@ VENDITIO_CORE_ROOT_USER_PASSWORD=password_here
         // ],
     ],
     'root_user' => [
-        'email' => env('VENDITIO_CORE_ROOT_USER_EMAIL'),
-        'password' => env('VENDITIO_CORE_ROOT_USER_PASSWORD'),
+        'email' => env('VENDITIO_ROOT_USER_EMAIL'),
+        'password' => env('VENDITIO_ROOT_USER_PASSWORD'),
     ],
 ],
 ```
@@ -224,10 +224,10 @@ public function brand(): BelongsTo
 Validation rules are managed inside separate classes than FormRequests
 
 ```php
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
 
 class AddressValidation implements AddressValidationRules
 {
@@ -237,7 +237,7 @@ class AddressValidation implements AddressValidationRules
             'type' => [
                 'required',
                 'string',
-                Rule::enum(config('venditio-core.addresses.type_enum')),
+                Rule::enum(config('venditio.addresses.type_enum')),
             ],
             'is_default' => 'sometimes|boolean',
             'first_name' => 'required|string|max:255',
@@ -253,7 +253,7 @@ class AddressValidation implements AddressValidationRules
             'type' => [
                 'sometimes',
                 'string',
-                Rule::enum(config('venditio-core.addresses.type_enum')),
+                Rule::enum(config('venditio.addresses.type_enum')),
             ],
             'is_default' => 'sometimes|boolean',
             'first_name' => 'sometimes|string|max:255',
@@ -268,10 +268,10 @@ class AddressValidation implements AddressValidationRules
 this classes are then resolved out of the container when needed
 
 ```php
-namespace PictaStudio\VenditioCore\Http\Requests\V1\Address;
+namespace PictaStudio\Venditio\Http\Requests\V1\Address;
 
 use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
 
 class StoreAddressRequest extends FormRequest
 {
@@ -290,7 +290,7 @@ class StoreAddressRequest extends FormRequest
 Customize validation rules by modifying the class bind in laravel container
 
 ```php
-use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
 use App\Validations\AddressValidation;
 
 // inside AppServiceProvider boot method
@@ -305,8 +305,8 @@ public function boot(): void
 The package uses Dtos inside the pipelines and you can modify the class it uses inside the the config file
 The important thing is that those classes need to implement the provided interfaces
 
-for Order dto: PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract
-for Cart dto: PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract
+for Order dto: PictaStudio\Venditio\Dto\Contracts\OrderDtoContract
+for Cart dto: PictaStudio\Venditio\Dto\Contracts\CartDtoContract
 
 ### Helper functions
 
@@ -319,11 +319,11 @@ function auth_manager(User|Authenticatable|null $user = null): AuthManagerContra
 }
 
 /**
- * @param  string  $model  String that identifies the model (one of the keys from config('venditio-core.models'))
+ * @param  string  $model  String that identifies the model (one of the keys from config('venditio.models'))
  */
 function resolve_model(string $model): string
 {
-    return config('venditio-core.models.' . $model);
+    return config('venditio.models.' . $model);
 }
 
 function query(string $model): Builder
@@ -405,8 +405,8 @@ Example of custom generator class
 ```php
 namespace App\Generators;
 
-use PictaStudio\VenditioCore\Models\Order;
-use PictaStudio\VenditioCore\Orders\Contracts\OrderIdentifierGeneratorInterface;
+use PictaStudio\Venditio\Models\Order;
+use PictaStudio\Venditio\Orders\Contracts\OrderIdentifierGeneratorInterface;
 
 class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
 {
@@ -430,10 +430,10 @@ the package provides some console commands to deal with common use cases
 #### Bruno API Collection
 
 - PublishBrunoCollection
-  publishes the Bruno request collection into the host app at `bruno/venditio-core`
+  publishes the Bruno request collection into the host app at `bruno/venditio`
 
 ```bash
-php artisan vendor:publish --tag=venditio-core-bruno
+php artisan vendor:publish --tag=venditio-bruno
 ```
 
 ## Structure
@@ -447,7 +447,7 @@ src/
 |--- Helpers
 |--- Http
 |--- Packages
-    |--- Simple   // core models, enums, validations, factories (internal module)
+    |--- Simple   // models, enums, validations, factories (internal module)
     |--- Advanced // variant system models, validations, factories (internal module)
 ```
 

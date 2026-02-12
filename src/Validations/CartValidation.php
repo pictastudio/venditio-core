@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
 use BackedEnum;
-use PictaStudio\VenditioCore\Validations\Contracts\CartValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\CartValidationRules;
 
 class CartValidation implements CartValidationRules
 {
@@ -41,7 +41,7 @@ class CartValidation implements CartValidationRules
     protected function getAddressValidationRulesFromEnum(): array
     {
         /** @var BackedEnum $addressTypeEnum */
-        $addressTypeEnum = config('venditio-core.addresses.type_enum');
+        $addressTypeEnum = config('venditio.addresses.type_enum');
 
         $rules = [];
         foreach ($addressTypeEnum::cases() as $case) {

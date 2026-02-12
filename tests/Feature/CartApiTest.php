@@ -3,8 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Enums\{DiscountType, ProductStatus};
-use PictaStudio\VenditioCore\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
+use PictaStudio\Venditio\Enums\{DiscountType, ProductStatus};
+use PictaStudio\Venditio\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
 
 use function Pest\Laravel\{assertSoftDeleted, deleteJson, getJson, patchJson, postJson};
 
@@ -84,7 +84,7 @@ it('creates a cart through api with lines', function () {
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-create-cart@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $response = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -111,7 +111,7 @@ it('filters carts by user_id', function () {
     $userA = createUserForCart('user-a@example.test');
     $userB = createUserForCart('user-b@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartA = Cart::query()->create([
         'user_id' => $userA->getKey(),
@@ -119,7 +119,7 @@ it('filters carts by user_id', function () {
         'user_first_name' => $userA->first_name,
         'user_last_name' => $userA->last_name,
         'user_email' => $userA->email,
-        'status' => config('venditio-core.cart.status_enum')::getActiveStatus(),
+        'status' => config('venditio.cart.status_enum')::getActiveStatus(),
         'sub_total_taxable' => 0,
         'sub_total_tax' => 0,
         'sub_total' => 0,
@@ -136,7 +136,7 @@ it('filters carts by user_id', function () {
         'user_first_name' => $userB->first_name,
         'user_last_name' => $userB->last_name,
         'user_email' => $userB->email,
-        'status' => config('venditio-core.cart.status_enum')::getActiveStatus(),
+        'status' => config('venditio.cart.status_enum')::getActiveStatus(),
         'sub_total_taxable' => 0,
         'sub_total_tax' => 0,
         'sub_total' => 0,
@@ -167,7 +167,7 @@ it('returns cart detail with lines loaded', function () {
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-lines@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartId = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -192,7 +192,7 @@ it('deletes a cart through api', function () {
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-delete@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartId = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -220,7 +220,7 @@ it('adds lines and recalculates cart totals through pipeline', function () {
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-add-lines@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartId = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -239,7 +239,7 @@ it('adds lines and recalculates cart totals through pipeline', function () {
     ])->assertOk()
         ->assertJsonPath('lines.0.qty', 3);
 
-    $cart = config('venditio-core.models.cart')::query()->with('lines')->findOrFail($cartId);
+    $cart = config('venditio.models.cart')::query()->with('lines')->findOrFail($cartId);
     $product->inventory->refresh();
 
     expect($cart->lines)->toHaveCount(1)
@@ -254,7 +254,7 @@ it('adds a line for a product already in the cart and updates the existing line 
     $product = createCartProduct($taxClass, 100);
     $user = createUserForCart('user-same-product@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartId = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -278,7 +278,7 @@ it('adds a line for a product already in the cart and updates the existing line 
     $response->assertJsonPath('lines.0.product_id', $product->getKey())
         ->assertJsonPath('lines.0.qty', 5);
 
-    $cart = config('venditio-core.models.cart')::query()->with('lines')->findOrFail($cartId);
+    $cart = config('venditio.models.cart')::query()->with('lines')->findOrFail($cartId);
     $product->inventory->refresh();
 
     expect($cart->lines)->toHaveCount(1)
@@ -294,7 +294,7 @@ it('removes lines and recalculates cart totals through pipeline', function () {
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-remove-lines@example.test');
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartId = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -306,7 +306,7 @@ it('removes lines and recalculates cart totals through pipeline', function () {
         ],
     ])->assertCreated()->json('id');
 
-    $lineId = config('venditio-core.models.cart_line')::query()
+    $lineId = config('venditio.models.cart_line')::query()
         ->where('cart_id', $cartId)
         ->value('id');
 
@@ -314,7 +314,7 @@ it('removes lines and recalculates cart totals through pipeline', function () {
         'line_ids' => [$lineId],
     ])->assertOk();
 
-    $cart = config('venditio-core.models.cart')::query()->with('lines')->findOrFail($cartId);
+    $cart = config('venditio.models.cart')::query()->with('lines')->findOrFail($cartId);
     $product->inventory->refresh();
 
     expect($cart->lines)->toHaveCount(0)
@@ -328,7 +328,7 @@ it('adds a discount code to an existing cart through api and recalculates totals
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-discount@example.test');
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,
@@ -341,7 +341,7 @@ it('adds a discount code to an existing cart through api and recalculates totals
         'apply_to_cart_total' => true,
     ]);
 
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
     $cartId = postJson($prefix . '/carts', [
         'user_id' => $user->getKey(),
@@ -366,9 +366,9 @@ it('returns 422 when adding a cart total discount code not eligible for cart tot
     setupCartTaxEnvironment($taxClass);
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-invalid-add-discount@example.test');
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,
@@ -401,9 +401,9 @@ it('returns 422 when creating a cart with a non eligible cart total discount cod
     setupCartTaxEnvironment($taxClass);
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-invalid-cart-create-discount@example.test');
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,
@@ -433,9 +433,9 @@ it('returns 422 when updating a cart with a non eligible cart total discount cod
     setupCartTaxEnvironment($taxClass);
     $product = createCartProduct($taxClass);
     $user = createUserForCart('user-invalid-cart-update-discount@example.test');
-    $prefix = config('venditio-core.routes.api.v1.prefix');
+    $prefix = config('venditio.routes.api.v1.prefix');
 
-    $discountModel = config('venditio-core.models.discount');
+    $discountModel = config('venditio.models.discount');
     $discountModel::query()->create([
         'discountable_type' => null,
         'discountable_id' => null,

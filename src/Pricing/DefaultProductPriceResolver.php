@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pricing;
+namespace PictaStudio\Venditio\Pricing;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\ProductPriceResolverInterface;
+use PictaStudio\Venditio\Contracts\ProductPriceResolverInterface;
 
 class DefaultProductPriceResolver implements ProductPriceResolverInterface
 {
     public function resolve(Model $product): array
     {
-        if (!config('venditio-core.price_lists.enabled', false)) {
+        if (!config('venditio.price_lists.enabled', false)) {
             return $this->fromInventory($product);
         }
 

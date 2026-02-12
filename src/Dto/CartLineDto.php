@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto;
+namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Dto\Contracts\{CartLineDtoContract};
-use PictaStudio\VenditioCore\Models\CartLine;
+use PictaStudio\Venditio\Dto\Contracts\{CartLineDtoContract};
+use PictaStudio\Venditio\Models\CartLine;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{get_fresh_model_instance, resolve_dto};
+use function PictaStudio\Venditio\Helpers\Functions\{get_fresh_model_instance, resolve_dto};
 
 class CartLineDto extends Dto implements CartLineDtoContract
 {

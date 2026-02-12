@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models;
+namespace PictaStudio\Venditio\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany, HasOne};
-use PictaStudio\VenditioCore\Models\Scopes\{Active, InDateRange};
-use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
+use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange};
+use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class Product extends Model
 {
@@ -30,7 +30,7 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'status' => config('venditio-core.product.status_enum'),
+            'status' => config('venditio.product.status_enum'),
             'active' => 'boolean',
             'new' => 'boolean',
             'in_evidence' => 'boolean',
@@ -38,7 +38,7 @@ class Product extends Model
             'visible_until' => 'datetime',
             'images' => 'json',
             'files' => 'json',
-            'measuring_unit' => config('venditio-core.product.measuring_unit_enum'),
+            'measuring_unit' => config('venditio.product.measuring_unit_enum'),
             'qty_for_unit' => 'integer',
             'length' => 'decimal:2',
             'width' => 'decimal:2',

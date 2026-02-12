@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Discounts;
+namespace PictaStudio\Venditio\Discounts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Contracts\DiscountablesResolverInterface;
+use PictaStudio\Venditio\Contracts\DiscountablesResolverInterface;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class DiscountablesResolver implements DiscountablesResolverInterface
 {

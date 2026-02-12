@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;

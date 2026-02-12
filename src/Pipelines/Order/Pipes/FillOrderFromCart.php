@@ -1,14 +1,14 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Models\Cart;
+use PictaStudio\Venditio\Dto\Contracts\OrderDtoContract;
+use PictaStudio\Venditio\Models\Cart;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
 
 class FillOrderFromCart
 {
@@ -17,7 +17,7 @@ class FillOrderFromCart
         $cart = $orderDto->getCart()->loadMissing('lines');
         $order = $orderDto->toModel();
         $order->fill([
-            'status' => config('venditio-core.order.status_enum')::getProcessingStatus(),
+            'status' => config('venditio.order.status_enum')::getProcessingStatus(),
         ]);
 
         $order->setRelation('sourceCart', $cart);

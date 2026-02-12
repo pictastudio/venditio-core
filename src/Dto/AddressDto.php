@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Dto;
+namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
-use PictaStudio\VenditioCore\Dto\Contracts\AddressDtoContract;
-use PictaStudio\VenditioCore\Models\Address;
+use PictaStudio\Venditio\Dto\Contracts\AddressDtoContract;
+use PictaStudio\Venditio\Models\Address;
 
 use RuntimeException;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
 
 class AddressDto extends Dto implements AddressDtoContract
 {
@@ -164,7 +164,7 @@ class AddressDto extends Dto implements AddressDtoContract
         }
 
         $addressData = [
-            'type' => config('venditio-core.addresses.type_enum')::tryFrom($this->getType()),
+            'type' => config('venditio.addresses.type_enum')::tryFrom($this->getType()),
             'is_default' => $this->getIsDefault(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
@@ -195,7 +195,7 @@ class AddressDto extends Dto implements AddressDtoContract
         $updatedData = [
             // 'addressable_id' => $this->getAddressable()?->getKey(),
             // 'addressable_type' => $this->getAddressable()?->getMorphClass(),
-            'type' => config('venditio-core.addresses.type_enum')::tryFrom($this->getType()),
+            'type' => config('venditio.addresses.type_enum')::tryFrom($this->getType()),
             'is_default' => $this->getIsDefault(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),

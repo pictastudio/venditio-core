@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Cart\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Actions\Taxes\ExtractTaxFromGrossPrice;
-use PictaStudio\VenditioCore\Contracts\{CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface};
-use PictaStudio\VenditioCore\Discounts\{DiscountContext, DiscountValidationException};
+use PictaStudio\Venditio\Actions\Taxes\ExtractTaxFromGrossPrice;
+use PictaStudio\Venditio\Contracts\{CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface};
+use PictaStudio\Venditio\Discounts\{DiscountContext, DiscountValidationException};
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ApplyDiscounts
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Validations\Contracts\ProductValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\ProductValidationRules;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductValidation implements ProductValidationRules
 {
@@ -37,7 +37,7 @@ class ProductValidation implements ProductValidationRules
             'status' => [
                 'required',
                 'string',
-                Rule::enum(config('venditio-core.product.status_enum')),
+                Rule::enum(config('venditio.product.status_enum')),
             ],
             'active' => 'sometimes|boolean',
             'new' => 'sometimes|boolean',
@@ -62,7 +62,7 @@ class ProductValidation implements ProductValidationRules
             'measuring_unit' => [
                 'nullable',
                 'string',
-                Rule::enum(config('venditio-core.product.measuring_unit_enum')),
+                Rule::enum(config('venditio.product.measuring_unit_enum')),
             ],
             'qty_for_unit' => 'nullable|integer|min:0',
             'length' => 'nullable|numeric|min:0',
@@ -115,7 +115,7 @@ class ProductValidation implements ProductValidationRules
             'status' => [
                 'sometimes',
                 'string',
-                Rule::enum(config('venditio-core.product.status_enum')),
+                Rule::enum(config('venditio.product.status_enum')),
             ],
             'active' => 'sometimes|boolean',
             'new' => 'sometimes|boolean',
@@ -140,7 +140,7 @@ class ProductValidation implements ProductValidationRules
             'measuring_unit' => [
                 'nullable',
                 'string',
-                Rule::enum(config('venditio-core.product.measuring_unit_enum')),
+                Rule::enum(config('venditio.product.measuring_unit_enum')),
             ],
             'qty_for_unit' => 'nullable|integer|min:0',
             'length' => 'nullable|numeric|min:0',

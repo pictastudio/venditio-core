@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Validations\Contracts\AddressValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class AddressValidation implements AddressValidationRules
 {
@@ -22,7 +22,7 @@ class AddressValidation implements AddressValidationRules
             'type' => [
                 'required',
                 'string',
-                Rule::enum(config('venditio-core.addresses.type_enum')),
+                Rule::enum(config('venditio.addresses.type_enum')),
             ],
             'is_default' => 'sometimes|boolean',
             'first_name' => 'required|string|max:255',
@@ -57,7 +57,7 @@ class AddressValidation implements AddressValidationRules
             'type' => [
                 'sometimes',
                 'string',
-                Rule::enum(config('venditio-core.addresses.type_enum')),
+                Rule::enum(config('venditio.addresses.type_enum')),
             ],
             'is_default' => 'sometimes|boolean',
             'first_name' => 'sometimes|string|max:255',

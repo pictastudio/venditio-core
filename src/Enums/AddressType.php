@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Enums;
+namespace PictaStudio\Venditio\Enums;
 
 enum AddressType: string
 {

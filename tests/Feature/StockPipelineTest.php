@@ -3,12 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\{Event, Schema};
-use PictaStudio\VenditioCore\Dto\{CartDto, OrderDto};
-use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Events\ProductStockBelowMinimum;
-use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, Product, TaxClass, User};
-use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
-use PictaStudio\VenditioCore\Pipelines\Order\OrderCreationPipeline;
+use PictaStudio\Venditio\Dto\{CartDto, OrderDto};
+use PictaStudio\Venditio\Enums\ProductStatus;
+use PictaStudio\Venditio\Events\ProductStockBelowMinimum;
+use PictaStudio\Venditio\Models\{Country, CountryTaxClass, Product, TaxClass, User};
+use PictaStudio\Venditio\Pipelines\Cart\CartCreationPipeline;
+use PictaStudio\Venditio\Pipelines\Order\OrderCreationPipeline;
 
 uses(RefreshDatabase::class);
 
@@ -140,7 +140,7 @@ it('reserves stock on cart creation and commits stock on order creation for mult
         ->and($productB->inventory->stock_reserved)->toBe(0)
         ->and($productB->inventory->stock_available)->toBe(10)
         ->and($cart->order_id)->toBe($order->getKey())
-        ->and($cart->status->value)->toBe(config('venditio-core.cart.status_enum')::getConvertedStatus()->value);
+        ->and($cart->status->value)->toBe(config('venditio.cart.status_enum')::getConvertedStatus()->value);
 });
 
 it('dispatches a `low stock` event with the expected data when `stock` goes below `stock_min`', function () {

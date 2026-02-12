@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Order\Pipes;
+namespace PictaStudio\Venditio\Pipelines\Order\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use PictaStudio\VenditioCore\Contracts\OrderIdentifierGeneratorInterface;
+use PictaStudio\Venditio\Contracts\OrderIdentifierGeneratorInterface;
 
 final class GenerateIdentifier
 {

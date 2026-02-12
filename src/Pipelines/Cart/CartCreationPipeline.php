@@ -1,18 +1,18 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Pipelines\Cart;
+namespace PictaStudio\Venditio\Pipelines\Cart;
 
-use PictaStudio\VenditioCore\Pipelines\Pipeline;
+use PictaStudio\Venditio\Pipelines\Pipeline;
 
 /**
  * Pipeline for creating a cart
  *
- * the expected payload is an instance of PictaStudio\VenditioCore\Dto\CartDto
+ * the expected payload is an instance of PictaStudio\Venditio\Dto\CartDto
  */
 class CartCreationPipeline extends Pipeline
 {
     public function getPipes(): array
     {
-        return config('venditio-core.cart.pipelines.create.pipes');
+        return config('venditio.cart.pipelines.create.pipes');
     }
 }

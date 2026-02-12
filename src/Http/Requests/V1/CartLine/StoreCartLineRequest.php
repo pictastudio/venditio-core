@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Http\Requests\V1\CartLine;
+namespace PictaStudio\Venditio\Http\Requests\V1\CartLine;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class StoreCartLineRequest extends FormRequest
 {

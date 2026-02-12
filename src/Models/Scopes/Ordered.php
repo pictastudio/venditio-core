@@ -1,6 +1,6 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models\Scopes;
+namespace PictaStudio\Venditio\Models\Scopes;
 
 use Illuminate\Database\Eloquent\{Builder, Model, Scope};
 

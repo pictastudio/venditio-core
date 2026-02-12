@@ -1,11 +1,11 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Policies\Traits;
+namespace PictaStudio\Venditio\Policies\Traits;
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Str;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\auth_manager;
+use function PictaStudio\Venditio\Helpers\Functions\auth_manager;
 
 trait VenditioPolicyPermissions
 {

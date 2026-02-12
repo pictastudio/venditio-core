@@ -1,9 +1,9 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Database\Seeders;
+namespace PictaStudio\Venditio\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\Brand;
+use PictaStudio\Venditio\Models\Brand;
 
 class BrandSeeder extends Seeder
 {

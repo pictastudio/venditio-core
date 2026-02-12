@@ -1,8 +1,8 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Validations;
+namespace PictaStudio\Venditio\Validations;
 
-use PictaStudio\VenditioCore\Validations\Contracts\ProductTypeValidationRules;
+use PictaStudio\Venditio\Validations\Contracts\ProductTypeValidationRules;
 
 class ProductTypeValidation implements ProductTypeValidationRules
 {

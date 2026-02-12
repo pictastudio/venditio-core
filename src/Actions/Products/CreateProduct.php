@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\Products;
+namespace PictaStudio\Venditio\Actions\Products;
 
 use Illuminate\Support\Arr;
-use PictaStudio\VenditioCore\Contracts\ProductSkuGeneratorInterface;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Contracts\ProductSkuGeneratorInterface;
+use PictaStudio\Venditio\Models\Product;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class CreateProduct
 {

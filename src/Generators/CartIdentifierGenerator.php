@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Generators;
+namespace PictaStudio\Venditio\Generators;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use PictaStudio\VenditioCore\Contracts\CartIdentifierGeneratorInterface;
+use PictaStudio\Venditio\Contracts\CartIdentifierGeneratorInterface;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{query};
+use function PictaStudio\Venditio\Helpers\Functions\{query};
 
 class CartIdentifierGenerator implements CartIdentifierGeneratorInterface
 {

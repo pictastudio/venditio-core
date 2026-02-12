@@ -1,10 +1,10 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Actions\ProductTypes;
+namespace PictaStudio\Venditio\Actions\ProductTypes;
 
-use PictaStudio\VenditioCore\Models\ProductType;
+use PictaStudio\Venditio\Models\ProductType;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class CreateProductType
 {

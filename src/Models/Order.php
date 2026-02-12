@@ -1,15 +1,15 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Models;
+namespace PictaStudio\Venditio\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Support\Fluent;
-use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
+use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class Order extends Model
 {
@@ -29,7 +29,7 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'status' => config('venditio-core.order.status_enum'),
+            'status' => config('venditio.order.status_enum'),
             'last_tracked_at' => 'datetime',
             'sub_total_taxable' => 'decimal:2',
             'sub_total_tax' => 'decimal:2',

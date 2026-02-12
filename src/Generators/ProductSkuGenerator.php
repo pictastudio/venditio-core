@@ -1,12 +1,12 @@
 <?php
 
-namespace PictaStudio\VenditioCore\Generators;
+namespace PictaStudio\Venditio\Generators;
 
 use Illuminate\Support\Str;
-use PictaStudio\VenditioCore\Contracts\ProductSkuGeneratorInterface;
-use PictaStudio\VenditioCore\Models\Product;
+use PictaStudio\Venditio\Contracts\ProductSkuGeneratorInterface;
+use PictaStudio\Venditio\Models\Product;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class ProductSkuGenerator implements ProductSkuGeneratorInterface
 {
