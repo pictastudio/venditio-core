@@ -74,6 +74,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Commands
+    |--------------------------------------------------------------------------
+    |
+    | Configure package console commands behavior.
+    |
+    */
+    'commands' => [
+        'release_stock_for_abandoned_carts' => [
+            'enabled' => env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_ENABLED', true),
+            'inactive_for_minutes' => (int) env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_INACTIVE_FOR_MINUTES', 1_440),
+            'schedule_every_minutes' => (int) env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_SCHEDULE_EVERY_MINUTES', 60),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Models
     |--------------------------------------------------------------------------
     |

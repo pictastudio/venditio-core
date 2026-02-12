@@ -423,7 +423,7 @@ the package provides some console commands to deal with common use cases
 
 #### Carts
 
-- UpdateAbandonedCarts
+- ReleaseStockForAbandonedCarts
   checks all carts with a pending status which by default are `processing` and `active`
   pending statuses are customizable by changing the `getPendingStatuses()` function in `CartStatus` enum which is located in the config file under `carts.status_enum`
 

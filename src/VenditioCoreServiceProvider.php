@@ -4,10 +4,11 @@ namespace PictaStudio\VenditioCore;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Console\Commands\{PublishBrunoCollection, UpdateAbandonedCarts};
+use PictaStudio\VenditioCore\Console\Commands\{PublishBrunoCollection, ReleaseStockForAbandonedCarts};
 use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductSkuGeneratorInterface};
 use PictaStudio\VenditioCore\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
@@ -33,7 +34,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
-            ->hasCommand(UpdateAbandonedCarts::class)
+            ->hasCommand(ReleaseStockForAbandonedCarts::class)
             ->hasMigrations([
                 'create_addresses_table',
                 'create_countries_table',
@@ -73,6 +74,7 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
     {
         $this->registerPublishableAssets();
         $this->registerApiRoutes();
+        $this->registerScheduledCommands();
         $this->bindValidationClasses();
         // $this->bindDtos();
         $this->registerFactoriesGuessing();
@@ -198,5 +200,29 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $this->publishes([
             $this->package->basePath('/../bruno/venditio-core') => base_path('bruno/venditio-core'),
         ], 'venditio-core-bruno');
+    }
+
+    private function registerScheduledCommands(): void
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            if (!config('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true)) {
+                return;
+            }
+
+            $scheduleEveryMinutes = max(
+                1,
+                (int) config('venditio-core.commands.release_stock_for_abandoned_carts.schedule_every_minutes', 60)
+            );
+
+            $schedule
+                ->command(ReleaseStockForAbandonedCarts::class)
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->when(static function () use ($scheduleEveryMinutes): bool {
+                    $minutesSinceMidnight = now()->startOfDay()->diffInMinutes(now());
+
+                    return $minutesSinceMidnight % $scheduleEveryMinutes === 0;
+                });
+        });
     }
 }

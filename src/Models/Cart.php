@@ -109,35 +109,51 @@ class Cart extends Model
     public function purge(): void
     {
         DB::transaction(function () {
-            $reservedQtyByProduct = $this->lines()
-                ->selectRaw('product_id, SUM(qty) as qty')
-                ->groupBy('product_id')
-                ->pluck('qty', 'product_id');
-
-            if ($reservedQtyByProduct->isNotEmpty()) {
-                $inventories = resolve_model('inventory')::query()
-                    ->whereIn('product_id', $reservedQtyByProduct->keys()->all())
-                    ->lockForUpdate()
-                    ->get()
-                    ->keyBy('product_id');
-
-                foreach ($reservedQtyByProduct as $productId => $qtyToRelease) {
-                    $inventory = $inventories->get((int) $productId);
-
-                    if (!$inventory instanceof Model) {
-                        continue;
-                    }
-
-                    $inventory->stock_reserved = max(0, (int) $inventory->stock_reserved - (int) $qtyToRelease);
-                    $inventory->save();
-                }
-            }
+            $this->releaseReservedStock();
 
             $this->lines()->delete();
             $this->status = resolve_enum('cart_status')::getCancelledStatus();
             $this->save();
             $this->delete();
         });
+    }
+
+    public function abandon(): void
+    {
+        DB::transaction(function () {
+            $this->releaseReservedStock();
+            $this->status = resolve_enum('cart_status')::getAbandonedStatus();
+            $this->save();
+        });
+    }
+
+    private function releaseReservedStock(): void
+    {
+        $reservedQtyByProduct = $this->lines()
+            ->selectRaw('product_id, SUM(qty) as qty')
+            ->groupBy('product_id')
+            ->pluck('qty', 'product_id');
+
+        if ($reservedQtyByProduct->isEmpty()) {
+            return;
+        }
+
+        $inventories = resolve_model('inventory')::query()
+            ->whereIn('product_id', $reservedQtyByProduct->keys()->all())
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('product_id');
+
+        foreach ($reservedQtyByProduct as $productId => $qtyToRelease) {
+            $inventory = $inventories->get((int) $productId);
+
+            if (!$inventory instanceof Model) {
+                continue;
+            }
+
+            $inventory->stock_reserved = max(0, (int) $inventory->stock_reserved - (int) $qtyToRelease);
+            $inventory->save();
+        }
     }
 
     protected function addresses(): Attribute
