@@ -3,9 +3,12 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use PictaStudio\VenditioCore\Models\ShippingStatus;
 
 class ShippingStatusFactory extends Factory
 {
+    protected $model = ShippingStatus::class;
+
     public function definition(): array
     {
         return [

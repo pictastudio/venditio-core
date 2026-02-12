@@ -7,14 +7,25 @@ use Spatie\Activitylog\Traits\LogsActivity as SpatieLogsActivity;
 
 trait LogsActivity
 {
-    use SpatieLogsActivity;
+    use SpatieLogsActivity {
+        SpatieLogsActivity::bootLogsActivity as spatieBootLogsActivity;
+    }
+
+    protected static function bootLogsActivity(): void
+    {
+        if (!config('venditio-core.activity_log.enabled')) {
+            return;
+        }
+
+        static::spatieBootLogsActivity();
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName('venditio-core')
+            ->useLogName(config('venditio-core.activity_log.log_name'))
             ->logAll()
             ->dontSubmitEmptyLogs()
-            ->logExcept(['updated_at']);
+            ->logExcept(config('venditio-core.activity_log.log_except'));
     }
 }

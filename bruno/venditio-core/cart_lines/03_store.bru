@@ -1,0 +1,22 @@
+meta {
+  name: Store cart_lines
+  type: http
+  seq: 93
+}
+
+post {
+  url: {{baseUrl}}/cart_lines
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

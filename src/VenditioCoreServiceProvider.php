@@ -2,38 +2,30 @@
 
 namespace PictaStudio\VenditioCore;
 
-use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\VenditioCore\Dto\CartDto;
-use PictaStudio\VenditioCore\Dto\CartLineDto;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Dto\Contracts\OrderDtoContract;
-use PictaStudio\VenditioCore\Dto\OrderDto;
-use PictaStudio\VenditioCore\Facades\VenditioCore;
-use PictaStudio\VenditioCore\Helpers\Cart\Contracts\CartIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Helpers\Cart\Generators\CartIdentifierGenerator;
-use PictaStudio\VenditioCore\Helpers\Order\Contracts\OrderIdentifierGeneratorInterface;
-use PictaStudio\VenditioCore\Helpers\Order\Generators\OrderIdentifierGenerator;
+use PictaStudio\VenditioCore\Console\Commands\{PublishBrunoCollection, ReleaseStockForAbandonedCarts};
+use PictaStudio\VenditioCore\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductSkuGeneratorInterface};
+use PictaStudio\VenditioCore\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
+use PictaStudio\VenditioCore\Dto\{CartDto, CartLineDto, OrderDto};
+use PictaStudio\VenditioCore\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
+use PictaStudio\VenditioCore\Facades\VenditioCore as VenditioCoreFacade;
+use PictaStudio\VenditioCore\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator, ProductSkuGenerator};
 use PictaStudio\VenditioCore\Managers\AuthManager;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\VenditioCore as VenditioCoreClass;
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\VenditioCore\Validations\{AddressValidation, BrandValidation, CartLineValidation, CartValidation, OrderValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
+use PictaStudio\VenditioCore\Validations\Contracts\{AddressValidationRules, BrandValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
+use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
 
 class VenditioCoreServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $migrations = collect(scandir($package->basePath('/../database/migrations')))
-            ->reject(fn (string $file) => in_array($file, ['.', '..']))
-            ->map(fn (string $file) => str($file)->beforeLast('.php'))
-            ->toArray();
-
         /*
          * This class is a Package Service Provider
          *
@@ -42,58 +34,114 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio-core')
             ->hasConfigFile()
-            ->hasMigrations($migrations)
-            ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->publishConfigFile()
-                    ->publishMigrations()
-                    ->copyAndRegisterServiceProviderInApp()
-                    ->askToRunMigrations();
-            });
+            ->hasCommand(ReleaseStockForAbandonedCarts::class)
+            ->hasMigrations([
+                'create_addresses_table',
+                'create_countries_table',
+                'create_country_tax_class_table',
+                'create_tax_classes_table',
+                'create_currencies_table',
+                'create_country_currency_table',
+                'create_orders_table',
+                'create_order_lines_table',
+                'create_shipping_statuses_table',
+                'create_brands_table',
+                'create_product_categories_table',
+                'create_discount_applications_table',
+                'create_discounts_table',
+                'create_products_table',
+                'create_product_types_table',
+                'create_product_category_product_table',
+                'create_product_variants_table',
+                'create_product_custom_fields_table',
+                'create_product_variant_options_table',
+                'create_product_configuration_table',
+                'create_inventories_table',
+                'create_carts_table',
+                'create_cart_lines_table',
+            ]);
+        // ->hasRoute('api');
     }
 
-    // public function registeringPackage()
-    // {
-    //     $this->app->bind('venditio-core', function (Application $app) {
-    //         return $app->make(VenditioCore::class);
-    //     });
-    // }
+    public function registeringPackage()
+    {
+        $this->app->bind('venditio-core', fn (Application $app) => (
+            $app->make(VenditioCore::class)
+        ));
+    }
 
     public function packageBooted(): void
     {
+        $this->registerPublishableAssets();
         $this->registerApiRoutes();
-        $this->bindModels();
+        $this->registerScheduledCommands();
         $this->bindValidationClasses();
-        $this->bindDtos();
+        // $this->bindDtos();
+        $this->registerFactoriesGuessing();
+        $this->registerMorphMap();
+        $this->bindDiscountClasses();
 
-        $this->app->singleton(AuthManagerContract::class, fn (Application $app) => (
-            AuthManager::make($app->make('auth')->user())
+        $this->app->singleton(AuthManagerContract::class, fn () => (
+            AuthManager::make(fn () => auth()->guard()->user())
         ));
 
         $this->app->singleton(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
         $this->app->singleton(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
-    }
-
-    private function bindModels(): void
-    {
-        foreach (config('venditio-core.models') as $contract => $implementation) {
-            $this->app->singleton($contract, $implementation);
-        }
+        $this->app->singleton(
+            ProductSkuGeneratorInterface::class,
+            config('venditio-core.product.sku_generator', ProductSkuGenerator::class)
+        );
     }
 
     private function bindValidationClasses(): void
     {
-        foreach (config('venditio-core.validations') as $contract => $implementation) {
+        $validations = [
+            AddressValidationRules::class => AddressValidation::class,
+            BrandValidationRules::class => BrandValidation::class,
+            CartValidationRules::class => CartValidation::class,
+            CartLineValidationRules::class => CartLineValidation::class,
+            OrderValidationRules::class => OrderValidation::class,
+            ProductValidationRules::class => ProductValidation::class,
+            ProductCategoryValidationRules::class => ProductCategoryValidation::class,
+            ProductTypeValidationRules::class => ProductTypeValidation::class,
+            ProductVariantValidationRules::class => ProductVariantValidation::class,
+            ProductVariantOptionValidationRules::class => ProductVariantOptionValidation::class,
+        ];
+
+        foreach ($validations as $contract => $implementation) {
             $this->app->singleton($contract, $implementation);
         }
     }
 
-    private function bindDtos(): void
+    private function bindDiscountClasses(): void
     {
-        $this->app->singleton(OrderDtoContract::class, fn (Application $app) => OrderDto::bindIntoContainer());
-        $this->app->singleton(CartDtoContract::class, fn (Application $app) => CartDto::bindIntoContainer());
-        $this->app->singleton(CartLineDtoContract::class, fn (Application $app) => CartLineDto::bindIntoContainer());
+        $this->app->singleton(
+            DiscountCalculatorInterface::class,
+            config('venditio-core.discounts.calculator', DiscountCalculator::class)
+        );
+
+        $this->app->singleton(
+            DiscountablesResolverInterface::class,
+            config('venditio-core.discounts.discountables_resolver', DiscountablesResolver::class)
+        );
+
+        $this->app->singleton(
+            DiscountUsageRecorderInterface::class,
+            config('venditio-core.discounts.usage_recorder', DiscountUsageRecorder::class)
+        );
+
+        $this->app->singleton(
+            CartTotalDiscountCalculatorInterface::class,
+            config('venditio-core.discounts.cart_total.calculator', CartTotalDiscountCalculator::class)
+        );
     }
+
+    // private function bindDtos(): void
+    // {
+    //     $this->app->singleton(OrderDtoContract::class, fn (Application $app) => OrderDto::bindIntoContainer());
+    //     $this->app->singleton(CartDtoContract::class, fn (Application $app) => CartDto::bindIntoContainer());
+    //     $this->app->singleton(CartLineDtoContract::class, fn (Application $app) => CartLineDto::bindIntoContainer());
+    // }
 
     private function registerApiRoutes(): void
     {
@@ -105,36 +153,76 @@ class VenditioCoreServiceProvider extends PackageServiceProvider
             JsonResource::withoutWrapping();
         }
 
-        $this->registerPolicies();
+        if (config('venditio-core.policies.register')) {
+            VenditioCoreFacade::registerPolicies();
+        }
 
         $prefix = config('venditio-core.routes.api.v1.prefix');
 
         // VenditioCore::configureRateLimiting($prefix);
         // config('venditio-core.routes.api.v1.rate_limit.configure')();
 
-        VenditioCoreClass::configureRateLimiting($prefix);
+        VenditioCoreFacade::configureRateLimiting($prefix);
 
         Route::middleware(config('venditio-core.routes.api.v1.middleware'))
             ->prefix($prefix)
-            ->name(rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
+            ->name(mb_rtrim(config('venditio-core.routes.api.v1.name'), '.') . '.')
             ->group(fn () => (
                 $this->loadRoutesFrom($this->package->basePath('/../routes/v1/api.php'))
             ));
     }
 
-    private function registerPolicies(): void
+    private function registerFactoriesGuessing(): void
     {
-        foreach (config('venditio-core.models') as $model => $class) {
-            $model = str($model)->studly()->toString();
+        Factory::guessFactoryNamesUsing(
+            fn (string $modelName) => str($modelName)
+                ->replace('Models', 'Database\\Factories')
+                ->append('Factory')
+                ->toString()
+        );
+    }
 
-            if (!class_exists("PictaStudio\VenditioCore\\Policies\\{$model}Policy")) {
-                continue;
+    private function registerMorphMap(): void
+    {
+        $morphMap = collect(config('venditio-core.models', []))
+            ->filter(fn (mixed $model) => is_string($model) && class_exists($model))
+            ->toArray();
+
+        if (!isset($morphMap['user'])) {
+            $morphMap['user'] = User::class;
+        }
+
+        Relation::morphMap($morphMap);
+    }
+
+    private function registerPublishableAssets(): void
+    {
+        $this->publishes([
+            $this->package->basePath('/../bruno/venditio-core') => base_path('bruno/venditio-core'),
+        ], 'venditio-core-bruno');
+    }
+
+    private function registerScheduledCommands(): void
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            if (!config('venditio-core.commands.release_stock_for_abandoned_carts.enabled', true)) {
+                return;
             }
 
-            Gate::policy(
-                "PictaStudio\VenditioCore\Models\\{$model}",
-                "PictaStudio\VenditioCore\Policies\\{$model}Policy"
+            $scheduleEveryMinutes = max(
+                1,
+                (int) config('venditio-core.commands.release_stock_for_abandoned_carts.schedule_every_minutes', 60)
             );
-        }
+
+            $schedule
+                ->command(ReleaseStockForAbandonedCarts::class)
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->when(static function () use ($scheduleEveryMinutes): bool {
+                    $minutesSinceMidnight = now()->startOfDay()->diffInMinutes(now());
+
+                    return $minutesSinceMidnight % $scheduleEveryMinutes === 0;
+                });
+        });
     }
 }

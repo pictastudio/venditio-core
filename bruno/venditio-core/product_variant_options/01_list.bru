@@ -1,0 +1,22 @@
+meta {
+  name: List product_variant_options
+  type: http
+  seq: 21
+}
+
+get {
+  url: {{baseUrl}}/product_variant_options
+  body: none
+  auth: none
+}
+
+params:query {
+  product_variant_id: 1
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -2,19 +2,18 @@
 
 namespace PictaStudio\VenditioCore\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\OrderLine;
-use PictaStudio\VenditioCore\Models\Contracts\ShippingStatus;
-use PictaStudio\VenditioCore\Models\Contracts\User;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Support\Fluent;
+use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class Order extends Model
 {
+    use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use LogsActivity;
@@ -27,40 +26,46 @@ class Order extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'tracking_date' => 'datetime',
-        'sub_total_taxable' => 'decimal:2',
-        'sub_total_tax' => 'decimal:2',
-        'sub_total' => 'decimal:2',
-        'shipping_fee' => 'decimal:2',
-        'payment_fee' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
-        'total_final' => 'decimal:2',
-        'addresses' => 'array',
-        'approved_at' => 'datetime',
-    ];
-
-    public function __construct(array $attributes = [])
+    protected function casts(): array
     {
-        parent::__construct($attributes);
-
-        $this->mergeCasts([
-            'status' => config('venditio-core.orders.status_enum'),
-        ]);
+        return [
+            'status' => config('venditio-core.order.status_enum'),
+            'last_tracked_at' => 'datetime',
+            'sub_total_taxable' => 'decimal:2',
+            'sub_total_tax' => 'decimal:2',
+            'sub_total' => 'decimal:2',
+            'shipping_fee' => 'decimal:2',
+            'payment_fee' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
+            'total_final' => 'decimal:2',
+            'addresses' => 'json',
+            'approved_at' => 'datetime',
+        ];
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(app(User::class));
+        return $this->belongsTo(resolve_model('user'));
     }
 
     public function shippingStatus(): BelongsTo
     {
-        return $this->belongsTo(app(ShippingStatus::class));
+        return $this->belongsTo(resolve_model('shipping_status'));
     }
 
     public function lines(): HasMany
     {
-        return $this->hasMany(app(OrderLine::class));
+        return $this->hasMany(resolve_model('order_line'));
+    }
+
+    protected function addresses(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value) => new Fluent(match (true) {
+                is_array($value) => $value,
+                is_string($value) => json_decode($value, true) ?? [],
+                default => [],
+            }),
+        );
     }
 }

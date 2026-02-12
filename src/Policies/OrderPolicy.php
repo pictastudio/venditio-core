@@ -21,7 +21,8 @@ class OrderPolicy
 
     public function view(User $user, Order $order): bool
     {
-        return $this->authorize('view', $user, $order);
+        return $this->belongsToUser($user, $order) &&
+            $this->authorize('view', $user, $order);
     }
 
     public function create(User $user): bool
@@ -31,21 +32,30 @@ class OrderPolicy
 
     public function update(User $user, Order $order): bool
     {
-        return $this->authorize('update', $user, $order);
+        return $this->belongsToUser($user, $order) &&
+            $this->authorize('update', $user, $order);
     }
 
     public function delete(User $user, Order $order): bool
     {
-        return $this->authorize('delete', $user, $order);
+        return $this->belongsToUser($user, $order) &&
+            $this->authorize('delete', $user, $order);
     }
 
     public function restore(User $user, Order $order): bool
     {
-        return $this->authorize('restore', $user, $order);
+        return $this->belongsToUser($user, $order) &&
+            $this->authorize('restore', $user, $order);
     }
 
     public function forceDelete(User $user, Order $order): bool
     {
-        return $this->authorize('forceDelete', $user, $order);
+        return $this->belongsToUser($user, $order) &&
+            $this->authorize('forceDelete', $user, $order);
+    }
+
+    public function belongsToUser(User $user, Order $order): bool
+    {
+        return $order->user_id === $user->getKey();
     }
 }

@@ -4,16 +4,23 @@ namespace PictaStudio\VenditioCore\Http\Resources\Traits;
 
 trait HasAttributesToExclude
 {
-    public function getDefaultAttributesToExclude(): array
+    protected function getAttributesToExclude(): array
     {
+        $attributes = $this->exclude();
+
         if (!config('venditio-core.routes.api.include_timestamps')) {
-            return [
+            $attributes = array_merge($attributes, [
                 // 'created_at',
                 'updated_at',
                 'deleted_at',
-            ];
+            ]);
         }
 
+        return $attributes;
+    }
+
+    protected function exclude(): array
+    {
         return [];
     }
 }

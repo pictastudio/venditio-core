@@ -1,24 +1,34 @@
 <?php
 
-use PictaStudio\VenditioCore\Enums;
+use PictaStudio\VenditioCore\Dto;
 use PictaStudio\VenditioCore\Facades\VenditioCore;
-use PictaStudio\VenditioCore\Formatters\Decimal\DefaultDecimalFormatter;
-use PictaStudio\VenditioCore\Formatters\Pricing\DefaultPriceFormatter;
 use PictaStudio\VenditioCore\Managers;
+use PictaStudio\VenditioCore\Enums;
+use PictaStudio\VenditioCore\Discounts;
+use PictaStudio\VenditioCore\Generators;
 use PictaStudio\VenditioCore\Models;
 use PictaStudio\VenditioCore\Pipelines\Cart;
 use PictaStudio\VenditioCore\Pipelines\CartLine;
 use PictaStudio\VenditioCore\Pipelines\Order;
-use PictaStudio\VenditioCore\Validations;
 
 return [
+
+    'activity_log' => [
+        'enabled' => env('VENDITIO_CORE_ACTIVITY_LOG_ENABLED', false),
+        'log_name' => env('VENDITIO_CORE_ACTIVITY_LOG_NAME', 'venditio-core'),
+        'log_except' => env('VENDITIO_CORE_ACTIVITY_LOG_EXCEPT', ['updated_at']),
+    ],
+
+    'policies' => [
+        'register' => env('VENDITIO_CORE_POLICIES_REGISTER', true),
+    ],
 
     /*
     |--------------------------------------------------------------------------
     | Auth
     |--------------------------------------------------------------------------
     |
-    | Specify the auth manager
+    | Specify the auth manager, roles, resources, actions, and extra permissions
     |
     */
     'auth' => [
@@ -37,6 +47,9 @@ return [
             'product',
             'product-category',
             'brand',
+            'product-type',
+            'product-variant',
+            'product-variant-option',
         ],
         'actions' => [
             'view-any',
@@ -61,34 +74,52 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Commands
+    |--------------------------------------------------------------------------
+    |
+    | Configure package console commands behavior.
+    |
+    */
+    'commands' => [
+        'release_stock_for_abandoned_carts' => [
+            'enabled' => env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_ENABLED', true),
+            'inactive_for_minutes' => (int) env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_INACTIVE_FOR_MINUTES', 1_440),
+            'schedule_every_minutes' => (int) env('VENDITIO_CORE_RELEASE_STOCK_FOR_ABANDONED_CARTS_SCHEDULE_EVERY_MINUTES', 60),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Models
     |--------------------------------------------------------------------------
     |
     | Specify the models to use
     |
+    | Host applications can override any model class to extend behavior.
+    |
     */
     'models' => [
-        Models\Contracts\Address::class => Models\Address::class,
-        Models\Contracts\Brand::class => Models\Brand::class,
-        Models\Contracts\Cart::class => Models\Cart::class,
-        Models\Contracts\CartLine::class => Models\CartLine::class,
-        Models\Contracts\Country::class => Models\Country::class,
-        Models\Contracts\CountryTaxClass::class => Models\CountryTaxClass::class,
-        Models\Contracts\Currency::class => Models\Currency::class,
-        Models\Contracts\Discount::class => Models\Discount::class,
-        Models\Contracts\Inventory::class => Models\Inventory::class,
-        Models\Contracts\Order::class => Models\Order::class,
-        Models\Contracts\OrderLine::class => Models\OrderLine::class,
-        Models\Contracts\Product::class => Models\Product::class,
-        Models\Contracts\ProductCategory::class => Models\ProductCategory::class,
-        Models\Contracts\ProductCustomField::class => Models\ProductCustomField::class,
-        Models\Contracts\ProductItem::class => Models\ProductItem::class,
-        Models\Contracts\ProductType::class => Models\ProductType::class,
-        Models\Contracts\ProductVariant::class => Models\ProductVariant::class,
-        Models\Contracts\ProductVariantOption::class => Models\ProductVariantOption::class,
-        Models\Contracts\ShippingStatus::class => Models\ShippingStatus::class,
-        Models\Contracts\TaxClass::class => Models\TaxClass::class,
-        Models\Contracts\User::class => Models\User::class,
+        'address' => Models\Address::class,
+        'brand' => Models\Brand::class,
+        'cart' => Models\Cart::class,
+        'cart_line' => Models\CartLine::class,
+        'country' => Models\Country::class,
+        'country_tax_class' => Models\CountryTaxClass::class,
+        'currency' => Models\Currency::class,
+        'discount' => Models\Discount::class,
+        'discount_application' => Models\DiscountApplication::class,
+        'inventory' => Models\Inventory::class,
+        'order' => Models\Order::class,
+        'order_line' => Models\OrderLine::class,
+        'product' => Models\Product::class,
+        'product_category' => Models\ProductCategory::class,
+        'shipping_status' => Models\ShippingStatus::class,
+        'tax_class' => Models\TaxClass::class,
+        'user' => Models\User::class,
+        'product_custom_field' => Models\ProductCustomField::class,
+        'product_type' => Models\ProductType::class,
+        'product_variant' => Models\ProductVariant::class,
+        'product_variant_option' => Models\ProductVariantOption::class,
     ],
 
     /*
@@ -99,62 +130,75 @@ return [
     | Specify the validation classes with the rules to use when storing and updating models
     |
     */
-    'validations' => [
-        Validations\Contracts\AddressValidationRules::class => Validations\Address::class,
-        // Validations\Contracts\BrandValidationRules::class => Validations\Brand::class,
-        Validations\Contracts\CartValidationRules::class => Validations\Cart::class,
-        Validations\Contracts\CartLineValidationRules::class => Validations\CartLine::class,
-        // Validations\Contracts\CountryValidationRules::class => Validations\Country::class,
-        // Validations\Contracts\CountryTaxClassValidationRules::class => Validations\CountryTaxClass::class,
-        // Validations\Contracts\CurrencyValidationRules::class => Validations\Currency::class,
-        // Validations\Contracts\DiscountValidationRules::class => Validations\Discount::class,
-        // Validations\Contracts\InventoryValidationRules::class => Validations\Inventory::class,
-        Validations\Contracts\OrderValidationRules::class => Validations\Order::class,
-        // Validations\Contracts\OrderLineValidationRules::class => Validations\OrderLine::class,
-        // Validations\Contracts\ProductValidationRules::class => Validations\Product::class,
-        // Validations\Contracts\ProductCategoryValidationRules::class => Validations\ProductCategory::class,
-        // Validations\Contracts\ProductCustomFieldValidationRules::class => Validations\ProductCustomField::class,
-        // Validations\Contracts\ProductItemValidationRules::class => Validations\ProductItem::class,
-        // Validations\Contracts\ProductTypeValidationRules::class => Validations\ProductType::class,
-        // Validations\Contracts\ProductVariantValidationRules::class => Validations\ProductVariant::class,
-        // Validations\Contracts\ProductVariantOptionValidationRules::class => Validations\ProductVariantOption::class,
-        // Validations\Contracts\ShippingStatusValidationRules::class => Validations\ShippingStatus::class,
-        // Validations\Contracts\TaxClassValidationRules::class => Validations\TaxClass::class,
-        // Validations\Contracts\UserValidationRules::class => Validations\User::class,
-    ],
+    // 'validations' => [
+    //     Validations\Contracts\AddressValidationRules::class => Validations\Address::class,
+    //     // Validations\Contracts\BrandValidationRules::class => Validations\Brand::class,
+    //     Validations\Contracts\CartValidationRules::class => Validations\Cart::class,
+    //     Validations\Contracts\CartLineValidationRules::class => Validations\CartLine::class,
+    //     // Validations\Contracts\CountryValidationRules::class => Validations\Country::class,
+    //     // Validations\Contracts\CountryTaxClassValidationRules::class => Validations\CountryTaxClass::class,
+    //     // Validations\Contracts\CurrencyValidationRules::class => Validations\Currency::class,
+    //     // Validations\Contracts\DiscountValidationRules::class => Validations\Discount::class,
+    //     // Validations\Contracts\InventoryValidationRules::class => Validations\Inventory::class,
+    //     Validations\Contracts\OrderValidationRules::class => Validations\Order::class,
+    //     // Validations\Contracts\OrderLineValidationRules::class => Validations\OrderLine::class,
+    //     // Validations\Contracts\ProductValidationRules::class => Validations\Product::class,
+    //     // Validations\Contracts\ProductCategoryValidationRules::class => Validations\ProductCategory::class,
+    //     // Validations\Contracts\ProductCustomFieldValidationRules::class => Validations\ProductCustomField::class,
+    //     // Validations\Contracts\ProductItemValidationRules::class => Validations\ProductItem::class,
+    //     // Validations\Contracts\ProductTypeValidationRules::class => Validations\ProductType::class,
+    //     // Validations\Contracts\ProductVariantValidationRules::class => Validations\ProductVariant::class,
+    //     // Validations\Contracts\ProductVariantOptionValidationRules::class => Validations\ProductVariantOption::class,
+    //     // Validations\Contracts\ShippingStatusValidationRules::class => Validations\ShippingStatus::class,
+    //     // Validations\Contracts\TaxClassValidationRules::class => Validations\TaxClass::class,
+    //     // Validations\Contracts\UserValidationRules::class => Validations\User::class,
+    // ],
 
     /*
     |--------------------------------------------------------------------------
-    | Addresses
+    | Address
     |--------------------------------------------------------------------------
     |
     */
     'addresses' => [
         'type_enum' => Enums\AddressType::class,
+
+        'dto' => Dto\AddressDto::class,
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Carts
+    | Cart
     |--------------------------------------------------------------------------
     |
     | Pipeline tasks are executed in the order they are defined
     |
     */
-    'carts' => [
+    'cart' => [
+        'status_enum' => Enums\CartStatus::class,
+
+        'dto' => Dto\CartDto::class,
+
+        // pipelines
         'pipelines' => [
-            'creation' => [
+            'create' => [
                 'pipes' => [
-                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\GenerateIdentifier::class,
                     Cart\Pipes\CalculateLines::class,
+                    Cart\Pipes\ReserveStock::class,
+                    Cart\Pipes\CalculateShippingFees::class,
+                    Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
             ],
             'update' => [
                 'pipes' => [
-                    Cart\Pipes\FillUserDetails::class,
+                    Cart\Pipes\FillDataFromPayload::class,
                     Cart\Pipes\UpdateLines::class,
+                    Cart\Pipes\ReserveStock::class,
+                    Cart\Pipes\CalculateShippingFees::class,
+                    Cart\Pipes\ApplyDiscounts::class,
                     Cart\Pipes\CalculateTotals::class,
                 ],
             ],
@@ -163,15 +207,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Car Lines
+    | Cart Line
     |--------------------------------------------------------------------------
     |
-    | Pipeline tasks are executed in the order they are defined
-    |
     */
-    'cart_lines' => [
+    'cart_line' => [
+        'dto' => Dto\CartLineDto::class,
+
+        // pipeline tasks are executed in the order they are defined
         'pipelines' => [
-            'creation' => [
+            'create' => [
                 'pipes' => [
                     CartLine\Pipes\FillProductInformations::class,
                     CartLine\Pipes\ApplyDiscount::class,
@@ -192,20 +237,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Orders
+    | Order
     |--------------------------------------------------------------------------
     |
-    | Pipeline tasks are executed in the order they are defined
-    |
     */
-    'orders' => [
+    'order' => [
         'status_enum' => Enums\OrderStatus::class,
+
+        'dto' => Dto\OrderDto::class,
+
+        // pipeline tasks are executed in the order they are defined
         'pipelines' => [
-            'creation' => [
+            'create' => [
                 'pipes' => [
                     Order\Pipes\FillOrderFromCart::class,
                     Order\Pipes\GenerateIdentifier::class,
+                    Order\Pipes\ApplyDiscounts::class,
                     Order\Pipes\CalculateLines::class,
+                    Order\Pipes\RegisterDiscountUsages::class,
+                    Order\Pipes\CommitStock::class,
                     Order\Pipes\ApproveOrder::class,
                 ],
             ],
@@ -221,37 +271,72 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Products
+    | Product
     |--------------------------------------------------------------------------
     |
     */
-    'products' => [
+    'product' => [
         'status_enum' => Enums\ProductStatus::class,
+        'measuring_unit_enum' => Enums\ProductMeasuringUnit::class,
+        'sku_generator' => Generators\ProductSkuGenerator::class,
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Pricing
+    | Discounts
     |--------------------------------------------------------------------------
     |
-    | Specify the pricing formatter
+    | Bindings and rule classes used to evaluate discount eligibility.
+    | Host applications can override the calculator/resolver/usage recorder
+    | implementations or completely replace the rules list.
     |
     */
-    // 'pricing' => [
-    //     'formatter' => DefaultPriceFormatter::class,
-    // ],
+    'discounts' => [
+        'calculator' => Discounts\DiscountCalculator::class,
+        'discountables_resolver' => Discounts\DiscountablesResolver::class,
+        'usage_recorder' => Discounts\DiscountUsageRecorder::class,
+        'rules' => [
+            Discounts\Rules\LineScopeRule::class,
+            Discounts\Rules\ActiveWindowRule::class,
+            Discounts\Rules\MaxUsesRule::class,
+            Discounts\Rules\MaxUsesPerUserRule::class,
+            Discounts\Rules\MinimumOrderTotalRule::class,
+            Discounts\Rules\OncePerCartRule::class,
+        ],
+        'cart_total' => [
+            'calculator' => Discounts\CartTotalDiscountCalculator::class,
+            // `subtotal` applies coupon to line totals (tax included),
+            // `checkout_total` also includes shipping + payment fees.
+            'base' => 'subtotal',
+            'rules' => [
+                Discounts\Rules\ActiveWindowRule::class,
+                Discounts\Rules\MaxUsesRule::class,
+                Discounts\Rules\MaxUsesPerUserRule::class,
+                Discounts\Rules\OncePerCartRule::class,
+            ],
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
-    | Decimal
+    | Product Variants
     |--------------------------------------------------------------------------
     |
-    | Specify the decimal formatter
-    |
     */
-    // 'decimal' => [
-    //     'formatter' => DefaultDecimalFormatter::class,
-    // ],
+    'product_variants' => [
+        'name_separator' => ' / ',
+        'name_suffix_separator' => ' - ',
+        'copy_categories' => true,
+        'copy_attributes_exclude' => [
+            'id',
+            'slug',
+            'sku',
+            'ean',
+            'created_at',
+            'updated_at',
+            'deleted_at',
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -267,7 +352,7 @@ return [
             'include_start_date' => true, // include the start date in the date range
             'include_end_date' => true, // include the end date in the date range
         ],
-        'routes_to_exclude' => [
+        'routes_to_exclude' => [ // routes to exclude from applying the scopes
             'filament.*',
             'livewire.update',
             // '*', // exclude all routes
@@ -285,9 +370,12 @@ return [
     'routes' => [
         'api' => [
             'v1' => [
-                'prefix' => 'venditio/api/v1',
-                'name' => 'venditio.api.v1',
-                'middleware' => ['api'],
+                'prefix' => 'api/venditio/v1',
+                'name' => 'api.venditio.v1',
+                'middleware' => [
+                    'api',
+                    // 'auth:sanctum',
+                ],
                 // 'rate_limit' => [
                 //     'configure' => fn () => VenditioCore::configureRateLimiting('venditio/api/v1'),
                 // ],

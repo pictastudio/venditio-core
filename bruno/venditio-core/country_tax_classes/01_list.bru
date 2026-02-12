@@ -1,0 +1,21 @@
+meta {
+  name: List country_tax_classes
+  type: http
+  seq: 56
+}
+
+get {
+  url: {{baseUrl}}/country_tax_classes
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

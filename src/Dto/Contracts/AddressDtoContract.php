@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
-use PictaStudio\VenditioCore\Models\Contracts\Address;
+use PictaStudio\VenditioCore\Models\Address;
 
 interface AddressDtoContract extends Dto
 {
@@ -14,7 +14,7 @@ interface AddressDtoContract extends Dto
 
     public function getType(): ?string;
 
-    public function isDefault(): bool;
+    public function getIsDefault(): bool;
 
     public function getFirstName(): ?string;
 
@@ -47,4 +47,6 @@ interface AddressDtoContract extends Dto
     public function getBirthPlace(): ?string;
 
     public function getNotes(): ?string;
+
+    public function toModel(): Model;
 }

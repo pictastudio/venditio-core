@@ -1,0 +1,22 @@
+meta {
+  name: Store product_custom_fields
+  type: http
+  seq: 88
+}
+
+post {
+  url: {{baseUrl}}/product_custom_fields
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

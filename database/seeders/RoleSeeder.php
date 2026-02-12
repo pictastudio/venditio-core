@@ -3,16 +3,17 @@
 namespace PictaStudio\VenditioCore\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\VenditioCore\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\auth_manager;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissions = app(AuthManagerContract::class)->getPermissions();
+        $permissions = auth_manager()->getPermissions();
 
         foreach ($permissions as $key => $permission) {
             Permission::findOrCreate($permission);
@@ -25,18 +26,6 @@ class RoleSeeder extends Seeder
                 $role->givePermissionTo($permissions);
                 // User::firstWhere('email', config('venditio-core.auth.root_user.email'))?->assignRole($role);
             }
-        }
-
-        // $this->assignRoles();
-    }
-
-    private function assignRoles(): void
-    {
-        $rootUser = User::firstWhere('email', config('venditio-core.auth.root_user.email'));
-        $rootRole = Role::findByName('root');
-
-        if ($rootUser) {
-            $rootUser->assignRole($rootRole);
         }
     }
 }

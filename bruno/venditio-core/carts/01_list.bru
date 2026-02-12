@@ -1,0 +1,21 @@
+meta {
+  name: List carts
+  type: http
+  seq: 26
+}
+
+get {
+  url: {{baseUrl}}/carts
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

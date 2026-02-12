@@ -4,8 +4,8 @@ namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use PictaStudio\VenditioCore\Models\Contracts\Country;
-use PictaStudio\VenditioCore\Models\Contracts\TaxClass;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class CountryTaxClass extends Pivot
 {
@@ -15,17 +15,20 @@ class CountryTaxClass extends Pivot
         'updated_at',
     ];
 
-    protected $casts = [
-        'rate' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'rate' => 'decimal:2',
+        ];
+    }
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(app(Country::class));
+        return $this->belongsTo(resolve_model('country'));
     }
 
     public function taxClass(): BelongsTo
     {
-        return $this->belongsTo(app(TaxClass::class));
+        return $this->belongsTo(resolve_model('tax_class'));
     }
 }

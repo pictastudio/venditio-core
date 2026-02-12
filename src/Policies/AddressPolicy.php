@@ -21,7 +21,8 @@ class AddressPolicy
 
     public function view(User $user, Address $address): bool
     {
-        return $this->authorize('view', $user, $address);
+        return $this->belongsToUser($user, $address) &&
+            $this->authorize('view', $user, $address);
     }
 
     public function create(User $user): bool
@@ -31,21 +32,31 @@ class AddressPolicy
 
     public function update(User $user, Address $address): bool
     {
-        return $this->authorize('update', $user, $address);
+        return $this->belongsToUser($user, $address) &&
+            $this->authorize('update', $user, $address);
     }
 
     public function delete(User $user, Address $address): bool
     {
-        return $this->authorize('delete', $user, $address);
+        return $this->belongsToUser($user, $address) &&
+            $this->authorize('delete', $user, $address);
     }
 
     public function restore(User $user, Address $address): bool
     {
-        return $this->authorize('restore', $user, $address);
+        return $this->belongsToUser($user, $address) &&
+            $this->authorize('restore', $user, $address);
     }
 
     public function forceDelete(User $user, Address $address): bool
     {
-        return $this->authorize('forceDelete', $user, $address);
+        return $this->belongsToUser($user, $address) &&
+            $this->authorize('forceDelete', $user, $address);
+    }
+
+    public function belongsToUser(User $user, Address $address): bool
+    {
+        return $user->getMorphClass() === $address->addressable_type &&
+            $user->getKey() === $address->addressable_id;
     }
 }

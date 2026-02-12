@@ -13,6 +13,8 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'PictaStudio\\VenditioCore\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );

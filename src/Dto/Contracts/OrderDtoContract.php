@@ -13,9 +13,9 @@ interface OrderDtoContract extends Dto
 
     public static function fromArray(array $data): static;
 
-    public function getOrder(): Order|Model;
+    public function getModel(): Model;
 
-    public function getCart(): Cart|Model;
+    public function getCart(): Model;
 
     public function getUserId(): ?int;
 
@@ -25,7 +25,7 @@ interface OrderDtoContract extends Dto
 
     public function getUserEmail(): ?string;
 
-    public function getDiscountRef(): ?string;
+    public function getDiscountCode(): ?string;
 
     public function getBillingAddress(): ?array;
 
@@ -35,5 +35,7 @@ interface OrderDtoContract extends Dto
 
     public function getLines(): Collection;
 
-    public static function getInstance(): Model;
+    public static function getFreshInstance(): Model;
+
+    public function toModel(): Model;
 }

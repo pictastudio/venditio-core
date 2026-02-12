@@ -5,68 +5,55 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
-use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
 use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
 use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
 use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Models\Contracts\Cart as CartContract;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
 use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 
 class CartController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
         $filters = request()->all();
-        $hasFilters = count($filters) > 0;
 
-        if ($hasFilters) {
-            $validationResponse = $this->validateData($filters, [
-                'all' => [
-                    'boolean',
-                ],
-                'ids' => [
-                    'array',
-                ],
-                'ids.*' => [
-                    Rule::exists('product_items', 'id'),
-                ],
-            ]);
+        $this->validateData($filters, [
+            'user_id' => [
+                'sometimes',
+                'integer',
+                Rule::exists((new (config('venditio-core.models.user')))->getTable(), 'id'),
+            ],
+        ]);
 
-            if ($validationResponse instanceof JsonResponse) {
-                return $validationResponse;
-            }
-
-            $filters = $validationResponse;
-        }
-
-        $carts = app(CartContract::class)::query()
-            ->when(
-                $hasFilters && isset($filters['ids']),
-                fn (Builder $query) => $query->whereIn('id', $filters['ids'])
+        return CartResource::collection(
+            $this->applyBaseFilters(
+                query('cart')
+                    ->with('lines')
+                    ->when(
+                        isset($filters['user_id']),
+                        fn (Builder $builder) => $builder->where('user_id', $filters['user_id']),
+                    ),
+                $filters,
+                'cart'
             )
-            ->when(
-                $hasFilters && isset($filters['all']),
-                fn (Builder $query) => $query->get(),
-                fn (Builder $query) => $query->paginate(
-                    request('per_page', config('venditio-core.routes.api.v1.pagination.per_page'))
-                ),
-            );
-
-        return CartResource::collection($carts);
+        );
     }
 
     public function store(StoreCartRequest $request, CartCreationPipeline $pipeline): JsonResource
     {
-        $cart = $pipeline->run(
-            app(CartDtoContract::class)::fromArray($request->validated())
+        return CartResource::make(
+            $pipeline->run(
+                resolve_dto('cart')::fromArray($request->validated())
+            )
         );
-
-        return CartResource::make($cart);
     }
 
     public function show(Cart $cart): JsonResource
@@ -76,47 +63,39 @@ class CartController extends Controller
 
     public function update(UpdateCartRequest $request, Cart $cart, CartUpdatePipeline $pipeline): JsonResource
     {
-        $cart = $pipeline->run(
-            app(CartDtoContract::class)::fromArray(array_merge(
-                $request->validated(),
-                ['cart' => $cart]
-            ))
+        return CartResource::make(
+            $pipeline->run(
+                resolve_dto('cart')::fromArray(
+                    array_merge(
+                        $request->validated(),
+                        ['cart' => $cart]
+                    )
+                )
+            )
         );
-
-        return CartResource::make($cart);
     }
 
-    public function destroy(Cart $cart)
+    public function destroy(Cart $cart): JsonResponse
     {
-        $cart->delete();
+        $cart->purge();
 
-        return response()->json([
-            'message' => 'Cart deleted successfully',
-        ]);
+        return $this->successJsonResponse(
+            message: 'Cart deleted successfully',
+        );
     }
 
-    public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules)
+    public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getStoreValidationRules());
+        $lines = $this->mergeExistingAndIncomingLines($cart, $validationResponse['lines']);
+        $updatedCart = $this->runCartUpdatePipeline($cart, ['lines' => $lines])->load('lines');
 
-        if ($validationResponse instanceof JsonResponse) {
-            return $validationResponse;
-        }
-
-        $cart->lines()->createMany($validationResponse['lines']);
-
-        return response()->json([
-            'message' => 'Lines added successfully',
-        ]);
+        return response()->json(CartResource::make($updatedCart));
     }
 
-    public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules)
+    public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getUpdateValidationRules());
-
-        if ($validationResponse instanceof JsonResponse) {
-            return $validationResponse;
-        }
 
         // pipeline per update cart lines
 
@@ -126,8 +105,119 @@ class CartController extends Controller
             ]);
         }
 
-        return response()->json([
-            'message' => 'Lines updated successfully',
+        $updatedCart = $this->runCartUpdatePipeline(
+            $cart,
+            [
+                'lines' => $cart->lines()
+                    ->get(['product_id', 'qty'])
+                    ->map(fn ($line) => [
+                        'product_id' => $line->product_id,
+                        'qty' => $line->qty,
+                    ])
+                    ->toArray(),
+            ]
+        )->load('lines');
+
+        return response()->json(CartResource::make($updatedCart));
+    }
+
+    public function removeLines(Cart $cart): JsonResponse
+    {
+        $validated = $this->validateData(request()->all(), [
+            'line_ids' => 'required|array|min:1',
+            'line_ids.*' => [
+                'integer',
+                Rule::exists((new (config('venditio-core.models.cart_line')))->getTable(), 'id'),
+            ],
         ]);
+
+        $lineIds = collect($validated['line_ids'])->map(fn ($id) => (int) $id)->all();
+        $cartLines = $cart->lines()->get(['id', 'product_id', 'qty']);
+        $lineIdsNotBelongingToCart = collect($lineIds)->diff($cartLines->pluck('id'));
+
+        if ($lineIdsNotBelongingToCart->isNotEmpty()) {
+            return $this->errorJsonResponse(
+                data: ['line_ids' => $lineIdsNotBelongingToCart->values()->all()],
+                message: 'Some lines do not belong to the provided cart.',
+                status: 422,
+            );
+        }
+
+        $remainingLines = $cartLines
+            ->reject(fn ($line) => in_array($line->id, $lineIds, true))
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines) => [
+                'product_id' => (int) $lines->first()->product_id,
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values()
+            ->all();
+
+        $updatedCart = $this->runCartUpdatePipeline($cart, ['lines' => $remainingLines])->load('lines');
+
+        return response()->json(CartResource::make($updatedCart));
+    }
+
+    public function addDiscount(Cart $cart): JsonResponse
+    {
+        $validated = $this->validateData(request()->all(), [
+            'discount_code' => 'required|string|max:255',
+        ]);
+
+        $updatedCart = $this->runCartUpdatePipeline(
+            $cart,
+            [
+                'discount_code' => $validated['discount_code'],
+            ]
+        )->load('lines');
+
+        return response()->json(CartResource::make($updatedCart));
+    }
+
+    private function mergeExistingAndIncomingLines(Cart $cart, array $incomingLines): array
+    {
+        $existingLines = $cart->lines()
+            ->get(['product_id', 'qty'])
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines, mixed $productId) => [
+                'product_id' => (int) $productId,
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values();
+
+        $incomingGrouped = collect($incomingLines)
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines, mixed $productId) => [
+                'product_id' => (int) $productId,
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values();
+
+        return $existingLines
+            ->concat($incomingGrouped)
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines) => [
+                'product_id' => (int) $lines->first()['product_id'],
+                'qty' => (int) $lines->sum('qty'),
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function runCartUpdatePipeline(Cart $cart, array $payload): Cart
+    {
+        /** @var CartUpdatePipeline $pipeline */
+        $pipeline = app(CartUpdatePipeline::class);
+
+        $payload = array_merge(
+            [
+                'cart' => $cart,
+            ],
+            $payload
+        );
+
+        return $pipeline->run(
+            resolve_dto('cart')::fromArray($payload)
+        );
     }
 }

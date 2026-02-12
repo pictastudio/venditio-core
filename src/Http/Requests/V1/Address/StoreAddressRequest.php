@@ -9,7 +9,7 @@ class StoreAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('address:create');
+        return $this->user()?->can('address:create') ?? true;
     }
 
     public function rules(AddressValidationRules $addressValidationRules): array

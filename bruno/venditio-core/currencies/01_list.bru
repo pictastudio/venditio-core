@@ -1,0 +1,21 @@
+meta {
+  name: List currencies
+  type: http
+  seq: 61
+}
+
+get {
+  url: {{baseUrl}}/currencies
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

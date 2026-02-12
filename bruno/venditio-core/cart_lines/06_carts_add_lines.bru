@@ -1,0 +1,31 @@
+meta {
+  name: Cart add lines
+  type: http
+  seq: 1003
+}
+
+post {
+  url: {{baseUrl}}/carts/:id/add_lines
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "lines": [
+      {
+        "product_id": 1,
+        "qty": 2
+      }
+    ]
+  }
+}

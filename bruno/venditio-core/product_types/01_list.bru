@@ -1,0 +1,21 @@
+meta {
+  name: List product_types
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/product_types
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

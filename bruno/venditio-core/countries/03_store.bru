@@ -1,0 +1,22 @@
+meta {
+  name: Store countries
+  type: http
+  seq: 53
+}
+
+post {
+  url: {{baseUrl}}/countries
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

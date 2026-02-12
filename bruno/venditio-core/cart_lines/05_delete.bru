@@ -1,0 +1,20 @@
+meta {
+  name: Delete cart_lines
+  type: http
+  seq: 95
+}
+
+delete {
+  url: {{baseUrl}}/cart_lines/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

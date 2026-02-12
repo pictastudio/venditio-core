@@ -1,0 +1,20 @@
+meta {
+  name: Show addresses
+  type: http
+  seq: 37
+}
+
+get {
+  url: {{baseUrl}}/addresses/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

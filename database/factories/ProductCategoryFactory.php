@@ -3,15 +3,18 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use PictaStudio\VenditioCore\Models\ProductCategory;
 
 class ProductCategoryFactory extends Factory
 {
+    protected $model = ProductCategory::class;
+
     public function definition(): array
     {
         return [
             'name' => fake()->word(),
             'active' => true,
-            'order' => fake()->unique()->numberBetween(0, 1000),
+            'sort_order' => fake()->unique()->numberBetween(0, 1000),
         ];
     }
 }

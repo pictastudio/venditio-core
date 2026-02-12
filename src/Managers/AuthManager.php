@@ -2,9 +2,10 @@
 
 namespace PictaStudio\VenditioCore\Managers;
 
+use Closure;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PictaStudio\VenditioCore\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\VenditioCore\Models\Contracts\User;
+use PictaStudio\VenditioCore\Models\User;
 
 class AuthManager implements AuthManagerContract
 {
@@ -14,12 +15,19 @@ class AuthManager implements AuthManagerContract
 
     const ROLE_USER = 'User';
 
-    public function __construct(public User|Authenticatable $user)
+    public function __construct(public User|Authenticatable|null $user = null)
     {
     }
 
-    public static function make(User|Authenticatable $user): static
+    public static function make(Closure|User|Authenticatable|null $user = null): static
     {
+        $user = match (true) {
+            $user instanceof Closure => $user(),
+            $user instanceof User => $user,
+            $user instanceof Authenticatable => $user,
+            default => null,
+        };
+
         return new static($user);
     }
 
@@ -30,14 +38,14 @@ class AuthManager implements AuthManagerContract
         return $this;
     }
 
-    public function getUser(): User|Authenticatable
+    public function getUser(): User|Authenticatable|null
     {
         return $this->user;
     }
 
     public function can(string $resource, string $action): bool
     {
-        return $this->user->can($this->generatePermissionName($resource, $action));
+        return $this->user?->can($this->generatePermissionName($resource, $action));
     }
 
     public static function generatePermissionName(string $resource, string $action): string

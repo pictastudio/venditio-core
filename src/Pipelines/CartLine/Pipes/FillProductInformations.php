@@ -3,40 +3,62 @@
 namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
 
 use Closure;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
+use function PictaStudio\VenditioCore\Helpers\Functions\query;
 
 class FillProductInformations
 {
+    /**
+     * In this task the input data is an array of line data
+     * - ['product_id', 'qty']
+     */
     public function __invoke(CartLineDtoContract $cartLineDto, Closure $next): Model
     {
-        $cartLine = $cartLineDto->getCartLine()->updateTimestamps();
+        $cartLine = $cartLineDto->getCartLine();
 
-        $productItem = app(ProductItem::class)
-            ->with([
-                'product',
-                'product.categories',
-                'inventory',
-            ])
-            ->firstWhere('id', $cartLineDto->getProductItemId());
+        $product = $this->fetchProduct($cartLineDto);
 
-        $data = [
-            'cart_id' => $cartLineDto->getCart()->getKey(),
-            'product_item_id' => $productItem->getKey(),
-            'product_name' => $productItem->name,
-            'product_sku' => $productItem->sku,
-            'unit_price' => $productItem->inventory->price,
+        $cartLine->product()->associate($product);
+
+        $cartLine->fill([
+            'unit_price' => $product->inventory->price,
+            'purchase_price' => $product->inventory->purchase_price,
+            'product_name' => $product->name,
+            'product_sku' => $product->sku,
             'qty' => $cartLineDto->getQty(),
-            'product_item' => $productItem->toArray(),
-        ];
-
-        if ($cartLine->getKey()) {
-            $data['id'] = $cartLine->getKey();
-        }
-
-        $cartLine->fill($data);
+            'product_data' => $product->toArray(),
+        ]);
 
         return $next($cartLine);
+    }
+
+    private function fetchProduct(CartLineDtoContract $cartLineDto): Model
+    {
+        $productId = $cartLineDto->getPurchasableModelId();
+
+        return query('product')
+            ->with([
+                'inventory',
+                'categories',
+                'brand',
+                'productType',
+                'variantOptions',
+                'parent',
+            ])
+            ->firstWhere('id', $productId);
+    }
+
+    private function checkPayloadValidity(array $line): void
+    {
+        if (!Arr::has($line, 'product_id')) {
+            throw new Exception('The key "product_id" is missing from the line data');
+        }
+
+        if (!Arr::has($line, 'qty')) {
+            throw new Exception('The key "qty" is missing from the line data');
+        }
     }
 }

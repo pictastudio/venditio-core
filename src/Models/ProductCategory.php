@@ -3,20 +3,18 @@
 namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\Product;
-use PictaStudio\VenditioCore\Models\Contracts\ProductCategory as ProductCategoryContract;
-use PictaStudio\VenditioCore\Models\Scopes\Active;
-use PictaStudio\VenditioCore\Models\Scopes\Ordered;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
+use Nevadskiy\Tree\AsTree;
+use PictaStudio\VenditioCore\Models\Scopes\{Active, Ordered};
+use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class ProductCategory extends Model
 {
+    use AsTree;
+    use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use LogsActivity;
@@ -29,9 +27,12 @@ class ProductCategory extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'active' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'active' => 'boolean',
+        ];
+    }
 
     protected static function booted(): void
     {
@@ -41,19 +42,9 @@ class ProductCategory extends Model
         ]);
     }
 
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(app(ProductCategoryContract::class), 'parent_id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(app(ProductCategoryContract::class), 'parent_id');
-    }
-
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(app(Product::class), 'product_category_product')
+        return $this->belongsToMany(resolve_model('product'), 'product_category_product')
             ->withTimestamps();
     }
 }

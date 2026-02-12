@@ -1,0 +1,22 @@
+meta {
+  name: Store country_tax_classes
+  type: http
+  seq: 58
+}
+
+post {
+  url: {{baseUrl}}/country_tax_classes
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Example"
+  }
+}

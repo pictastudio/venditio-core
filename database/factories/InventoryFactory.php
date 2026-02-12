@@ -3,21 +3,20 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use PictaStudio\VenditioCore\Models\Inventory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\PictaStudio\VenditioCore\Models\Inventory>
- */
 class InventoryFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Inventory::class;
+
     public function definition(): array
     {
         return [
-
+            'stock' => fake()->numberBetween(1, 1000),
+            'stock_min' => fake()->numberBetween(1, 1000),
+            'price' => fake()->randomFloat(2, 1, 1000),
+            'price_includes_tax' => false,
+            'purchase_price' => fake()->optional()->randomFloat(2, 1, 1000),
         ];
     }
 }

@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\ProductType;
 use PictaStudio\VenditioCore\Models\Scopes\Ordered;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class ProductCustomField extends Model
 {
@@ -34,6 +35,6 @@ class ProductCustomField extends Model
 
     public function productType(): BelongsTo
     {
-        return $this->belongsTo(app(ProductType::class));
+        return $this->belongsTo(resolve_model('product_type'));
     }
 }

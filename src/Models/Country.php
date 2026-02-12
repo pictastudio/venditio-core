@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\Address;
-use PictaStudio\VenditioCore\Models\Contracts\Currency;
-use PictaStudio\VenditioCore\Models\Contracts\TaxClass;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class Country extends Model
 {
@@ -27,19 +26,20 @@ class Country extends Model
 
     public function taxClasses(): BelongsToMany
     {
-        return $this->belongsToMany(app(TaxClass::class), 'country_tax_class')
-            ->using(config('venditio-core.models.country_tax_class')::class)
+        return $this->belongsToMany(resolve_model('tax_class'), 'country_tax_class')
+            ->using(resolve_model('country_tax_class'))
             ->withTimestamps()
             ->withPivot('rate');
     }
 
     public function addresses(): HasMany
     {
-        return $this->hasMany(app(Address::class));
+        return $this->hasMany(resolve_model('address'));
     }
 
-    public function currencies(): HasMany
+    public function currencies(): BelongsToMany
     {
-        return $this->hasMany(app(Currency::class));
+        return $this->belongsToMany(resolve_model('currency'), 'country_currency')
+            ->withTimestamps();
     }
 }

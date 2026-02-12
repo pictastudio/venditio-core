@@ -3,9 +3,12 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use PictaStudio\VenditioCore\Models\Cart;
 
 class CartFactory extends Factory
 {
+    protected $model = Cart::class;
+
     public function definition(): array
     {
         return [
@@ -16,7 +19,7 @@ class CartFactory extends Factory
             'sub_total' => fake()->randomFloat(2, 0, 100),
             'shipping_fee' => fake()->randomFloat(2, 0, 20),
             'payment_fee' => fake()->randomFloat(2, 0, 10),
-            'discount_ref' => fake()->randomElement(['DISCOUNT10', 'SALE20']),
+            'discount_code' => fake()->randomElement(['DISCOUNT10', 'SALE20']),
             'discount_amount' => fake()->randomFloat(2, 0, 50),
             'total_final' => fake()->randomFloat(2, 0, 200),
             'user_first_name' => fake()->firstName(),

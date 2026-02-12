@@ -11,7 +11,7 @@ class ApproveOrder
     public function __invoke(Order $order, Closure $next): Model
     {
         $order->fill([
-            'status' => config('venditio-core.orders.status_enum')::getCompletedStatus(),
+            'status' => config('venditio-core.order.status_enum')::getCompletedStatus(),
             'approved_at' => now(),
         ]);
 

@@ -3,11 +3,13 @@
 namespace PictaStudio\VenditioCore\Dto;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Illuminate\Support\{Collection, Fluent};
 use PictaStudio\VenditioCore\Dto\Contracts\CartDtoContract;
-use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 
-class CartDto implements CartDtoContract
+use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
+
+class CartDto extends Dto implements CartDtoContract
 {
     public function __construct(
         private Model $cart,
@@ -16,36 +18,58 @@ class CartDto implements CartDtoContract
         private ?string $userLastName,
         private ?string $userEmail,
         private ?string $discountRef,
-        private ?array $billingAddress,
-        private ?array $shippingAddress,
-        private array $lines,
-    ) {
-
-    }
+        private ?array $addresses,
+        private ?Collection $lines = null,
+        private bool $linesProvided = false,
+    ) {}
 
     public static function fromArray(array $data): static
     {
         return new static(
-            $data['cart'] ?? static::getInstance(),
-            $data['user_id'] ?? null,
-            $data['user_first_name'] ?? null,
-            $data['user_last_name'] ?? null,
-            $data['user_email'] ?? null,
-            $data['discount_ref'] ?? null,
-            $data['billing_address'] ?? null,
-            $data['shipping_address'] ?? null,
-            $data['lines'] ?? [],
+            cart: $data['cart'] ?? static::getFreshInstance(),
+            userId: $data['user_id'] ?? null,
+            userFirstName: $data['user_first_name'] ?? null,
+            userLastName: $data['user_last_name'] ?? null,
+            userEmail: $data['user_email'] ?? null,
+            discountRef: $data['discount_code'] ?? $data['discount_ref'] ?? null,
+            addresses: $data['addresses'] ?? null,
+            lines: collect($data['lines'] ?? [])
+                ->map(fn (array $line) => CartLineDto::fromArray($line)),
+            linesProvided: array_key_exists('lines', $data),
         );
     }
 
-    public function getCart(): Model
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('cart');
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'user_id' => $this->getUserId(),
+            'user_first_name' => $this->getUserFirstName(),
+            'user_last_name' => $this->getUserLastName(),
+            'user_email' => $this->getUserEmail(),
+            'discount_code' => $this->getDiscountRef(),
+            'addresses' => $this->getAddresses(),
+        ];
+    }
+
+    public function toModel(): Model
+    {
+        return $this->getCart()
+            ->fill($this->toArray());
+    }
+
+    public function getCart(): Cart|Model
     {
         return $this->cart;
     }
 
     public function getUserId(): ?int
     {
-        return $this->userId ?? auth()->id();
+        return $this->userId ?? auth()->guard()->id();
     }
 
     public function getUserFirstName(): ?string
@@ -65,44 +89,30 @@ class CartDto implements CartDtoContract
 
     public function getDiscountRef(): ?string
     {
-        return $this->discountRef ?? $this->getCart()?->discount_ref;
+        return $this->discountRef ?? $this->getCart()?->discount_code;
     }
 
-    public function getBillingAddress(): ?array
+    public function getAddresses(): ?array
     {
-        return $this->billingAddress ?? $this->getCart()?->addresses['billing'] ?? null;
-    }
+        $addresses = $this->addresses ?? $this->getCart()?->addresses;
 
-    public function getShippingAddress(): ?array
-    {
-        return $this->shippingAddress ?? $this->getCart()?->addresses['shipping'] ?? null;
+        if ($addresses instanceof Fluent) {
+            return $addresses->toArray();
+        }
+
+        return $addresses;
     }
 
     /**
-     * @return Collection<[['product_item_id' => int, 'qty' => int]]>
+     * @return Collection<CartLineDto>
      */
     public function getLines(): Collection
     {
-        return collect($this->lines);
+        return $this->lines;
     }
 
-    public static function getInstance(): Model
+    public function hasLinesProvided(): bool
     {
-        return app(Cart::class);
-    }
-
-    public static function bindIntoContainer(): static
-    {
-        return new static(
-            static::getInstance(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            [],
-        );
+        return $this->linesProvided;
     }
 }

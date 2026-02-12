@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\Country;
 use PictaStudio\VenditioCore\Models\Traits\HasDefault;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
 use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class Address extends Model
 {
@@ -27,17 +28,12 @@ class Address extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'default' => 'boolean',
-    ];
-
-    public function __construct(array $attributes = [])
+    protected function casts(): array
     {
-        parent::__construct($attributes);
-
-        $this->mergeCasts([
+        return [
             'type' => config('venditio-core.addresses.type_enum'),
-        ]);
+            'is_default' => 'boolean',
+        ];
     }
 
     public function addressable(): MorphTo
@@ -47,6 +43,6 @@ class Address extends Model
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(app(Country::class));
+        return $this->belongsTo(resolve_model('country'));
     }
 }

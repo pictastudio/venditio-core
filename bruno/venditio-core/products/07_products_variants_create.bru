@@ -1,0 +1,31 @@
+meta {
+  name: Generate product variants
+  type: http
+  seq: 1002
+}
+
+post {
+  url: {{baseUrl}}/products/:id/variants
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "variants": [
+      {
+        "variant_id": 10,
+        "option_ids": [101, 102]
+      }
+    ]
+  }
+}

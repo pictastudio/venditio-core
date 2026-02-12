@@ -4,18 +4,13 @@ namespace PictaStudio\VenditioCore\Enums;
 
 enum ProductMeasuringUnit: string
 {
-    case PIECE = 'pz';
-    case KILOGRAM = 'kg';
-    case LITER = 'lt';
-    case MILLILITER = 'ml';
-    case GRAM = 'g';
-    case METER = 'm';
-    case SQUARE_METER = 'm2';
-    case CUBIC_METER = 'm3';
-    case HOUR = 'h';
-    case DAY = 'd';
-    case WEEK = 'w';
-    case MONTH = 'mo';
-    case YEAR = 'y';
-    case OTHER = 'other';
+    case Piece = 'pz';
+    case Kilogram = 'kg';
+    case Liter = 'lt';
+    case Milliliter = 'ml';
+    case Gram = 'g';
+    case Meter = 'm';
+    case SquareMeter = 'm2';
+    case CubicMeter = 'm3';
+    case Other = 'other';
 }

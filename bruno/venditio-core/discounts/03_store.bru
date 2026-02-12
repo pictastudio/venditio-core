@@ -1,0 +1,43 @@
+meta {
+  name: Store discounts
+  type: http
+  seq: 78
+}
+
+post {
+  url: {{baseUrl}}/discounts
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Discount 10%",
+    "type": "percentage",
+    "value": 10,
+    "code": "TEST10",
+    "starts_at": "2026-02-11 17:00:00"
+  }
+}
+
+docs {
+  allowed values for discountable_type:
+  - product
+  - product_category
+  - product_type
+  - brand
+  - user
+  
+  available rule fields:
+  - apply_to_cart_total
+  - apply_once_per_cart
+  - max_uses_per_user
+  - one_per_user
+  - free_shipping
+  - minimum_order_total
+}

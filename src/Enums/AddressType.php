@@ -4,6 +4,6 @@ namespace PictaStudio\VenditioCore\Enums;
 
 enum AddressType: string
 {
-    case BILLING = 'billing';
-    case SHIPPING = 'shipping';
+    case Billing = 'billing';
+    case Shipping = 'shipping';
 }

@@ -1,0 +1,20 @@
+meta {
+  name: Product variants list for product
+  type: http
+  seq: 1001
+}
+
+get {
+  url: {{baseUrl}}/products/:id/variants
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

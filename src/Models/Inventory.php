@@ -3,12 +3,12 @@
 namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Events\ProductStockBelowMinimum;
+use PictaStudio\VenditioCore\Models\Traits\{HasHelperMethods, LogsActivity};
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class Inventory extends Model
 {
@@ -24,12 +24,45 @@ class Inventory extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-    ];
-
-    public function productItem(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(app(ProductItem::class));
+        return [
+            'stock' => 'integer',
+            'stock_reserved' => 'integer',
+            'stock_available' => 'integer',
+            'stock_min' => 'integer',
+            'price' => 'decimal:2',
+            'price_includes_tax' => 'boolean',
+            'purchase_price' => 'decimal:2',
+        ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $inventory) {
+            $inventory->stock_available = (int) $inventory->stock - (int) $inventory->stock_reserved;
+        });
+
+        static::saved(function (self $inventory) {
+            $stockMin = $inventory->stock_min;
+
+            if ($stockMin === null || !$inventory->wasChanged('stock')) {
+                return;
+            }
+
+            $previousStock = $inventory->getOriginal('stock');
+            $currentStock = (int) $inventory->stock;
+
+            if ($previousStock !== null && (int) $previousStock >= $stockMin && $currentStock < $stockMin) {
+                event(new ProductStockBelowMinimum(
+                    inventory: $inventory->fresh(['product']) ?? $inventory,
+                ));
+            }
+        });
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(resolve_model('product'));
     }
 }

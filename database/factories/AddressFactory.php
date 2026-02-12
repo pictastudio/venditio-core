@@ -3,14 +3,16 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Enums\AddressType;
+use PictaStudio\VenditioCore\Models\Address;
 
 class AddressFactory extends Factory
 {
+    protected $model = Address::class;
+
     public function definition(): array
     {
         return [
-            'type' => fake()->randomElement(AddressType::cases())->value,
+            'type' => fake()->randomElement(config('venditio-core.addresses.type_enum')::cases())->value,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->safeEmail(),

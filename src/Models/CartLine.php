@@ -3,44 +3,54 @@
 namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\Cart;
-use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods};
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class CartLine extends Model
 {
+    use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use SoftDeletes;
 
     protected $guarded = [
-        // 'id',
+        'id',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
 
-    protected $casts = [
-        'unit_price' => 'decimal:2',
-        'unit_discount' => 'decimal:2',
-        'unit_final_price' => 'decimal:2',
-        'unit_final_price_tax' => 'decimal:2',
-        'unit_final_price_taxable' => 'decimal:2',
-        'total_final_price' => 'decimal:2',
-        'tax_rate' => 'decimal:2',
-        'product_item' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'discount_amount' => 'decimal:2',
+            'unit_price' => 'decimal:2',
+            'purchase_price' => 'decimal:2',
+            'unit_discount' => 'decimal:2',
+            'unit_final_price' => 'decimal:2',
+            'unit_final_price_tax' => 'decimal:2',
+            'unit_final_price_taxable' => 'decimal:2',
+            'total_final_price' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'product_data' => 'json',
+        ];
+    }
 
     public function cart(): BelongsTo
     {
-        return $this->belongsTo(app(Cart::class));
+        return $this->belongsTo(resolve_model('cart'));
     }
 
-    public function productItem(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(app(ProductItem::class));
+        return $this->belongsTo(resolve_model('product'));
+    }
+
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(resolve_model('discount'));
     }
 }

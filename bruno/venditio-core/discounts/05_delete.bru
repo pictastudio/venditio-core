@@ -1,0 +1,20 @@
+meta {
+  name: Delete discounts
+  type: http
+  seq: 80
+}
+
+delete {
+  url: {{baseUrl}}/discounts/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -4,18 +4,31 @@ namespace PictaStudio\VenditioCore\Pipelines\CartLine\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use PictaStudio\VenditioCore\Actions\Taxes\ExtractTaxFromGrossPrice;
+use PictaStudio\VenditioCore\Models\CountryTaxClass;
 
 class CalculateTaxes
 {
+    public function __construct(
+        private readonly ExtractTaxFromGrossPrice $extractTaxFromGrossPrice,
+    ) {}
+
     public function __invoke(Model $cartLine, Closure $next): Model
     {
-        $price = $cartLine->unit_discount;
-        $unitDiscount = $cartLine->unit_final_price;
-        $unitFinalPrice = $cartLine->unit_final_price;
+        $unitFinalPrice = (float) $cartLine->unit_final_price;
 
-        $taxRate = 0; // get 'rate' from 'country_tax_class' after getting the taxClass from the product
-        $unitFinalPriceTax = 0; // tassa unitaria calcolata su unit_final_price
-        $unitFinalPriceTaxable = $unitFinalPrice - $unitFinalPriceTax;
+        $taxRate = $this->getTaxRate($cartLine->getAttribute('product_data'));
+        $priceIncludesTax = $this->isPriceTaxInclusive($cartLine->getAttribute('product_data'));
+
+        if ($priceIncludesTax) {
+            $taxBreakdown = $this->extractTaxFromGrossPrice->handle($unitFinalPrice, $taxRate);
+            $unitFinalPriceTaxable = $taxBreakdown['taxable'];
+            $unitFinalPriceTax = $taxBreakdown['tax'];
+        } else {
+            $unitFinalPriceTaxable = $unitFinalPrice;
+            $unitFinalPriceTax = round($unitFinalPrice * ($taxRate / 100), 2);
+        }
 
         $cartLine->fill([
             'unit_final_price_tax' => $unitFinalPriceTax,
@@ -24,5 +37,20 @@ class CalculateTaxes
         ]);
 
         return $next($cartLine);
+    }
+
+    private function getTaxRate(array $product): float
+    {
+        $taxClassId = Arr::get($product, 'tax_class_id');
+
+        return CountryTaxClass::query()
+            ->where('tax_class_id', $taxClassId)
+            ->firstOrFail()
+            ->rate;
+    }
+
+    private function isPriceTaxInclusive(array $product): bool
+    {
+        return (bool) Arr::get($product, 'inventory.price_includes_tax', false);
     }
 }

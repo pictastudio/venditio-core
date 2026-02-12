@@ -1,0 +1,20 @@
+meta {
+  name: Delete tax_classes
+  type: http
+  seq: 70
+}
+
+delete {
+  url: {{baseUrl}}/tax_classes/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

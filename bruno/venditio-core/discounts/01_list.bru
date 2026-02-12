@@ -1,0 +1,21 @@
+meta {
+  name: List discounts
+  type: http
+  seq: 76
+}
+
+get {
+  url: {{baseUrl}}/discounts
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

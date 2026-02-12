@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\ProductItem;
-use PictaStudio\VenditioCore\Models\Contracts\ProductVariant;
 use PictaStudio\VenditioCore\Models\Scopes\Ordered;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class ProductVariantOption extends Model
 {
@@ -25,10 +25,6 @@ class ProductVariantOption extends Model
         'deleted_at',
     ];
 
-    protected $casts = [
-        'value' => 'array',
-    ];
-
     protected static function booted(): void
     {
         static::addGlobalScope(Ordered::class);
@@ -36,11 +32,12 @@ class ProductVariantOption extends Model
 
     public function productVariant(): BelongsTo
     {
-        return $this->belongsTo(app(ProductVariant::class));
+        return $this->belongsTo(resolve_model('product_variant'));
     }
 
-    public function productItems(): BelongsToMany
+    public function products(): BelongsToMany
     {
-        return $this->belongsToMany(app(ProductItem::class), 'product_configuration');
+        return $this->belongsToMany(resolve_model('product'), 'product_configuration')
+            ->withTimestamps();
     }
 }

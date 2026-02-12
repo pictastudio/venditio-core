@@ -10,6 +10,6 @@ class Ordered implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $builder->orderBy('order', 'asc');
+        $builder->orderBy('sort_order', 'asc');
     }
 }

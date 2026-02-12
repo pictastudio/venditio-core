@@ -10,26 +10,20 @@ class CurrencySeeder extends Seeder
 {
     public function run(): void
     {
-        // Currency::factory()
-        //     ->for(Country::where('iso_2', 'IT')->first())
-        //     ->create([
-        //         'name' => 'Euro',
-        //         'code' => 'EUR',
-        //         'symbol' => '€',
-        //         'exchange_rate' => 1,
-        //         'enabled' => true,
-        //         'default' => true,
-        //     ]);
-
-        Currency::query()
+        $currency = Currency::query()
             ->create([
-                'country_id' => Country::where('iso_2', 'IT')->value('id'),
                 'name' => 'Euro',
                 'code' => 'EUR',
                 'symbol' => '€',
                 'exchange_rate' => 1,
-                'enabled' => true,
-                'default' => true,
+                'is_enabled' => true,
+                'is_default' => true,
             ]);
+
+        $countryId = Country::where('iso_2', 'IT')->value('id');
+
+        if ($countryId) {
+            $currency->countries()->attach($countryId);
+        }
     }
 }

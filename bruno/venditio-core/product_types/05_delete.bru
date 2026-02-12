@@ -1,0 +1,20 @@
+meta {
+  name: Delete product_types
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{baseUrl}}/product_types/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Update products
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/products/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "T-shirt v2",
+    "status": "published",
+    "price": 34.99,
+    "category_ids": [1, 2]
+  }
+}

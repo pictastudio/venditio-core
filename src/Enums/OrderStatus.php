@@ -6,30 +6,46 @@ use PictaStudio\VenditioCore\Enums\Contracts\OrderStatus as OrderStatusContract;
 
 enum OrderStatus: string implements OrderStatusContract
 {
-    case PENDING = 'pending';
-    case PROCESSING = 'processing';
-    case COMPLETED = 'completed';
-    case CANCELLED = 'cancelled';
-    case REFUNDED = 'refunded';
-    case FAILED = 'failed';
-    case ON_HOLD = 'on_hold';
-    case PAYMENT_FAILED = 'payment_failed';
-    case PAYMENT_PENDING = 'payment_pending';
-    case SHIPPED = 'shipped';
-    case DELIVERED = 'delivered';
+    case Pending = 'pending';
+    case Processing = 'processing';
+    case Completed = 'completed';
+    case Cancelled = 'cancelled';
+    case Refunded = 'refunded';
+    case Failed = 'failed';
+    case OnHold = 'on_hold';
+    case PaymentFailed = 'payment_failed';
+    case PaymentPending = 'payment_pending';
+    case Shipped = 'shipped';
+    case Delivered = 'delivered';
 
     public static function getProcessingStatus(): self
     {
-        return self::PROCESSING;
+        return self::Processing;
+    }
+
+    public static function getOnHoldStatus(): self
+    {
+        return self::OnHold;
     }
 
     public static function getCompletedStatus(): self
     {
-        return self::COMPLETED;
+        return self::Completed;
     }
 
     public static function getCancelledStatus(): self
     {
-        return self::CANCELLED;
+        return self::Cancelled;
+    }
+
+    public static function getNotConfirmedStatuses(): array
+    {
+        return [
+            self::Pending,
+            self::Processing,
+            self::OnHold,
+            self::PaymentFailed,
+            self::PaymentPending,
+        ];
     }
 }

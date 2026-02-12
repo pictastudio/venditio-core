@@ -3,15 +3,15 @@
 namespace PictaStudio\VenditioCore\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\Product;
-use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
-use PictaStudio\VenditioCore\Models\Traits\LogsActivity;
+use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class Brand extends Model
 {
+    use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use LogsActivity;
@@ -26,6 +26,6 @@ class Brand extends Model
 
     public function products(): HasMany
     {
-        return $this->hasMany(app(Product::class));
+        return $this->hasMany(resolve_model('product'));
     }
 }

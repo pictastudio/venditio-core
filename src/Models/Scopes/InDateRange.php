@@ -15,13 +15,13 @@ class InDateRange implements Scope
         private ?bool $includeEndDate = null,
         private ?bool $allowNull = null
     ) {
-        $this->startColumn = $startColumn ?? 'start_date';
-        $this->endColumn = $endColumn ?? 'end_date';
+        $this->startColumn ??= 'starts_at';
+        $this->endColumn ??= 'ends_at';
 
-        $this->includeStartDate = $includeStartDate ?? config('venditio-core.scopes.in_date_range.include_start_date', true);
-        $this->includeEndDate = $includeEndDate ?? config('venditio-core.scopes.in_date_range.include_end_date', true);
+        $this->includeStartDate ??= config('venditio-core.scopes.in_date_range.include_start_date', true);
+        $this->includeEndDate ??= config('venditio-core.scopes.in_date_range.include_end_date', true);
 
-        $this->allowNull = $allowNull ?? config('venditio-core.scopes.in_date_range.allow_null', true);
+        $this->allowNull ??= config('venditio-core.scopes.in_date_range.allow_null', true);
     }
 
     public function apply(Builder $builder, Model $model): void

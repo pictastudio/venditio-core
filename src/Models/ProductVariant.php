@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PictaStudio\VenditioCore\Models\Contracts\ProductType;
-use PictaStudio\VenditioCore\Models\Contracts\ProductVariantOption;
 use PictaStudio\VenditioCore\Models\Scopes\Ordered;
 use PictaStudio\VenditioCore\Models\Traits\HasHelperMethods;
+
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_model;
 
 class ProductVariant extends Model
 {
@@ -32,11 +32,11 @@ class ProductVariant extends Model
 
     public function productType(): BelongsTo
     {
-        return $this->belongsTo(app(ProductType::class));
+        return $this->belongsTo(resolve_model('product_type'));
     }
 
     public function productVariantOptions(): HasMany
     {
-        return $this->hasMany(app(ProductVariantOption::class));
+        return $this->hasMany(resolve_model('product_variant_option'));
     }
 }

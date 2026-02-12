@@ -1,0 +1,20 @@
+meta {
+  name: Show tax_classes
+  type: http
+  seq: 67
+}
+
+get {
+  url: {{baseUrl}}/tax_classes/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

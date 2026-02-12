@@ -1,0 +1,26 @@
+meta {
+  name: Update discount_applications
+  type: http
+  seq: 84
+}
+
+patch {
+  url: {{baseUrl}}/discount_applications/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Updated example"
+  }
+}

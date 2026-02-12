@@ -13,7 +13,7 @@ class ProductCustomFieldFactory extends Factory
             // 'product_type_id' => ProductType::factory(),
             'name' => fake()->word(),
             'required' => fake()->boolean(),
-            'order' => fake()->numberBetween(1, 100),
+            'sort_order' => fake()->numberBetween(1, 100),
             'type' => fake()->randomElement(['text', 'number', 'date', 'boolean', 'select']),
             'options' => fake()->randomElement([null, json_encode(['option1', 'option2', 'option3'])]),
         ];

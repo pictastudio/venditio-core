@@ -6,15 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 trait HasHelperMethods
 {
-    public static function getService(): string
-    {
-        return str(self::class)
-            ->classBasename()
-            ->prepend('App\\Services\\')
-            ->append('Service')
-            ->toString();
-    }
-
     public static function getTableName(): string
     {
         return app(static::class)->getTable();

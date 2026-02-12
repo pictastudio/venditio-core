@@ -4,11 +4,13 @@ namespace PictaStudio\VenditioCore\Dto\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use PictaStudio\VenditioCore\Models\Contracts\Cart;
+use PictaStudio\VenditioCore\Models\Cart;
 
 interface CartDtoContract extends Dto
 {
     public static function fromArray(array $data): static;
+
+    public static function getFreshInstance(): Model;
 
     public function getCart(): Cart|Model;
 
@@ -22,11 +24,11 @@ interface CartDtoContract extends Dto
 
     public function getDiscountRef(): ?string;
 
-    public function getBillingAddress(): ?array;
-
-    public function getShippingAddress(): ?array;
+    public function getAddresses(): ?array;
 
     public function getLines(): Collection;
 
-    public static function getInstance(): Model;
+    public function hasLinesProvided(): bool;
+
+    public function toModel(): Model;
 }
