@@ -6,8 +6,8 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
-use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineUpdatePipeline;
 use PictaStudio\VenditioCore\Models\CartLine;
+use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineUpdatePipeline;
 
 use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 

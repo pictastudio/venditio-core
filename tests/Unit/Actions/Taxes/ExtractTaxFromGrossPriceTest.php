@@ -29,5 +29,5 @@ it('rounds tax up and adjusts taxable down when rounding is inconsistent', funct
         ->and(round($result['taxable'] + $result['tax'], 2))->toBe($gross);
 })->with([
     'low price with decimal VAT' => [9.39, 0.16, 0.02, 9.37],
-    'higher price with 22% VAT'  => [87.23, 22.00, 15.73, 71.50],
+    'higher price with 22% VAT' => [87.23, 22.00, 15.73, 71.50],
 ]);

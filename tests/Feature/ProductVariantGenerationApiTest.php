@@ -2,12 +2,7 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PictaStudio\VenditioCore\Contracts\ProductSkuGeneratorInterface;
-use PictaStudio\VenditioCore\Models\ProductType;
-use PictaStudio\VenditioCore\Models\ProductVariant;
-use PictaStudio\VenditioCore\Models\ProductVariantOption;
-use PictaStudio\VenditioCore\Models\Brand;
-use PictaStudio\VenditioCore\Models\Product;
-use PictaStudio\VenditioCore\Models\TaxClass;
+use PictaStudio\VenditioCore\Models\{Brand, Product, ProductType, ProductVariant, ProductVariantOption, TaxClass};
 
 use function Pest\Laravel\postJson;
 

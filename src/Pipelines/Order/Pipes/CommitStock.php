@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_enum;
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_enum};
 
 class CommitStock
 {

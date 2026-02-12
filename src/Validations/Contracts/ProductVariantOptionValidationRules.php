@@ -2,6 +2,4 @@
 
 namespace PictaStudio\VenditioCore\Validations\Contracts;
 
-interface ProductVariantOptionValidationRules extends ProvidesValidationRules
-{
-}
+interface ProductVariantOptionValidationRules extends ProvidesValidationRules {}

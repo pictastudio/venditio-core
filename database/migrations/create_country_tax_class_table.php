@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Models\Country;
-use PictaStudio\VenditioCore\Models\TaxClass;
+use PictaStudio\VenditioCore\Models\{Country, TaxClass};
 
 return new class extends Migration
 {

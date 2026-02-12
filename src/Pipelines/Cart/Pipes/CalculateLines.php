@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Dto\Contracts\CartLineDtoContract;
 use PictaStudio\VenditioCore\Pipelines\CartLine\CartLineCreationPipeline;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\{resolve_dto};
+use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
 
 class CalculateLines
 {

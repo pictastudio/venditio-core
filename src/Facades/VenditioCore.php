@@ -4,6 +4,7 @@ namespace PictaStudio\VenditioCore\Facades;
 
 use Closure;
 use Illuminate\Support\Facades\Facade;
+
 /**
  * @see PictaStudio\VenditioCore\VenditioCore
  *

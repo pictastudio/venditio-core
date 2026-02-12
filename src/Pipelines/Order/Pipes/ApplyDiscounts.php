@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use PictaStudio\VenditioCore\Actions\Taxes\ExtractTaxFromGrossPrice;
 use PictaStudio\VenditioCore\Contracts\{CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface};
-use PictaStudio\VenditioCore\Discounts\DiscountValidationException;
-use PictaStudio\VenditioCore\Discounts\DiscountContext;
+use PictaStudio\VenditioCore\Discounts\{DiscountContext, DiscountValidationException};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\query;
 

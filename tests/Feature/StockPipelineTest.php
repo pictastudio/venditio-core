@@ -2,8 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\{Event, Schema};
 use PictaStudio\VenditioCore\Dto\{CartDto, OrderDto};
 use PictaStudio\VenditioCore\Enums\ProductStatus;
 use PictaStudio\VenditioCore\Events\ProductStockBelowMinimum;

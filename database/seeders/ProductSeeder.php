@@ -3,10 +3,7 @@
 namespace PictaStudio\VenditioCore\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\Brand;
-use PictaStudio\VenditioCore\Models\Inventory;
-use PictaStudio\VenditioCore\Models\Product;
-use PictaStudio\VenditioCore\Models\TaxClass;
+use PictaStudio\VenditioCore\Models\{Brand, Inventory, Product, TaxClass};
 
 class ProductSeeder extends Seeder
 {

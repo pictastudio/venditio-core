@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Date;
 use PictaStudio\VenditioCore\Dto\Contracts\AddressDtoContract;
 use PictaStudio\VenditioCore\Models\Address;
 
+use RuntimeException;
+
 use function PictaStudio\VenditioCore\Helpers\Functions\get_fresh_model_instance;
 
 class AddressDto extends Dto implements AddressDtoContract
@@ -32,9 +34,7 @@ class AddressDto extends Dto implements AddressDtoContract
         private ?string $birthDate,
         private ?string $birthPlace,
         private ?string $notes,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {
@@ -44,15 +44,15 @@ class AddressDto extends Dto implements AddressDtoContract
         return parent::fromArray($data);
     }
 
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('address');
+    }
+
     public function toModel(): Model
     {
         return $this->getFreshInstance()
             ->fill($this->toArray());
-    }
-
-    public static function getFreshInstance(): Model
-    {
-        return get_fresh_model_instance('address');
     }
 
     public function getAddress(): Address|Model
@@ -160,7 +160,7 @@ class AddressDto extends Dto implements AddressDtoContract
         $addressable = $this->getAddressable();
 
         if (!$addressable) {
-            throw new \RuntimeException('No addressable entity found to attach address to.');
+            throw new RuntimeException('No addressable entity found to attach address to.');
         }
 
         $addressData = [
@@ -185,7 +185,7 @@ class AddressDto extends Dto implements AddressDtoContract
         ];
 
         // Remove null values to prevent overwriting defaults with null
-        $addressData = array_filter($addressData, fn($value) => $value !== null);
+        $addressData = array_filter($addressData, fn ($value) => $value !== null);
 
         return $addressable->addresses()->create($addressData);
     }

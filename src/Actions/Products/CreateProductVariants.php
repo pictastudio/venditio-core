@@ -106,7 +106,7 @@ class CreateProductVariants
         $combinations = $this->buildCombinations($optionSets->all());
         $existingSignatures = $this->getExistingSignatures($product);
 
-        $created = new Collection();
+        $created = new Collection;
         $skipped = [];
 
         foreach ($combinations as $combination) {
@@ -114,6 +114,7 @@ class CreateProductVariants
 
             if (isset($existingSignatures[$signature])) {
                 $skipped[] = $signature;
+
                 continue;
             }
 

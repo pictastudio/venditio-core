@@ -97,7 +97,7 @@
         "unary_operator_spaces": true,
         "whitespace_after_comma_in_array": true,
         "array_syntax": true,
-        "use_arrow_functions": true,
+        "use_arrow_functions": false,
         "ternary_to_null_coalescing": true,
         "ternary_operator_spaces": true,
         "ternary_to_elvis_operator": true,

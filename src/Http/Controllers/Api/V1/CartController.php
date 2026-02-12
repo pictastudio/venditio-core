@@ -8,16 +8,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\Cart\StoreCartRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\Cart\UpdateCartRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\Cart\{StoreCartRequest, UpdateCartRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\CartResource;
 use PictaStudio\VenditioCore\Models\Cart;
-use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
-use PictaStudio\VenditioCore\Pipelines\Cart\CartUpdatePipeline;
+use PictaStudio\VenditioCore\Pipelines\Cart\{CartCreationPipeline, CartUpdatePipeline};
 use PictaStudio\VenditioCore\Validations\Contracts\CartLineValidationRules;
 
-use function PictaStudio\VenditioCore\Helpers\Functions\query;
-use function PictaStudio\VenditioCore\Helpers\Functions\resolve_dto;
+use function PictaStudio\VenditioCore\Helpers\Functions\{query, resolve_dto};
 
 class CartController extends Controller
 {

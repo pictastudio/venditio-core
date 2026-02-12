@@ -2,10 +2,9 @@
 
 namespace PictaStudio\VenditioCore\Http\Resources\V1;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Http\Resources\Traits\CanTransformAttributes;
-use PictaStudio\VenditioCore\Http\Resources\Traits\HasAttributesToExclude;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use PictaStudio\VenditioCore\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
 class OrderLineResource extends JsonResource
 {

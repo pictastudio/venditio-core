@@ -3,12 +3,8 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Enums\ProductMeasuringUnit;
-use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Models\Brand;
-use PictaStudio\VenditioCore\Models\Product;
-use PictaStudio\VenditioCore\Models\ProductType;
-use PictaStudio\VenditioCore\Models\TaxClass;
+use PictaStudio\VenditioCore\Enums\{ProductMeasuringUnit, ProductStatus};
+use PictaStudio\VenditioCore\Models\{Brand, Product, ProductType, TaxClass};
 
 class ProductFactory extends Factory
 {
@@ -49,7 +45,7 @@ class ProductFactory extends Factory
                 [
                     'name' => fake()->word(),
                     'src' => fake()->url(),
-                ]
+                ],
             ],
             'measuring_unit' => fake()->randomElement(ProductMeasuringUnit::cases())->value,
             'qty_for_unit' => fake()->optional(0.7)->numberBetween(1, 100),

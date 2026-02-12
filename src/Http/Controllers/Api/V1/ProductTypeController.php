@@ -4,11 +4,9 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\VenditioCore\Actions\ProductTypes\CreateProductType;
-use PictaStudio\VenditioCore\Actions\ProductTypes\UpdateProductType;
+use PictaStudio\VenditioCore\Actions\ProductTypes\{CreateProductType, UpdateProductType};
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductType\StoreProductTypeRequest;
-use PictaStudio\VenditioCore\Http\Requests\V1\ProductType\UpdateProductTypeRequest;
+use PictaStudio\VenditioCore\Http\Requests\V1\ProductType\{StoreProductTypeRequest, UpdateProductTypeRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\ProductTypeResource;
 use PictaStudio\VenditioCore\Models\ProductType;
 

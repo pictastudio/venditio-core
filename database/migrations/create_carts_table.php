@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Models\Order;
-use PictaStudio\VenditioCore\Models\User;
+use PictaStudio\VenditioCore\Models\{Order, User};
 
 return new class extends Migration
 {

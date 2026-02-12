@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
-use Illuminate\Support\Fluent;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Fluent;
 use PictaStudio\VenditioCore\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 
 use function PictaStudio\VenditioCore\Helpers\Functions\{resolve_enum, resolve_model};
@@ -127,6 +127,17 @@ class Cart extends Model
         });
     }
 
+    protected function addresses(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value) => new Fluent(match (true) {
+                is_array($value) => $value,
+                is_string($value) => json_decode($value, true) ?? [],
+                default => [],
+            }),
+        );
+    }
+
     private function releaseReservedStock(): void
     {
         $reservedQtyByProduct = $this->lines()
@@ -154,16 +165,5 @@ class Cart extends Model
             $inventory->stock_reserved = max(0, (int) $inventory->stock_reserved - (int) $qtyToRelease);
             $inventory->save();
         }
-    }
-
-    protected function addresses(): Attribute
-    {
-        return Attribute::make(
-            get: fn (mixed $value) => new Fluent(match (true) {
-                is_array($value) => $value,
-                is_string($value) => json_decode($value, true) ?? [],
-                default => [],
-            }),
-        );
     }
 }

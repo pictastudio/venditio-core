@@ -3,8 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Enums\DiscountType;
-use PictaStudio\VenditioCore\Enums\ProductStatus;
+use PictaStudio\VenditioCore\Enums\{DiscountType, ProductStatus};
 use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, TaxClass, User};
 
 use function Pest\Laravel\postJson;
@@ -56,7 +55,7 @@ function createOrderDiscountValidationUser(string $email): User
     ]);
 }
 
-function createOrderDiscountValidationProduct(TaxClass $taxClass): \PictaStudio\VenditioCore\Models\Product
+function createOrderDiscountValidationProduct(TaxClass $taxClass): PictaStudio\VenditioCore\Models\Product
 {
     $product = config('venditio-core.models.product')::query()->create([
         'tax_class_id' => $taxClass->getKey(),

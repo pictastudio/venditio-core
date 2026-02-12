@@ -3,8 +3,7 @@
 namespace PictaStudio\VenditioCore\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\Country;
-use PictaStudio\VenditioCore\Models\TaxClass;
+use PictaStudio\VenditioCore\Models\{Country, TaxClass};
 
 class TaxClassSeeder extends Seeder
 {

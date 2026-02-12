@@ -1,12 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\VenditioCore\Models\ProductType;
-use PictaStudio\VenditioCore\Models\ProductVariant;
-use PictaStudio\VenditioCore\Models\ProductVariantOption;
+use PictaStudio\VenditioCore\Models\{ProductType, ProductVariant, ProductVariantOption};
 
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\{getJson, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -33,7 +30,7 @@ it('creates product types, variants, and options', function () {
     ])->assertCreated()
         ->assertJsonFragment([
             'product_variant_id' => $variantId,
-        'name' => 'red',
+            'name' => 'red',
         ]);
 });
 

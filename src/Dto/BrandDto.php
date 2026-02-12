@@ -13,9 +13,7 @@ class BrandDto extends Dto implements BrandDtoContract
     public function __construct(
         private Model $brand,
         private ?string $name,
-    ) {
-
-    }
+    ) {}
 
     public static function fromArray(array $data): static
     {
@@ -24,15 +22,15 @@ class BrandDto extends Dto implements BrandDtoContract
         return parent::fromArray($data);
     }
 
+    public static function getFreshInstance(): Model
+    {
+        return get_fresh_model_instance('brand');
+    }
+
     public function toModel(): Model
     {
         return $this->getFreshInstance()
             ->fill($this->toArray());
-    }
-
-    public static function getFreshInstance(): Model
-    {
-        return get_fresh_model_instance('brand');
     }
 
     public function getBrand(): Brand|Model

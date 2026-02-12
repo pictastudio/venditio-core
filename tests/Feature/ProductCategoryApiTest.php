@@ -3,10 +3,7 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PictaStudio\VenditioCore\Models\ProductCategory;
 
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\patchJson;
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\{assertDatabaseHas, getJson, patchJson, postJson};
 
 uses(RefreshDatabase::class);
 

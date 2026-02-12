@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use PictaStudio\VenditioCore\Dto\CartDto;
 use PictaStudio\VenditioCore\Enums\ProductStatus;
-use PictaStudio\VenditioCore\Models\{Country, CountryTaxClass, Product, TaxClass, User};
+use PictaStudio\VenditioCore\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
 use PictaStudio\VenditioCore\Pipelines\Cart\CartCreationPipeline;
 
 use function Pest\Laravel\artisan;
@@ -71,7 +71,7 @@ function createAbandonedCartProduct(TaxClass $taxClass, int $stock): Product
     return $product->refresh();
 }
 
-function createCartForAbandonmentTest(User $user, Product $product, int $qty): \PictaStudio\VenditioCore\Models\Cart
+function createCartForAbandonmentTest(User $user, Product $product, int $qty): Cart
 {
     return CartCreationPipeline::make()->run(
         CartDto::fromArray([

@@ -3,8 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\VenditioCore\Enums\DiscountType;
-use PictaStudio\VenditioCore\Enums\ProductStatus;
+use PictaStudio\VenditioCore\Enums\{DiscountType, ProductStatus};
 use PictaStudio\VenditioCore\Models\{Cart, Country, CountryTaxClass, Product, TaxClass, User};
 
 use function Pest\Laravel\{assertSoftDeleted, deleteJson, getJson, patchJson, postJson};

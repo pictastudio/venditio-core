@@ -3,8 +3,7 @@
 namespace PictaStudio\VenditioCore\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use PictaStudio\VenditioCore\Models\Country;
-use PictaStudio\VenditioCore\Models\Currency;
+use PictaStudio\VenditioCore\Models\{Country, Currency};
 
 class CurrencySeeder extends Seeder
 {

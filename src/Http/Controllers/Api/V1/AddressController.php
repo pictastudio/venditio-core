@@ -4,7 +4,7 @@ namespace PictaStudio\VenditioCore\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\{ValidationException};
+use Illuminate\Validation\ValidationException;
 use PictaStudio\VenditioCore\Http\Controllers\Api\Controller;
 use PictaStudio\VenditioCore\Http\Requests\V1\Address\{StoreAddressRequest, UpdateAddressRequest};
 use PictaStudio\VenditioCore\Http\Resources\V1\AddressResource;

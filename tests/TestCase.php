@@ -20,13 +20,6 @@ class TestCase extends Orchestra
         );
     }
 
-    protected function getPackageProviders($app)
-    {
-        return [
-            VenditioCoreServiceProvider::class,
-        ];
-    }
-
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
@@ -40,5 +33,12 @@ class TestCase extends Orchestra
         //     ->toArray();
 
         // Artisan::call('migrate', ['--path' => 'database/migrations']);
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            VenditioCoreServiceProvider::class,
+        ];
     }
 }

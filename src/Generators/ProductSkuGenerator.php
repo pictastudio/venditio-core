@@ -44,7 +44,7 @@ class ProductSkuGenerator implements ProductSkuGeneratorInterface
 
     private function uniqueSku(string $seed): string
     {
-        $normalizedSeed = trim($seed);
+        $normalizedSeed = mb_trim($seed);
 
         if ($normalizedSeed === '') {
             $normalizedSeed = 'SKU';

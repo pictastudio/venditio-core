@@ -44,8 +44,8 @@ class ReleaseStockForAbandonedCarts extends Command
                 }
             );
 
-        logger()->info("[ReleaseStockForAbandonedCarts] Abandoned carts updated successfully. Updated carts count: " . count($updatedCarts), ['carts' => $updatedCarts]);
-        $this->info("Abandoned carts updated successfully. Updated carts count: " . count($updatedCarts));
+        logger()->info('[ReleaseStockForAbandonedCarts] Abandoned carts updated successfully. Updated carts count: ' . count($updatedCarts), ['carts' => $updatedCarts]);
+        $this->info('Abandoned carts updated successfully. Updated carts count: ' . count($updatedCarts));
 
         return self::SUCCESS;
     }

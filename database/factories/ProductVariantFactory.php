@@ -3,8 +3,7 @@
 namespace PictaStudio\VenditioCore\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PictaStudio\VenditioCore\Models\ProductType;
-use PictaStudio\VenditioCore\Models\ProductVariant;
+use PictaStudio\VenditioCore\Models\{ProductType, ProductVariant};
 
 class ProductVariantFactory extends Factory
 {
