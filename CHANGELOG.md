@@ -2,6 +2,16 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v1.0.0 - 2026-02-12
+
+### What's Changed
+
+* Arch update by @Frameck in https://github.com/pictastudio/venditio/pull/18
+* multiple price lists by @Frameck in https://github.com/pictastudio/venditio/pull/19
+* rename from `venditio-core` to `venditio` by @Frameck in https://github.com/pictastudio/venditio/pull/20
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v0.1.8...v1.0.0
+
 ## v0.1.9 - 2024-11-18
 
 ### What's Changed
