@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use PictaStudio\Venditio\Contracts\DiscountUsageRecorderInterface;
 use PictaStudio\Venditio\Models\Discount;
 
+use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class DiscountUsageRecorder implements DiscountUsageRecorderInterface
@@ -49,7 +50,7 @@ class DiscountUsageRecorder implements DiscountUsageRecorderInterface
                 ['order_line_id' => $line->getKey()],
                 [
                     'discount_id' => $discount->getKey(),
-                    'discountable_type' => resolve_model('product'),
+                    'discountable_type' => get_fresh_model_instance('product')->getMorphClass(),
                     'discountable_id' => $line->getAttribute('product_id'),
                     'user_id' => $order->getAttribute('user_id'),
                     'cart_id' => $order->getRelation('sourceCart')?->getKey(),

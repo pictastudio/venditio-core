@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('qty')->default(1);
             $table->decimal('amount', 10, 2)->default(0.00);
             $table->datetimes();
+            $table->softDeletesDatetime();
         });
     }
 

@@ -114,8 +114,10 @@ Register it in host app config:
 
 Validation is decoupled using contracts so host apps can override rule sources.
 
-- `Validations/Contracts/*ValidationRules`
-- Implementations live in `src/Packages/*/Validations`
+- Contract interfaces live in `Validations/Contracts/*ValidationRules`.
+- Default implementations live in `src/Validations`.
+- The service provider binds contract → implementation by reading `config('venditio.validations')`. Each key is the contract class, each value the implementation class.
+- To override rules for a resource, publish the config and point that contract to your custom class. To disable validation for a resource, remove its entry from `venditio.validations`.
 
 ## Authorization
 
@@ -148,6 +150,7 @@ Important sections:
 
 - `routes.api` for prefix, version, middleware, pagination, and wrapping
 - `models` for model overrides
+- `validations` for validation contract → implementation bindings (Form Request rules)
 - `auth` for roles/permissions and optional root user
 - `product` enums
 - `product_variants` naming/copy behavior

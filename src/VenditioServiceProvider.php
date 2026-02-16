@@ -19,8 +19,6 @@ use PictaStudio\Venditio\Managers\AuthManager;
 use PictaStudio\Venditio\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\Venditio\Models\User;
 use PictaStudio\Venditio\Pricing\DefaultProductPriceResolver;
-use PictaStudio\Venditio\Validations\{AddressValidation, BrandValidation, CartLineValidation, CartValidation, OrderValidation, PriceListPriceValidation, PriceListValidation, ProductCategoryValidation, ProductTypeValidation, ProductValidation, ProductVariantOptionValidation, ProductVariantValidation};
-use PictaStudio\Venditio\Validations\Contracts\{AddressValidationRules, BrandValidationRules, CartLineValidationRules, CartValidationRules, OrderValidationRules, PriceListPriceValidationRules, PriceListValidationRules, ProductCategoryValidationRules, ProductTypeValidationRules, ProductValidationRules, ProductVariantOptionValidationRules, ProductVariantValidationRules};
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
 
 class VenditioServiceProvider extends PackageServiceProvider
@@ -84,11 +82,19 @@ class VenditioServiceProvider extends PackageServiceProvider
         $this->registerMorphMap();
         $this->bindDiscountClasses();
         $this->bindPricingClasses();
+        $this->bindAuthManager();
+        $this->bindIdentifierGenerators();
+    }
 
+    private function bindAuthManager(): void
+    {
         $this->app->singleton(AuthManagerContract::class, fn () => (
             AuthManager::make(fn () => auth()->guard()->user())
         ));
+    }
 
+    private function bindIdentifierGenerators(): void
+    {
         $this->app->singleton(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
         $this->app->singleton(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
         $this->app->singleton(
@@ -99,20 +105,7 @@ class VenditioServiceProvider extends PackageServiceProvider
 
     private function bindValidationClasses(): void
     {
-        $validations = [
-            AddressValidationRules::class => AddressValidation::class,
-            BrandValidationRules::class => BrandValidation::class,
-            CartValidationRules::class => CartValidation::class,
-            CartLineValidationRules::class => CartLineValidation::class,
-            OrderValidationRules::class => OrderValidation::class,
-            ProductValidationRules::class => ProductValidation::class,
-            ProductCategoryValidationRules::class => ProductCategoryValidation::class,
-            ProductTypeValidationRules::class => ProductTypeValidation::class,
-            ProductVariantValidationRules::class => ProductVariantValidation::class,
-            ProductVariantOptionValidationRules::class => ProductVariantOptionValidation::class,
-            PriceListValidationRules::class => PriceListValidation::class,
-            PriceListPriceValidationRules::class => PriceListPriceValidation::class,
-        ];
+        $validations = config('venditio.validations', []);
 
         foreach ($validations as $contract => $implementation) {
             $this->app->singleton($contract, $implementation);

@@ -3,6 +3,7 @@
 use PictaStudio\Venditio\{Discounts, Dto, Enums, Generators, Managers, Models, Pricing};
 use PictaStudio\Venditio\Facades\Venditio;
 use PictaStudio\Venditio\Pipelines\{Cart, CartLine, Order};
+use PictaStudio\Venditio\Validations;
 
 return [
 
@@ -124,32 +125,26 @@ return [
     | Validation
     |--------------------------------------------------------------------------
     |
-    | Specify the validation classes with the rules to use when storing and updating models
+    | Map validation contract (interface) to implementation. The service provider
+    | binds these into the container so Form Requests resolve the correct rules.
+    | Remove an entry to disable validation for that resource; replace with a
+    | custom class to override rules. Publish config to customize.
     |
     */
-    // 'validations' => [
-    //     Validations\Contracts\AddressValidationRules::class => Validations\Address::class,
-    //     // Validations\Contracts\BrandValidationRules::class => Validations\Brand::class,
-    //     Validations\Contracts\CartValidationRules::class => Validations\Cart::class,
-    //     Validations\Contracts\CartLineValidationRules::class => Validations\CartLine::class,
-    //     // Validations\Contracts\CountryValidationRules::class => Validations\Country::class,
-    //     // Validations\Contracts\CountryTaxClassValidationRules::class => Validations\CountryTaxClass::class,
-    //     // Validations\Contracts\CurrencyValidationRules::class => Validations\Currency::class,
-    //     // Validations\Contracts\DiscountValidationRules::class => Validations\Discount::class,
-    //     // Validations\Contracts\InventoryValidationRules::class => Validations\Inventory::class,
-    //     Validations\Contracts\OrderValidationRules::class => Validations\Order::class,
-    //     // Validations\Contracts\OrderLineValidationRules::class => Validations\OrderLine::class,
-    //     // Validations\Contracts\ProductValidationRules::class => Validations\Product::class,
-    //     // Validations\Contracts\ProductCategoryValidationRules::class => Validations\ProductCategory::class,
-    //     // Validations\Contracts\ProductCustomFieldValidationRules::class => Validations\ProductCustomField::class,
-    //     // Validations\Contracts\ProductItemValidationRules::class => Validations\ProductItem::class,
-    //     // Validations\Contracts\ProductTypeValidationRules::class => Validations\ProductType::class,
-    //     // Validations\Contracts\ProductVariantValidationRules::class => Validations\ProductVariant::class,
-    //     // Validations\Contracts\ProductVariantOptionValidationRules::class => Validations\ProductVariantOption::class,
-    //     // Validations\Contracts\ShippingStatusValidationRules::class => Validations\ShippingStatus::class,
-    //     // Validations\Contracts\TaxClassValidationRules::class => Validations\TaxClass::class,
-    //     // Validations\Contracts\UserValidationRules::class => Validations\User::class,
-    // ],
+    'validations' => [
+        Validations\Contracts\AddressValidationRules::class => Validations\AddressValidation::class,
+        Validations\Contracts\BrandValidationRules::class => Validations\BrandValidation::class,
+        Validations\Contracts\CartValidationRules::class => Validations\CartValidation::class,
+        Validations\Contracts\CartLineValidationRules::class => Validations\CartLineValidation::class,
+        Validations\Contracts\OrderValidationRules::class => Validations\OrderValidation::class,
+        Validations\Contracts\ProductValidationRules::class => Validations\ProductValidation::class,
+        Validations\Contracts\ProductCategoryValidationRules::class => Validations\ProductCategoryValidation::class,
+        Validations\Contracts\ProductTypeValidationRules::class => Validations\ProductTypeValidation::class,
+        Validations\Contracts\ProductVariantValidationRules::class => Validations\ProductVariantValidation::class,
+        Validations\Contracts\ProductVariantOptionValidationRules::class => Validations\ProductVariantOptionValidation::class,
+        Validations\Contracts\PriceListValidationRules::class => Validations\PriceListValidation::class,
+        Validations\Contracts\PriceListPriceValidationRules::class => Validations\PriceListPriceValidation::class,
+    ],
 
     /*
     |--------------------------------------------------------------------------

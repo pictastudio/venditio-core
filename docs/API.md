@@ -289,6 +289,7 @@ Response includes the created variant products and a `meta` object with counts.
 ## Validation and Errors
 
 - Validation errors return HTTP 422 with error messages in the standard Laravel format.
+- Validation rules are provided by classes bound via `config('venditio.validations')` (contract → implementation). Override or remove entries there to customize or disable validation per resource.
 - Variant generation validates that:
   - The base product has a `product_type_id`
   - Variant axes belong to that product type

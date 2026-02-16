@@ -5,6 +5,7 @@ namespace PictaStudio\Venditio\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
+use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\Venditio\Models\Traits\HasHelperMethods;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
@@ -13,11 +14,13 @@ class DiscountApplication extends Model
 {
     use HasFactory;
     use HasHelperMethods;
+    use SoftDeletes;
 
     protected $guarded = [
         'id',
         'created_at',
         'updated_at',
+        'deleted_at',
     ];
 
     protected function casts(): array
