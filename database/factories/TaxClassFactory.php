@@ -13,6 +13,7 @@ class TaxClassFactory extends Factory
     {
         return [
             'name' => 'Standard',
+            'is_default' => false,
         ];
     }
 }

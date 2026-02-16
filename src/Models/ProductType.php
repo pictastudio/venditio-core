@@ -26,6 +26,7 @@ class ProductType extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'is_default' => 'boolean',
     ];
 
     protected static function booted(): void

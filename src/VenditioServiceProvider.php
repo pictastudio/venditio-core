@@ -60,6 +60,7 @@ class VenditioServiceProvider extends PackageServiceProvider
                 'create_price_list_prices_table',
                 'create_carts_table',
                 'create_cart_lines_table',
+                'seed_venditio_data',
             ]);
         // ->hasRoute('api');
     }

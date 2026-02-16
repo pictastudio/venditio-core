@@ -58,36 +58,6 @@ All the variants are computed using `product_variants` and `product_variant_opti
 
 No edition or mode selection is required. All behavior is configured via the `venditio` config file.
 
-### Seeding Data
-
-Add the following seeders to your `DatabaseSeeder` to seed the initial data used by the package, this will seed the countries data as well as a root user, then it will create all the roles and permissions based on the [auth section of the config](#auth)
-
-```php
-namespace Database\Seeders;
-
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use PictaStudio\Venditio\Database\Seeders\CountrySeeder;
-use PictaStudio\Venditio\Database\Seeders\CurrencySeeder;
-use PictaStudio\Venditio\Database\Seeders\RoleSeeder;
-use PictaStudio\Venditio\Database\Seeders\TaxClassSeeder;
-use PictaStudio\Venditio\Database\Seeders\UserSeeder;
-
-class DatabaseSeeder extends Seeder
-{
-    public function run(): void
-    {
-        $this->call([
-            CountrySeeder::class,
-            CurrencySeeder::class,
-            TaxClassSeeder::class,
-            RoleSeeder::class,
-            UserSeeder::class,
-        ]);
-    }
-}
-```
-
 ### Auth
 
 Add the `HasApiTokens` trait to your user model if not already present and then update the model in the config so the package can use the correct one

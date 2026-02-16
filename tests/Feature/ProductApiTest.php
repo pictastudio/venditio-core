@@ -42,7 +42,54 @@ it('creates a product with categories', function () {
 it('validates product creation', function () {
     postJson(config('venditio.routes.api.v1.prefix') . '/products', [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['tax_class_id', 'name', 'status']);
+        ->assertJsonValidationErrors(['name', 'status', 'sku']);
+});
+
+it('assigns default product type when product_type_id is omitted and a default exists', function () {
+    $defaultProductType = ProductType::factory()->create(['is_default' => true]);
+    $taxClass = TaxClass::factory()->create();
+
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
+        'tax_class_id' => $taxClass->getKey(),
+        'name' => 'Product with default type',
+        'sku' => 'DEFAULT-TYPE-001',
+        'status' => ProductStatus::Published,
+    ])->assertCreated();
+
+    $productId = $response->json('id');
+    assertDatabaseHas('products', [
+        'id' => $productId,
+        'product_type_id' => $defaultProductType->getKey(),
+    ]);
+});
+
+it('assigns default tax class when tax_class_id is omitted and a default exists', function () {
+    $defaultTaxClass = TaxClass::factory()->create(['is_default' => true]);
+    $productType = ProductType::factory()->create();
+
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
+        'product_type_id' => $productType->getKey(),
+        'name' => 'Product with default tax class',
+        'sku' => 'DEFAULT-TAX-001',
+        'status' => ProductStatus::Published,
+    ])->assertCreated();
+
+    $productId = $response->json('id');
+    assertDatabaseHas('products', [
+        'id' => $productId,
+        'tax_class_id' => $defaultTaxClass->getKey(),
+    ]);
+});
+
+it('returns validation error when tax_class_id is omitted and no default tax class exists', function () {
+    ProductType::factory()->create(['is_default' => true]);
+
+    postJson(config('venditio.routes.api.v1.prefix') . '/products', [
+        'name' => 'Product without tax class',
+        'sku' => 'NO-TAX-CLASS-001',
+        'status' => ProductStatus::Published,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['tax_class_id']);
 });
 
 it('updates product categories when provided', function () {

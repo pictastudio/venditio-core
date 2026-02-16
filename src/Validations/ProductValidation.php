@@ -29,7 +29,7 @@ class ProductValidation implements ProductValidationRules
                 Rule::exists($this->tableFor('product_type'), 'id'),
             ],
             'tax_class_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists($this->tableFor('tax_class'), 'id'),
             ],
@@ -108,6 +108,7 @@ class ProductValidation implements ProductValidationRules
             ],
             'tax_class_id' => [
                 'sometimes',
+                'nullable',
                 'integer',
                 Rule::exists($this->tableFor('tax_class'), 'id'),
             ],

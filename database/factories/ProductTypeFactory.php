@@ -14,6 +14,7 @@ class ProductTypeFactory extends Factory
         return [
             'name' => fake()->word(),
             'active' => fake()->boolean(),
+            'is_default' => false,
         ];
     }
 }

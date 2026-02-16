@@ -11,6 +11,7 @@ class ProductTypeValidation implements ProductTypeValidationRules
         return [
             'name' => 'required|string|max:255',
             'active' => 'sometimes|boolean',
+            'is_default' => 'sometimes|boolean',
         ];
     }
 
@@ -19,6 +20,7 @@ class ProductTypeValidation implements ProductTypeValidationRules
         return [
             'name' => 'sometimes|string|max:255',
             'active' => 'sometimes|boolean',
+            'is_default' => 'sometimes|boolean',
         ];
     }
 }

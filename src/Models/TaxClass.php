@@ -22,6 +22,10 @@ class TaxClass extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
+
     public function countries(): BelongsToMany
     {
         return $this->belongsToMany(resolve_model('country'), 'country_tax_class')

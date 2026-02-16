@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('tax_classes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('is_default')->default(false);
             $table->datetimes();
             $table->softDeletesDatetime();
         });

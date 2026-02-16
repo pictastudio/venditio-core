@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->boolean('active')->default(true);
+            $table->boolean('is_default')->default(false);
             $table->datetimes();
             $table->softDeletesDatetime();
         });
