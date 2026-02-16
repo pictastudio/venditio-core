@@ -21,19 +21,24 @@ class CalculateLines
         $cart->setRelation(
             'lines',
             $this->calculateLines(
-                $cart->getRelation('lines')
+                $cart->getRelation('lines'),
+                $cart
             )
         );
 
         return $next($cart);
     }
 
-    public function calculateLines(Collection $lines)
+    public function calculateLines(Collection $lines, Model $cart): Collection
     {
-        return $lines->map(function (mixed $line) {
+        return $lines->map(function (mixed $line) use ($cart) {
             $cartLineDto = $line instanceof CartLineDtoContract
                 ? $line
                 : resolve_dto('cart_line')::fromArray((array) $line);
+
+            $cartLine = $cartLineDto->getCartLine();
+            $cartLine->setRelation('cart', $cart);
+            $cartLine->cart()->associate($cart);
 
             return CartLineCreationPipeline::make()->run($cartLineDto);
         });

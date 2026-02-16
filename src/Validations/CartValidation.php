@@ -3,6 +3,7 @@
 namespace PictaStudio\Venditio\Validations;
 
 use BackedEnum;
+use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Validations\Contracts\CartValidationRules;
 
 class CartValidation implements CartValidationRules
@@ -47,7 +48,7 @@ class CartValidation implements CartValidationRules
         foreach ($addressTypeEnum::cases() as $case) {
             $rules = [
                 ...$rules,
-                'addresses' . $case->value => 'sometimes|array',
+                'addresses.' . $case->value => 'sometimes|array',
                 ...$this->getAddressValidationRules('addresses.' . $case->value),
             ];
         }
@@ -58,6 +59,11 @@ class CartValidation implements CartValidationRules
     protected function getAddressValidationRules(string $key): array
     {
         return [
+            $key . '.country_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('country'), 'id'),
+            ],
             $key . '.first_name' => 'nullable|string|max:255',
             $key . '.last_name' => 'nullable|string|max:255',
             $key . '.email' => 'nullable|email|max:255',
@@ -75,5 +81,10 @@ class CartValidation implements CartValidationRules
             $key . '.birth_place' => 'nullable|string|max:100',
             $key . '.notes' => 'nullable|string',
         ];
+    }
+
+    private function tableFor(string $model): string
+    {
+        return (new (config('venditio.models.' . $model)))->getTable();
     }
 }

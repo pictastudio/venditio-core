@@ -107,6 +107,53 @@ it('creates a cart through api with lines', function () {
         ->assertJsonPath('lines.0.qty', 2);
 });
 
+it('uses the shipping address country tax rate when calculating cart line VAT', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $user = createUserForCart('user-country-tax@example.test');
+
+    $otherCountry = Country::query()->create([
+        'name' => 'Germany',
+        'iso_2' => 'DE',
+        'iso_3' => 'DEU',
+        'phone_code' => '+49',
+        'currency_code' => 'EUR',
+        'flag_emoji' => 'de',
+        'capital' => 'Berlin',
+        'native' => 'Deutschland',
+    ]);
+
+    CountryTaxClass::query()->create([
+        'country_id' => $otherCountry->getKey(),
+        'tax_class_id' => $taxClass->getKey(),
+        'rate' => 10,
+    ]);
+
+    $prefix = config('venditio.routes.api.v1.prefix');
+
+    $cartId = postJson($prefix . '/carts', [
+        'user_id' => $user->getKey(),
+        'user_first_name' => $user->first_name,
+        'user_last_name' => $user->last_name,
+        'user_email' => $user->email,
+        'addresses' => [
+            'shipping' => [
+                'country_id' => $otherCountry->getKey(),
+            ],
+        ],
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated()->json('id');
+
+    getJson($prefix . '/carts/' . $cartId)
+        ->assertOk()
+        ->assertJsonPath('lines.0.tax_rate', 10)
+        ->assertJsonPath('lines.0.unit_final_price_tax', 10)
+        ->assertJsonPath('total_final', 110);
+});
+
 it('filters carts by user_id', function () {
     $userA = createUserForCart('user-a@example.test');
     $userB = createUserForCart('user-b@example.test');
