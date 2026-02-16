@@ -1,6 +1,6 @@
-# Venditio Core Architecture
+# Venditio Architecture
 
-Venditio Core is a Laravel package that exposes API-only ecommerce primitives. It is designed for headless use, with the host application providing auth, UI, and rendering.
+Venditio is a Laravel package that exposes API-only ecommerce primitives. It is designed for headless use, with the host application providing auth, UI, and rendering.
 
 ## Goals
 
