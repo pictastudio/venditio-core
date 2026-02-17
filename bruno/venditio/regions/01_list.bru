@@ -1,0 +1,22 @@
+meta {
+  name: List regions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/regions
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+  ~country_id:
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

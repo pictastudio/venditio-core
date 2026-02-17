@@ -41,4 +41,9 @@ class Address extends Model
     {
         return $this->belongsTo(resolve_model('country'));
     }
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(resolve_model('province'));
+    }
 }

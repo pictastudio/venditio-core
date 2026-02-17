@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use PictaStudio\Venditio\Http\Controllers\Api\V1\{AddressController, BrandController, CartController, CartLineController, CountryController, CountryTaxClassController, CurrencyController, DiscountApplicationController, DiscountController, InventoryController, OrderController, OrderLineController, PriceListController, PriceListPriceController, ProductCategoryController, ProductController, ProductCustomFieldController, ProductTypeController, ProductVariantController, ProductVariantOptionController, ShippingStatusController, TaxClassController};
+use PictaStudio\Venditio\Http\Controllers\Api\V1\{AddressController, BrandController, CartController, CartLineController, CountryController, CountryTaxClassController, CurrencyController, DiscountApplicationController, DiscountController, InventoryController, MunicipalityController, OrderController, OrderLineController, PriceListController, PriceListPriceController, ProductCategoryController, ProductController, ProductCustomFieldController, ProductTypeController, ProductVariantController, ProductVariantOptionController, ProvinceController, RegionController, ShippingStatusController, TaxClassController};
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +31,10 @@ Route::apiResource('orders', OrderController::class);
 Route::apiResource('addresses', AddressController::class);
 Route::apiResource('brands', BrandController::class);
 Route::apiResource('inventories', InventoryController::class);
-Route::apiResource('countries', CountryController::class);
+Route::apiResource('countries', CountryController::class)->only(['index', 'show']);
+Route::apiResource('regions', RegionController::class)->only(['index', 'show']);
+Route::apiResource('provinces', ProvinceController::class)->only(['index', 'show']);
+Route::apiResource('municipalities', MunicipalityController::class)->only(['index', 'show']);
 Route::apiResource('country_tax_classes', CountryTaxClassController::class);
 Route::apiResource('currencies', CurrencyController::class);
 Route::apiResource('tax_classes', TaxClassController::class);

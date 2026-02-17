@@ -24,6 +24,7 @@ if (!function_exists('resolve_model')) {
      * @param  string  $model  Can be one of the following values:
      *                         'address', 'brand', 'cart', 'cart_line', 'country',
      *                         'country_tax_class', 'currency', 'discount', 'discount_application', 'inventory',
+     *                         'municipality', 'province', 'region',
      *                         'order', 'order_line', 'product', 'product_category',
      *                         'shipping_status', 'tax_class', 'user'.
      *                         'product_custom_field', 'product_type',
@@ -43,6 +44,7 @@ if (!function_exists('query')) {
      * @param  string  $model  Can be one of the following values:
      *                         'address', 'brand', 'cart', 'cart_line', 'country',
      *                         'country_tax_class', 'currency', 'discount', 'discount_application', 'inventory',
+     *                         'municipality', 'province', 'region',
      *                         'order', 'order_line', 'product', 'product_category',
      *                         'shipping_status', 'tax_class', 'user'.
      *                         'product_custom_field', 'product_type',
@@ -62,6 +64,7 @@ if (!function_exists('get_fresh_model_instance')) {
      * @param  string  $model  Can be one of the following values:
      *                         'address', 'brand', 'cart', 'cart_line', 'country',
      *                         'country_tax_class', 'currency', 'discount', 'discount_application', 'inventory',
+     *                         'municipality', 'province', 'region',
      *                         'order', 'order_line', 'product', 'product_category',
      *                         'shipping_status', 'tax_class', 'user'.
      *                         'product_custom_field', 'product_type',

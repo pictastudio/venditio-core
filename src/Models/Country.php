@@ -35,6 +35,11 @@ class Country extends Model
         return $this->hasMany(resolve_model('address'));
     }
 
+    public function regions(): HasMany
+    {
+        return $this->hasMany(resolve_model('region'));
+    }
+
     public function currencies(): BelongsToMany
     {
         return $this->belongsToMany(resolve_model('currency'), 'country_currency')

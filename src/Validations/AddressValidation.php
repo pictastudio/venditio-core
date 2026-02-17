@@ -19,6 +19,11 @@ class AddressValidation implements AddressValidationRules
                 'integer',
                 Rule::exists($this->tableFor('country'), 'id'),
             ],
+            'province_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('province'), 'id'),
+            ],
             'type' => [
                 'required',
                 'string',
@@ -53,6 +58,11 @@ class AddressValidation implements AddressValidationRules
                 'nullable',
                 'integer',
                 Rule::exists($this->tableFor('country'), 'id'),
+            ],
+            'province_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('province'), 'id'),
             ],
             'type' => [
                 'sometimes',

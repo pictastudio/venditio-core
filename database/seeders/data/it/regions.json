@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Abruzzo",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Basilicata",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Calabria",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Campania",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Emilia-Romagna",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Friuli-Venezia Giulia",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Lazio",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Liguria",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Lombardia",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Marche",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Molise",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Piemonte",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Puglia",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Sardegna",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Sicilia",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Toscana",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Trentino-Alto Adige",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Umbria",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Valle d'Aosta",
+        "code": null,
+        "country_code": "it"
+    },
+    {
+        "name": "Veneto",
+        "code": null,
+        "country_code": "it"
+    }
+]

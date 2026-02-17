@@ -1,0 +1,20 @@
+meta {
+  name: Show province
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/provinces/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id:
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

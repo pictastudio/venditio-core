@@ -37,6 +37,9 @@ class VenditioServiceProvider extends PackageServiceProvider
             ->hasMigrations([
                 'create_addresses_table',
                 'create_countries_table',
+                'create_regions_table',
+                'create_provinces_table',
+                'create_municipalities_table',
                 'create_country_tax_class_table',
                 'create_tax_classes_table',
                 'create_currencies_table',
@@ -208,6 +211,13 @@ class VenditioServiceProvider extends PackageServiceProvider
         $this->publishes([
             $this->package->basePath('/../bruno/venditio') => base_path('bruno/venditio'),
         ], 'venditio-bruno');
+
+        $this->publishes([
+            __DIR__ . '/../database/seeders/data/countries.json' => database_path('seeders/data/countries.json'),
+            __DIR__ . '/../database/seeders/data/it/regions.json' => database_path('seeders/data/it/regions.json'),
+            __DIR__ . '/../database/seeders/data/it/provinces.json' => database_path('seeders/data/it/provinces.json'),
+            __DIR__ . '/../database/seeders/data/it/municipalities.json' => database_path('seeders/data/it/municipalities.json'),
+        ], 'venditio-data');
     }
 
     private function registerScheduledCommands(): void

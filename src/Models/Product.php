@@ -98,7 +98,7 @@ class Product extends Model
         return $this->hasOne(resolve_model('inventory'));
     }
 
-    public function priceLists(): HasMany
+    public function priceLists(): BelongsToMany
     {
         return $this->belongsToMany(resolve_model('price_list'), 'price_list_prices')
             ->withPivot([

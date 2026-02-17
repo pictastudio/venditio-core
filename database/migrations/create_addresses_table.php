@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PictaStudio\Venditio\Models\Country;
+use PictaStudio\Venditio\Models\{Country, Province};
 
 return new class extends Migration
 {
@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('addressable');
             $table->foreignIdFor(Country::class)->nullable();
+            $table->foreignIdFor(Province::class)->nullable();
             $table->string('type', 30)->comment('billing, shipping')->index();
             $table->boolean('is_default')->default(0);
             $table->string('first_name');

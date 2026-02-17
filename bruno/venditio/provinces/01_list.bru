@@ -1,0 +1,22 @@
+meta {
+  name: List provinces
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/provinces
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+  ~region_id:
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

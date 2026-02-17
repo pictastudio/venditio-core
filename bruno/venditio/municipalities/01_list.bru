@@ -1,0 +1,22 @@
+meta {
+  name: List municipalities
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/municipalities
+  body: none
+  auth: none
+}
+
+params:query {
+  ~all: 1
+  ~per_page: 30
+  ~province_id:
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

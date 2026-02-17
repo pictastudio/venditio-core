@@ -2,6 +2,7 @@
 
 namespace PictaStudio\Venditio\Validations;
 
+use BackedEnum;
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Validations\Contracts\OrderValidationRules;
 
@@ -54,9 +55,43 @@ class OrderValidation implements OrderValidationRules
             'user_last_name' => 'sometimes|string|max:255',
             'user_email' => 'sometimes|email|max:255',
             'addresses' => 'sometimes|array',
+            ...$this->getAddressValidationRulesFromEnum(),
             'customer_notes' => 'nullable|string',
             'admin_notes' => 'nullable|string',
             'approved_at' => 'nullable|date',
+        ];
+    }
+
+    protected function getAddressValidationRulesFromEnum(): array
+    {
+        /** @var BackedEnum $addressTypeEnum */
+        $addressTypeEnum = config('venditio.addresses.type_enum');
+
+        $rules = [];
+        foreach ($addressTypeEnum::cases() as $case) {
+            $rules = [
+                ...$rules,
+                'addresses.' . $case->value => 'sometimes|array',
+                ...$this->getAddressValidationRules('addresses.' . $case->value),
+            ];
+        }
+
+        return $rules;
+    }
+
+    protected function getAddressValidationRules(string $key): array
+    {
+        return [
+            $key . '.country_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('country'), 'id'),
+            ],
+            $key . '.province_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('province'), 'id'),
+            ],
         ];
     }
 

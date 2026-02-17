@@ -64,6 +64,11 @@ class CartValidation implements CartValidationRules
                 'integer',
                 Rule::exists($this->tableFor('country'), 'id'),
             ],
+            $key . '.province_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('province'), 'id'),
+            ],
             $key . '.first_name' => 'nullable|string|max:255',
             $key . '.last_name' => 'nullable|string|max:255',
             $key . '.email' => 'nullable|email|max:255',
