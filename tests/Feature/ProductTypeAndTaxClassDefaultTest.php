@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\Venditio\Models\ProductType;
-use PictaStudio\Venditio\Models\TaxClass;
+use PictaStudio\Venditio\Models\{ProductType, TaxClass};
 
 use function Pest\Laravel\{patchJson, postJson};
 

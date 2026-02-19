@@ -7,8 +7,7 @@ use Illuminate\Support\Collection;
 use PictaStudio\Venditio\Contracts\DiscountUsageRecorderInterface;
 use PictaStudio\Venditio\Models\Discount;
 
-use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
-use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
+use function PictaStudio\Venditio\Helpers\Functions\{get_fresh_model_instance, resolve_model};
 
 class DiscountUsageRecorder implements DiscountUsageRecorderInterface
 {

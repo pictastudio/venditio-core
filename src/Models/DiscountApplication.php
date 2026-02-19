@@ -3,9 +3,8 @@
 namespace PictaStudio\Venditio\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
-use Illuminate\Database\Eloquent\SoftDeletes;
 use PictaStudio\Venditio\Models\Traits\HasHelperMethods;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;

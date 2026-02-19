@@ -97,7 +97,7 @@ class Controller extends BaseController
             return;
         }
 
-        if (! $this->hasAuthorizationDefinition($ability, $arguments)) {
+        if (!$this->hasAuthorizationDefinition($ability, $arguments)) {
             return;
         }
 
