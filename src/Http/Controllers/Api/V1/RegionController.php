@@ -16,6 +16,8 @@ class RegionController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Region::class);
+
         $filters = request()->all();
 
         $this->validateData($filters, [
@@ -41,6 +43,8 @@ class RegionController extends Controller
 
     public function show(Region $region): JsonResource
     {
+        $this->authorizeIfConfigured('view', $region);
+
         return GenericModelResource::make($region);
     }
 }

@@ -9,7 +9,7 @@ class UpdateOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('order:update') ?? true;
+        return true;
     }
 
     public function rules(OrderValidationRules $orderValidationRules): array

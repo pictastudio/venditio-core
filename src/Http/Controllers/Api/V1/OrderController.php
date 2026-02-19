@@ -17,6 +17,8 @@ class OrderController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Order::class);
+
         $filters = request()->all();
 
         // $this->validateData($filters, [
@@ -38,6 +40,8 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request, OrderCreationPipeline $pipeline): JsonResource
     {
+        $this->authorizeIfConfigured('create', Order::class);
+
         $order = $pipeline->run(
             resolve_dto('order')::fromCart(
                 query('cart')
@@ -51,11 +55,15 @@ class OrderController extends Controller
 
     public function show(Order $order): JsonResource
     {
+        $this->authorizeIfConfigured('view', $order);
+
         return OrderResource::make($order->load('lines'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order): JsonResource
     {
+        $this->authorizeIfConfigured('update', $order);
+
         $order->fill($request->validated());
         $order->save();
 
@@ -64,6 +72,8 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
+        $this->authorizeIfConfigured('delete', $order);
+
         $order->delete();
 
         return response()->noContent();

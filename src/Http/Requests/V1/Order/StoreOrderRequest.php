@@ -9,7 +9,7 @@ class StoreOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('order:create') ?? true;
+        return true;
     }
 
     public function rules(OrderValidationRules $orderValidationRules): array

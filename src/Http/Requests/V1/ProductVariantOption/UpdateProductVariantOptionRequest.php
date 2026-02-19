@@ -9,7 +9,7 @@ class UpdateProductVariantOptionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('product-variant-option:update') ?? true;
+        return true;
     }
 
     public function rules(ProductVariantOptionValidationRules $productVariantOptionValidationRules): array

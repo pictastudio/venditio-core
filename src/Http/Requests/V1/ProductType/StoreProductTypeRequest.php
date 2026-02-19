@@ -12,7 +12,7 @@ class StoreProductTypeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('product-type:create') ?? true;
+        return true;
     }
 
     public function rules(ProductTypeValidationRules $productTypeValidationRules): array

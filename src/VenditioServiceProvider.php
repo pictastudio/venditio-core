@@ -15,8 +15,6 @@ use PictaStudio\Venditio\Dto\{CartDto, CartLineDto, OrderDto};
 use PictaStudio\Venditio\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
 use PictaStudio\Venditio\Facades\Venditio as VenditioFacade;
 use PictaStudio\Venditio\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator, ProductSkuGenerator};
-use PictaStudio\Venditio\Managers\AuthManager;
-use PictaStudio\Venditio\Managers\Contracts\AuthManager as AuthManagerContract;
 use PictaStudio\Venditio\Models\User;
 use PictaStudio\Venditio\Pricing\DefaultProductPriceResolver;
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
@@ -86,15 +84,7 @@ class VenditioServiceProvider extends PackageServiceProvider
         $this->registerMorphMap();
         $this->bindDiscountClasses();
         $this->bindPricingClasses();
-        $this->bindAuthManager();
         $this->bindIdentifierGenerators();
-    }
-
-    private function bindAuthManager(): void
-    {
-        $this->app->singleton(AuthManagerContract::class, fn () => (
-            AuthManager::make(fn () => auth()->guard()->user())
-        ));
     }
 
     private function bindIdentifierGenerators(): void
@@ -162,10 +152,6 @@ class VenditioServiceProvider extends PackageServiceProvider
 
         if (!config('venditio.routes.api.json_resource_enable_wrapping')) {
             JsonResource::withoutWrapping();
-        }
-
-        if (config('venditio.policies.register')) {
-            VenditioFacade::registerPolicies();
         }
 
         $prefix = config('venditio.routes.api.v1.prefix');

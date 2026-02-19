@@ -16,6 +16,8 @@ class ProvinceController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Province::class);
+
         $filters = request()->all();
 
         $this->validateData($filters, [
@@ -41,6 +43,8 @@ class ProvinceController extends Controller
 
     public function show(Province $province): JsonResource
     {
+        $this->authorizeIfConfigured('view', $province);
+
         return GenericModelResource::make($province);
     }
 }

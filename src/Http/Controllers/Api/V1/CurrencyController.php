@@ -16,6 +16,8 @@ class CurrencyController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Currency::class);
+
         return GenericModelResource::collection(
             $this->applyBaseFilters(query('currency'), request()->all(), 'currency')
         );
@@ -23,6 +25,8 @@ class CurrencyController extends Controller
 
     public function store(StoreCurrencyRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', Currency::class);
+
         $payload = $request->validated();
         $countryIds = Arr::pull($payload, 'country_ids');
 
@@ -37,11 +41,15 @@ class CurrencyController extends Controller
 
     public function show(Currency $currency): JsonResource
     {
+        $this->authorizeIfConfigured('view', $currency);
+
         return GenericModelResource::make($currency);
     }
 
     public function update(UpdateCurrencyRequest $request, Currency $currency): JsonResource
     {
+        $this->authorizeIfConfigured('update', $currency);
+
         $payload = $request->validated();
         $countryIds = Arr::pull($payload, 'country_ids');
 
@@ -57,6 +65,8 @@ class CurrencyController extends Controller
 
     public function destroy(Currency $currency)
     {
+        $this->authorizeIfConfigured('delete', $currency);
+
         $currency->delete();
 
         return response()->noContent();

@@ -16,6 +16,8 @@ class TaxClassController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', TaxClass::class);
+
         $includes = request()->query('include', []);
 
         $this->validateData([
@@ -35,6 +37,8 @@ class TaxClassController extends Controller
 
     public function store(StoreTaxClassRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', TaxClass::class);
+
         $taxClass = query('tax_class')->create($request->validated());
 
         return GenericModelResource::make($taxClass);
@@ -42,11 +46,15 @@ class TaxClassController extends Controller
 
     public function show(TaxClass $taxClass): JsonResource
     {
+        $this->authorizeIfConfigured('view', $taxClass);
+
         return GenericModelResource::make($taxClass);
     }
 
     public function update(UpdateTaxClassRequest $request, TaxClass $taxClass): JsonResource
     {
+        $this->authorizeIfConfigured('update', $taxClass);
+
         $taxClass->fill($request->validated());
         $taxClass->save();
 
@@ -55,6 +63,8 @@ class TaxClassController extends Controller
 
     public function destroy(TaxClass $taxClass)
     {
+        $this->authorizeIfConfigured('delete', $taxClass);
+
         $taxClass->delete();
 
         return response()->noContent();

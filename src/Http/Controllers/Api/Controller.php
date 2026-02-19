@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\{JsonResponse, Response};
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Traits\ValidatesData;
 
@@ -88,7 +89,7 @@ class Controller extends BaseController
 
     protected function authorizeIfConfigured(string $ability, mixed $arguments): void
     {
-        if (!config('venditio.policies.register')) {
+        if (!config('venditio.authorize_using_policies')) {
             return;
         }
 
@@ -96,6 +97,27 @@ class Controller extends BaseController
             return;
         }
 
-        $this->authorize($ability, $arguments);
+        if (! $this->hasAuthorizationDefinition($ability, $arguments)) {
+            return;
+        }
+
+        Gate::forUser(auth()->user())->authorize($ability, $arguments);
+    }
+
+    protected function hasAuthorizationDefinition(string $ability, mixed $arguments): bool
+    {
+        if (Gate::has($ability)) {
+            return true;
+        }
+
+        if (is_string($arguments) && class_exists($arguments)) {
+            return Gate::getPolicyFor($arguments) !== null;
+        }
+
+        if (is_object($arguments)) {
+            return Gate::getPolicyFor($arguments) !== null;
+        }
+
+        return false;
     }
 }

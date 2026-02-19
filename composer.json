@@ -26,7 +26,6 @@
         "nevadskiy/laravel-tree": "^0.6.1",
         "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-package-tools": "^1.16",
-        "spatie/laravel-permission": "^6.3",
         "spatie/laravel-sluggable": "^3.7"
     },
     "require-dev": {

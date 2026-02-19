@@ -1,6 +1,6 @@
 <?php
 
-use PictaStudio\Venditio\{Discounts, Dto, Enums, Generators, Managers, Models, Pricing};
+use PictaStudio\Venditio\{Discounts, Dto, Enums, Generators, Models, Pricing};
 use PictaStudio\Venditio\Facades\Venditio;
 use PictaStudio\Venditio\Pipelines\{Cart, CartLine, Order};
 use PictaStudio\Venditio\Validations;
@@ -13,60 +13,7 @@ return [
         'log_except' => env('VENDITIO_ACTIVITY_LOG_EXCEPT', ['updated_at']),
     ],
 
-    'policies' => [
-        'register' => env('VENDITIO_POLICIES_REGISTER', true),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Auth
-    |--------------------------------------------------------------------------
-    |
-    | Specify the auth manager, roles, resources, actions, and extra permissions
-    |
-    */
-    'auth' => [
-        // 'manager' => AuthManager::class,
-        'roles' => [
-            'root' => Managers\AuthManager::ROLE_ROOT,
-            'admin' => Managers\AuthManager::ROLE_ADMIN,
-            'user' => Managers\AuthManager::ROLE_USER,
-        ],
-        'resources' => [
-            'user',
-            'role',
-            'address',
-            'cart',
-            'order',
-            'product',
-            'product-category',
-            'brand',
-            'product-type',
-            'product-variant',
-            'product-variant-option',
-            'price-list',
-            'price-list-price',
-        ],
-        'actions' => [
-            'view-any',
-            'view',
-            'create',
-            'update',
-            'delete',
-            'restore',
-            'force-delete',
-        ],
-        'extra_permissions' => [
-            // 'orders' => [
-            //     'export',
-            //     'export-bulk',
-            // ],
-        ],
-        'root_user' => [
-            'email' => env('VENDITIO_ROOT_USER_EMAIL'),
-            'password' => env('VENDITIO_ROOT_USER_PASSWORD'),
-        ],
-    ],
+    'authorize_using_policies' => env('VENDITIO_AUTHORIZE_USING_POLICIES', true),
 
     /*
     |--------------------------------------------------------------------------

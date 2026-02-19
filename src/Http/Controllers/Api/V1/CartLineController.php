@@ -15,6 +15,8 @@ class CartLineController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', CartLine::class);
+
         return CartLineResource::collection(
             $this->applyBaseFilters(query('cart_line'), request()->all(), 'cart_line')
         );
@@ -22,6 +24,8 @@ class CartLineController extends Controller
 
     public function store(StoreCartLineRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', CartLine::class);
+
         $cartLine = query('cart_line')->create($request->validated());
 
         return CartLineResource::make($cartLine);
@@ -29,11 +33,15 @@ class CartLineController extends Controller
 
     public function show(CartLine $cartLine): JsonResource
     {
+        $this->authorizeIfConfigured('view', $cartLine);
+
         return CartLineResource::make($cartLine);
     }
 
     public function update(UpdateCartLineRequest $request, CartLine $cartLine): JsonResource
     {
+        $this->authorizeIfConfigured('update', $cartLine);
+
         $cartLine->fill($request->validated());
         $cartLine->save();
 
@@ -42,6 +50,8 @@ class CartLineController extends Controller
 
     public function destroy(CartLine $cartLine)
     {
+        $this->authorizeIfConfigured('delete', $cartLine);
+
         $cartLine->delete();
 
         return response()->noContent();

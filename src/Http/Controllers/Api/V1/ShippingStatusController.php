@@ -15,6 +15,8 @@ class ShippingStatusController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', ShippingStatus::class);
+
         return GenericModelResource::collection(
             $this->applyBaseFilters(query('shipping_status'), request()->all(), 'shipping_status')
         );
@@ -22,6 +24,8 @@ class ShippingStatusController extends Controller
 
     public function store(StoreShippingStatusRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', ShippingStatus::class);
+
         $shippingStatus = query('shipping_status')->create($request->validated());
 
         return GenericModelResource::make($shippingStatus);
@@ -29,11 +33,15 @@ class ShippingStatusController extends Controller
 
     public function show(ShippingStatus $shippingStatus): JsonResource
     {
+        $this->authorizeIfConfigured('view', $shippingStatus);
+
         return GenericModelResource::make($shippingStatus);
     }
 
     public function update(UpdateShippingStatusRequest $request, ShippingStatus $shippingStatus): JsonResource
     {
+        $this->authorizeIfConfigured('update', $shippingStatus);
+
         $shippingStatus->fill($request->validated());
         $shippingStatus->save();
 
@@ -42,6 +50,8 @@ class ShippingStatusController extends Controller
 
     public function destroy(ShippingStatus $shippingStatus)
     {
+        $this->authorizeIfConfigured('delete', $shippingStatus);
+
         $shippingStatus->delete();
 
         return response()->noContent();

@@ -15,6 +15,8 @@ class InventoryController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Inventory::class);
+
         return InventoryResource::collection(
             $this->applyBaseFilters(query('inventory'), request()->all(), 'inventory')
         );
@@ -22,6 +24,8 @@ class InventoryController extends Controller
 
     public function store(StoreInventoryRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', Inventory::class);
+
         $inventory = query('inventory')->create($request->validated());
 
         return InventoryResource::make($inventory);
@@ -29,11 +33,15 @@ class InventoryController extends Controller
 
     public function show(Inventory $inventory): JsonResource
     {
+        $this->authorizeIfConfigured('view', $inventory);
+
         return InventoryResource::make($inventory);
     }
 
     public function update(UpdateInventoryRequest $request, Inventory $inventory): JsonResource
     {
+        $this->authorizeIfConfigured('update', $inventory);
+
         $inventory->fill($request->validated());
         $inventory->save();
 
@@ -42,6 +50,8 @@ class InventoryController extends Controller
 
     public function destroy(Inventory $inventory)
     {
+        $this->authorizeIfConfigured('delete', $inventory);
+
         $inventory->delete();
 
         return response()->noContent();

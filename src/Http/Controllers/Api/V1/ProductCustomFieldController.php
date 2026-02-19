@@ -15,6 +15,8 @@ class ProductCustomFieldController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', ProductCustomField::class);
+
         return GenericModelResource::collection(
             $this->applyBaseFilters(query('product_custom_field'), request()->all(), 'product_custom_field')
         );
@@ -22,6 +24,8 @@ class ProductCustomFieldController extends Controller
 
     public function store(StoreProductCustomFieldRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', ProductCustomField::class);
+
         $productCustomField = query('product_custom_field')->create($request->validated());
 
         return GenericModelResource::make($productCustomField);
@@ -29,11 +33,15 @@ class ProductCustomFieldController extends Controller
 
     public function show(ProductCustomField $productCustomField): JsonResource
     {
+        $this->authorizeIfConfigured('view', $productCustomField);
+
         return GenericModelResource::make($productCustomField);
     }
 
     public function update(UpdateProductCustomFieldRequest $request, ProductCustomField $productCustomField): JsonResource
     {
+        $this->authorizeIfConfigured('update', $productCustomField);
+
         $productCustomField->fill($request->validated());
         $productCustomField->save();
 
@@ -42,6 +50,8 @@ class ProductCustomFieldController extends Controller
 
     public function destroy(ProductCustomField $productCustomField)
     {
+        $this->authorizeIfConfigured('delete', $productCustomField);
+
         $productCustomField->delete();
 
         return response()->noContent();

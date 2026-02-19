@@ -15,6 +15,8 @@ class CountryTaxClassController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', CountryTaxClass::class);
+
         return GenericModelResource::collection(
             $this->applyBaseFilters(query('country_tax_class'), request()->all(), 'country_tax_class')
         );
@@ -22,6 +24,8 @@ class CountryTaxClassController extends Controller
 
     public function store(StoreCountryTaxClassRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', CountryTaxClass::class);
+
         $countryTaxClass = query('country_tax_class')->create($request->validated());
 
         return GenericModelResource::make($countryTaxClass);
@@ -29,11 +33,15 @@ class CountryTaxClassController extends Controller
 
     public function show(CountryTaxClass $countryTaxClass): JsonResource
     {
+        $this->authorizeIfConfigured('view', $countryTaxClass);
+
         return GenericModelResource::make($countryTaxClass);
     }
 
     public function update(UpdateCountryTaxClassRequest $request, CountryTaxClass $countryTaxClass): JsonResource
     {
+        $this->authorizeIfConfigured('update', $countryTaxClass);
+
         $countryTaxClass->fill($request->validated());
         $countryTaxClass->save();
 
@@ -42,6 +50,8 @@ class CountryTaxClassController extends Controller
 
     public function destroy(CountryTaxClass $countryTaxClass)
     {
+        $this->authorizeIfConfigured('delete', $countryTaxClass);
+
         $countryTaxClass->delete();
 
         return response()->noContent();

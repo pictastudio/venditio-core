@@ -9,7 +9,7 @@ class UpdateCartRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('cart:update') ?? true;
+        return true;
     }
 
     public function rules(CartValidationRules $cartValidationRules): array

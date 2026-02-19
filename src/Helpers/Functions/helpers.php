@@ -3,19 +3,6 @@
 namespace PictaStudio\Venditio\Helpers\Functions;
 
 use Illuminate\Database\Eloquent\{Builder, Model};
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use PictaStudio\Venditio\Managers\Contracts\AuthManager as AuthManagerContract;
-use PictaStudio\Venditio\Models\User;
-
-if (!function_exists('auth_manager')) {
-    /**
-     * Get the auth manager instance
-     */
-    function auth_manager(User|Authenticatable|null $user = null): AuthManagerContract
-    {
-        return app(AuthManagerContract::class, ['user' => $user]);
-    }
-}
 
 if (!function_exists('resolve_model')) {
     /**

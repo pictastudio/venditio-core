@@ -15,6 +15,8 @@ class DiscountController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Discount::class);
+
         return GenericModelResource::collection(
             $this->applyBaseFilters(query('discount'), request()->all(), 'discount')
         );
@@ -22,6 +24,8 @@ class DiscountController extends Controller
 
     public function store(StoreDiscountRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', Discount::class);
+
         $discount = query('discount')->create($request->validated());
 
         return GenericModelResource::make($discount);
@@ -29,11 +33,15 @@ class DiscountController extends Controller
 
     public function show(Discount $discount): JsonResource
     {
+        $this->authorizeIfConfigured('view', $discount);
+
         return GenericModelResource::make($discount->load('discountable'));
     }
 
     public function update(UpdateDiscountRequest $request, Discount $discount): JsonResource
     {
+        $this->authorizeIfConfigured('update', $discount);
+
         $discount->fill($request->validated());
         $discount->save();
 
@@ -42,6 +50,8 @@ class DiscountController extends Controller
 
     public function destroy(Discount $discount)
     {
+        $this->authorizeIfConfigured('delete', $discount);
+
         $discount->delete();
 
         return response()->noContent();

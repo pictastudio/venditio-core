@@ -12,7 +12,7 @@ class UpdateProductTypeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('product-type:update') ?? true;
+        return true;
     }
 
     public function rules(ProductTypeValidationRules $productTypeValidationRules): array

@@ -9,7 +9,7 @@ class UpdatePriceListRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('price-list:update') ?? true;
+        return true;
     }
 
     public function rules(PriceListValidationRules $priceListValidationRules): array

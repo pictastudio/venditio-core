@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static void configureRateLimiting(string $prefix)
  * @method static void configureUsing(Closure $callback)
- * @method static void registerPolicies()
  */
 class Venditio extends Facade
 {

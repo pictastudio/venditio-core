@@ -16,7 +16,8 @@ Configure via:
 
 - No authentication is enforced by default.
 - Middleware is configurable via `venditio.routes.api.v1.middleware`.
-- Policy checks are optional and enabled by `venditio.policies.register`.
+- Policy checks are optional and enabled by `venditio.authorize_using_policies`.
+- Policies/gates must be registered by the host app (for example in `AuthServiceProvider` via `Gate::policy(...)`).
 
 ## Common Query Parameters
 

@@ -20,6 +20,8 @@ class CartController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Cart::class);
+
         $filters = request()->all();
 
         $this->validateData($filters, [
@@ -46,6 +48,8 @@ class CartController extends Controller
 
     public function store(StoreCartRequest $request, CartCreationPipeline $pipeline): JsonResource
     {
+        $this->authorizeIfConfigured('create', Cart::class);
+
         return CartResource::make(
             $pipeline->run(
                 resolve_dto('cart')::fromArray($request->validated())
@@ -55,11 +59,15 @@ class CartController extends Controller
 
     public function show(Cart $cart): JsonResource
     {
+        $this->authorizeIfConfigured('view', $cart);
+
         return CartResource::make($cart->load('lines'));
     }
 
     public function update(UpdateCartRequest $request, Cart $cart, CartUpdatePipeline $pipeline): JsonResource
     {
+        $this->authorizeIfConfigured('update', $cart);
+
         return CartResource::make(
             $pipeline->run(
                 resolve_dto('cart')::fromArray(
@@ -74,6 +82,8 @@ class CartController extends Controller
 
     public function destroy(Cart $cart): JsonResponse
     {
+        $this->authorizeIfConfigured('delete', $cart);
+
         $cart->purge();
 
         return $this->successJsonResponse(
@@ -83,6 +93,8 @@ class CartController extends Controller
 
     public function addLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
+        $this->authorizeIfConfigured('update', $cart);
+
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getStoreValidationRules());
         $lines = $this->mergeExistingAndIncomingLines($cart, $validationResponse['lines']);
         $updatedCart = $this->runCartUpdatePipeline($cart, ['lines' => $lines])->load('lines');
@@ -92,6 +104,8 @@ class CartController extends Controller
 
     public function updateLines(Cart $cart, CartLineValidationRules $cartLineValidationRules): JsonResponse
     {
+        $this->authorizeIfConfigured('update', $cart);
+
         $validationResponse = $this->validateData(request()->all(), $cartLineValidationRules->getUpdateValidationRules());
 
         // pipeline per update cart lines
@@ -120,6 +134,8 @@ class CartController extends Controller
 
     public function removeLines(Cart $cart): JsonResponse
     {
+        $this->authorizeIfConfigured('update', $cart);
+
         $validated = $this->validateData(request()->all(), [
             'line_ids' => 'required|array|min:1',
             'line_ids.*' => [
@@ -157,6 +173,8 @@ class CartController extends Controller
 
     public function addDiscount(Cart $cart): JsonResponse
     {
+        $this->authorizeIfConfigured('update', $cart);
+
         $validated = $this->validateData(request()->all(), [
             'discount_code' => 'required|string|max:255',
         ]);

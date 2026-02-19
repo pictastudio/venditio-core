@@ -9,7 +9,7 @@ class UpdateProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('product:update') ?? true;
+        return true;
     }
 
     public function rules(ProductValidationRules $productValidationRules): array

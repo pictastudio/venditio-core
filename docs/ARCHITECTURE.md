@@ -123,7 +123,7 @@ Validation is decoupled using contracts so host apps can override rule sources.
 
 Authorization is optional and policy-based.
 
-- Policies are registered if `venditio.policies.register` is true.
+- Host applications register policies/gates in their own auth provider.
 - Controllers call `authorizeIfConfigured()` to avoid enforcing auth by default.
 - Requests use permissive defaults and defer to the host app.
 
@@ -151,7 +151,7 @@ Important sections:
 - `routes.api` for prefix, version, middleware, pagination, and wrapping
 - `models` for model overrides
 - `validations` for validation contract → implementation bindings (Form Request rules)
-- `auth` for roles/permissions and optional root user
+- `policies` for optional controller-level Gate checks (`register`)
 - `product` enums
 - `product_variants` naming/copy behavior
 

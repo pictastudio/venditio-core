@@ -15,6 +15,8 @@ class OrderLineController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', OrderLine::class);
+
         return OrderLineResource::collection(
             $this->applyBaseFilters(query('order_line'), request()->all(), 'order_line')
         );
@@ -22,6 +24,8 @@ class OrderLineController extends Controller
 
     public function store(StoreOrderLineRequest $request): JsonResource
     {
+        $this->authorizeIfConfigured('create', OrderLine::class);
+
         $orderLine = query('order_line')->create($request->validated());
 
         return OrderLineResource::make($orderLine);
@@ -29,11 +33,15 @@ class OrderLineController extends Controller
 
     public function show(OrderLine $orderLine): JsonResource
     {
+        $this->authorizeIfConfigured('view', $orderLine);
+
         return OrderLineResource::make($orderLine);
     }
 
     public function update(UpdateOrderLineRequest $request, OrderLine $orderLine): JsonResource
     {
+        $this->authorizeIfConfigured('update', $orderLine);
+
         $orderLine->fill($request->validated());
         $orderLine->save();
 
@@ -42,6 +50,8 @@ class OrderLineController extends Controller
 
     public function destroy(OrderLine $orderLine)
     {
+        $this->authorizeIfConfigured('delete', $orderLine);
+
         $orderLine->delete();
 
         return response()->noContent();

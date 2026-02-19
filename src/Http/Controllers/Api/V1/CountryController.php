@@ -14,6 +14,8 @@ class CountryController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Country::class);
+
         return GenericModelResource::collection(
             $this->applyBaseFilters(query('country'), request()->all(), 'country')
         );
@@ -21,6 +23,8 @@ class CountryController extends Controller
 
     public function show(Country $country): JsonResource
     {
+        $this->authorizeIfConfigured('view', $country);
+
         return GenericModelResource::make($country);
     }
 }

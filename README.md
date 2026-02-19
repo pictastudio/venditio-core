@@ -85,60 +85,20 @@ then update the class in `config/venditio`
 ],
 ```
 
-If you want the package to create a root user then provide inside the `.env` file the following variables
-
-```env
-VENDITIO_ROOT_USER_EMAIL=mail_here
-VENDITIO_ROOT_USER_PASSWORD=password_here
-```
+Register policies in your host application (for example in `App\Providers\AuthServiceProvider`):
 
 ```php
-/*
-|--------------------------------------------------------------------------
-| Auth
-|--------------------------------------------------------------------------
-|
-| Specify the auth manager, roles, resources, actions, and extra permissions
-|
-*/
-'auth' => [
-    // 'manager' => AuthManager::class,
-    'roles' => [
-        'root' => Managers\AuthManager::ROLE_ROOT,
-        'admin' => Managers\AuthManager::ROLE_ADMIN,
-        'user' => Managers\AuthManager::ROLE_USER,
-    ],
-    'resources' => [
-        'user',
-        'role',
-        'address',
-        'cart',
-        'order',
-        'product',
-        'product-category',
-        'brand',
-    ],
-    'actions' => [
-        'view-any',
-        'view',
-        'create',
-        'update',
-        'delete',
-        'restore',
-        'force-delete',
-    ],
-    'extra_permissions' => [
-        // 'orders' => [
-        //     'export',
-        //     'export-bulk',
-        // ],
-    ],
-    'root_user' => [
-        'email' => env('VENDITIO_ROOT_USER_EMAIL'),
-        'password' => env('VENDITIO_ROOT_USER_PASSWORD'),
-    ],
-],
+use Illuminate\Support\Facades\Gate;
+use App\Models\Product;
+use App\Policies\ProductPolicy;
+
+public function boot(): void
+{
+    Gate::policy(Product::class, ProductPolicy::class);
+}
 ```
+
+When `venditio.authorize_using_policies` is `true`, Venditio controllers call `Gate::authorize(...)` for CRUD actions only if a policy/gate exists for the model.
 
 ### Models
 
@@ -247,7 +207,7 @@ class StoreAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('address:create');
+        return true;
     }
 
     public function rules(AddressValidationRules $addressValidationRules): array
@@ -283,11 +243,6 @@ for Cart dto: PictaStudio\Venditio\Dto\Contracts\CartDtoContract
 Utility functions used across the package to simplify resolving the correct namespaced classes
 
 ```php
-function auth_manager(User|Authenticatable|null $user = null): AuthManagerContract
-{
-    return app(AuthManagerContract::class, ['user' => $user]);
-}
-
 /**
  * @param  string  $model  String that identifies the model (one of the keys from config('venditio.models'))
  */

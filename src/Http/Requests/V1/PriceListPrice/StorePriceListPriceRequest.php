@@ -9,7 +9,7 @@ class StorePriceListPriceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('price-list-price:create') ?? true;
+        return true;
     }
 
     public function rules(PriceListPriceValidationRules $priceListPriceValidationRules): array

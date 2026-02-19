@@ -16,6 +16,8 @@ class MunicipalityController extends Controller
 {
     public function index(): JsonResource|JsonResponse
     {
+        $this->authorizeIfConfigured('viewAny', Municipality::class);
+
         $filters = request()->all();
 
         $this->validateData($filters, [
@@ -41,6 +43,8 @@ class MunicipalityController extends Controller
 
     public function show(Municipality $municipality): JsonResource
     {
+        $this->authorizeIfConfigured('view', $municipality);
+
         return GenericModelResource::make($municipality);
     }
 }
