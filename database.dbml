@@ -1,0 +1,492 @@
+Table users {
+  id bigint [pk, increment, not null, note: 'Host application table (external to package migrations)']
+}
+
+Table addresses {
+  id bigint [pk, increment, not null]
+  addressable_type varchar(255) [not null]
+  addressable_id bigint [not null]
+  country_id bigint [ref: > countries.id]
+  province_id bigint [ref: > provinces.id]
+  type varchar(30) [not null, note: 'billing, shipping']
+  is_default boolean [not null, default: false]
+  first_name varchar(255) [not null]
+  last_name varchar(255) [not null]
+  email varchar(255) [not null]
+  sex varchar(2) [not null]
+  phone varchar(50) [not null]
+  vat_number varchar(25)
+  fiscal_code varchar(25) [not null]
+  company_name varchar(255)
+  address_line_1 varchar(255) [not null, note: 'street address, including the house number and street name']
+  address_line_2 varchar(255) [note: 'apartment, suite, unit, building, floor, etc.']
+  city varchar(100) [not null]
+  state varchar(10) [not null]
+  zip varchar(10) [not null]
+  birth_date date
+  birth_place varchar(100)
+  notes text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    (addressable_type, addressable_id)
+    type
+  }
+}
+
+Table brands {
+  id bigint [pk, increment, not null]
+  name varchar(255) [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table cart_lines {
+  id bigint [pk, increment, not null]
+  cart_id bigint [not null, ref: > carts.id]
+  product_id bigint [not null, ref: > products.id]
+  discount_id bigint [ref: > discounts.id]
+  product_name varchar(255) [not null]
+  product_sku varchar(255) [not null]
+  discount_code varchar(30)
+  discount_amount decimal(10,2) [not null, default: 0]
+  unit_price decimal(10,2) [not null]
+  purchase_price decimal(10,2)
+  unit_discount decimal(10,2) [not null, default: 0]
+  unit_final_price decimal(10,2) [not null]
+  unit_final_price_tax decimal(10,2) [not null]
+  unit_final_price_taxable decimal(10,2) [not null]
+  qty mediumint [not null]
+  total_final_price decimal(10,2) [not null]
+  tax_rate decimal(10,2) [not null]
+  product_data json [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    discount_id
+  }
+}
+
+Table carts {
+  id bigint [pk, increment, not null]
+  user_id bigint [ref: > users.id, note: 'nullable (guest checkout supported by host app)']
+  order_id bigint [ref: > orders.id]
+  identifier varchar(100) [not null, unique]
+  status varchar(50) [not null]
+  sub_total_taxable decimal(10,2) [not null]
+  sub_total_tax decimal(10,2) [not null]
+  sub_total decimal(10,2) [not null]
+  shipping_fee decimal(10,2) [not null, default: 0]
+  payment_fee decimal(10,2) [not null, default: 0]
+  discount_code varchar(30)
+  discount_amount decimal(10,2) [not null, default: 0]
+  total_final decimal(10,2) [not null]
+  user_first_name varchar(255)
+  user_last_name varchar(255)
+  user_email varchar(255)
+  addresses json
+  notes text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    status
+  }
+}
+
+Table countries {
+  id bigint [pk, increment, not null]
+  name varchar(255) [not null]
+  iso_2 char(2) [not null, unique]
+  iso_3 char(3) [not null, unique]
+  phone_code varchar(20) [not null]
+  currency_code varchar(3) [not null]
+  flag_emoji varchar(50) [not null]
+  capital varchar(150) [not null]
+  native varchar(150)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table country_currency {
+  id bigint [pk, increment, not null]
+  country_id bigint [not null, ref: > countries.id]
+  currency_id bigint [not null, ref: > currencies.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+
+  Indexes {
+    (country_id, currency_id) [unique]
+  }
+}
+
+Table country_tax_class {
+  id bigint [pk, increment, not null]
+  country_id bigint [not null, ref: > countries.id]
+  tax_class_id bigint [not null, ref: > tax_classes.id]
+  rate decimal(8,2) [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table currencies {
+  id bigint [pk, increment, not null]
+  name varchar(100) [not null]
+  code char(3) [not null, unique, note: 'ISO 4217 currency code']
+  symbol varchar(10)
+  exchange_rate decimal(10,4) [not null]
+  decimal_places tinyint [not null, default: 2]
+  is_enabled boolean [not null, default: false]
+  is_default boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    is_enabled
+    is_default
+  }
+}
+
+Table discount_applications {
+  id bigint [pk, increment, not null]
+  discount_id bigint [not null, ref: > discounts.id]
+  discountable_type varchar(255)
+  discountable_id bigint
+  user_id bigint [ref: > users.id]
+  cart_id bigint [ref: > carts.id]
+  order_id bigint [ref: > orders.id]
+  order_line_id bigint [unique, ref: > order_lines.id]
+  qty int [not null, default: 1]
+  amount decimal(10,2) [not null, default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    discount_id
+    (discountable_type, discountable_id)
+    user_id
+    cart_id
+    order_id
+  }
+}
+
+Table discounts {
+  id bigint [pk, increment, not null]
+  discountable_type varchar(255)
+  discountable_id bigint
+  type varchar(20) [not null, note: 'percentage, fixed']
+  value decimal(10,2) [not null]
+  name varchar(255)
+  code varchar(50) [not null, unique]
+  active boolean [not null, default: true]
+  starts_at datetime [not null]
+  ends_at datetime
+  uses int [not null, default: 0]
+  max_uses int
+  apply_to_cart_total boolean [not null, default: false]
+  apply_once_per_cart boolean [not null, default: false]
+  max_uses_per_user int
+  one_per_user boolean [not null, default: false]
+  free_shipping boolean [not null, default: false]
+  minimum_order_total decimal(10,2)
+  priority int [not null, default: 0]
+  stop_after_propagation boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    (discountable_type, discountable_id)
+  }
+}
+
+Table inventories {
+  id bigint [pk, increment, not null]
+  product_id bigint [not null, ref: > products.id]
+  stock mediumint [not null, default: 0]
+  stock_reserved mediumint [not null, default: 0, note: 'reserved quantity']
+  stock_available mediumint [not null, default: 0, note: 'available quantity']
+  stock_min mediumint [note: 'minimum stock quantity']
+  price decimal(10,2) [not null, default: 0]
+  price_includes_tax boolean [not null, default: false]
+  purchase_price decimal(10,2)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table municipalities {
+  id bigint [pk, increment, not null]
+  province_id bigint [not null, ref: > provinces.id]
+  name varchar(255) [not null]
+  country_zone varchar(100)
+  zip varchar(20)
+  phone_prefix varchar(20)
+  istat_code varchar(20)
+  cadastral_code varchar(20)
+  latitude decimal(10,7)
+  longitude decimal(10,7)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    istat_code
+  }
+}
+
+Table order_lines {
+  id bigint [pk, increment, not null]
+  order_id bigint [not null, ref: > orders.id]
+  product_id bigint [not null, ref: > products.id]
+  discount_id bigint [ref: > discounts.id]
+  product_name varchar(255) [not null]
+  product_sku varchar(255) [not null]
+  discount_code varchar(30)
+  discount_amount decimal(10,2) [not null, default: 0]
+  unit_price decimal(10,2) [not null]
+  purchase_price decimal(10,2)
+  unit_discount decimal(10,2) [not null, default: 0]
+  unit_final_price decimal(10,2) [not null]
+  unit_final_price_tax decimal(10,2) [not null]
+  unit_final_price_taxable decimal(10,2) [not null]
+  qty mediumint [not null]
+  total_final_price decimal(10,2) [not null]
+  tax_rate decimal(10,2) [not null]
+  product_data json [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    discount_id
+  }
+}
+
+Table orders {
+  id bigint [pk, increment, not null]
+  user_id bigint [ref: > users.id, note: 'nullable (guest checkout supported by host app)']
+  shipping_status_id bigint [ref: > shipping_statuses.id]
+  identifier varchar(100) [not null, unique]
+  status varchar(50) [not null]
+  tracking_code varchar(150)
+  tracking_link varchar(255)
+  last_tracked_at datetime
+  courier_code varchar(50)
+  sub_total_taxable decimal(10,2) [not null]
+  sub_total_tax decimal(10,2) [not null]
+  sub_total decimal(10,2) [not null]
+  shipping_fee decimal(10,2) [not null, default: 0]
+  payment_fee decimal(10,2) [not null, default: 0]
+  discount_code varchar(255)
+  discount_amount decimal(10,2) [not null, default: 0]
+  total_final decimal(10,2) [not null]
+  user_first_name varchar(255)
+  user_last_name varchar(255)
+  user_email varchar(255)
+  addresses json [not null]
+  customer_notes text
+  admin_notes text
+  approved_at datetime
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    status
+  }
+}
+
+Table price_list_prices {
+  id bigint [pk, increment, not null]
+  product_id bigint [not null, ref: > products.id]
+  price_list_id bigint [not null, ref: > price_lists.id]
+  price decimal(10,2) [not null]
+  purchase_price decimal(10,2)
+  price_includes_tax boolean [not null, default: false]
+  is_default boolean [not null, default: false]
+  metadata json
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    product_id
+    price_list_id
+    (product_id, price_list_id) [unique]
+  }
+}
+
+Table price_lists {
+  id bigint [pk, increment, not null]
+  name varchar(255) [not null]
+  code varchar(255) [unique]
+  active boolean [not null, default: true]
+  description varchar(255)
+  metadata json
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table product_categories {
+  id bigint [pk, increment, not null]
+  parent_id bigint [ref: > product_categories.id]
+  path varchar(255)
+  name varchar(255) [not null]
+  active boolean [not null, default: true]
+  sort_order smallint [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    path
+  }
+}
+
+Table product_category_product {
+  id bigint [pk, increment, not null]
+  product_category_id bigint [not null, ref: > product_categories.id]
+  product_id bigint [not null, ref: > products.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table product_configuration {
+  id bigint [pk, increment, not null]
+  product_id bigint [not null, ref: > products.id]
+  product_variant_option_id bigint [not null, ref: > product_variant_options.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table product_custom_fields {
+  id bigint [pk, increment, not null]
+  product_type_id bigint [not null, ref: > product_types.id]
+  name varchar(255) [not null]
+  required boolean [not null, default: false]
+  sort_order smallint [not null]
+  type varchar(255) [not null]
+  options json
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table product_types {
+  id bigint [pk, increment, not null]
+  name varchar(255) [not null]
+  active boolean [not null, default: true]
+  is_default boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table product_variant_options {
+  id bigint [pk, increment, not null]
+  product_variant_id bigint [not null, ref: > product_variants.id]
+  name varchar(255) [not null]
+  image varchar(255)
+  hex_color varchar(20)
+  sort_order smallint [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table product_variants {
+  id bigint [pk, increment, not null]
+  product_type_id bigint [not null, ref: > product_types.id]
+  name varchar(255) [not null]
+  sort_order smallint [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table products {
+  id bigint [pk, increment, not null]
+  parent_id bigint [ref: > products.id]
+  brand_id bigint [ref: > brands.id]
+  product_type_id bigint [ref: > product_types.id]
+  tax_class_id bigint [not null, ref: > tax_classes.id]
+  name varchar(255) [not null]
+  slug varchar(255) [not null, unique]
+  status varchar(20) [not null]
+  active boolean [not null, default: true]
+  new boolean [not null, default: true]
+  in_evidence boolean [not null, default: true]
+  sku varchar(255) [not null, unique]
+  ean varchar(255)
+  visible_from datetime
+  visible_until datetime
+  description text
+  description_short text
+  images json
+  files json
+  measuring_unit varchar(50)
+  qty_for_unit smallint
+  length decimal(8,2)
+  width decimal(8,2)
+  height decimal(8,2)
+  weight decimal(8,2)
+  metadata json [note: 'SEO metadata']
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+
+  Indexes {
+    status
+    visible_from
+    visible_until
+  }
+}
+
+Table provinces {
+  id bigint [pk, increment, not null]
+  region_id bigint [not null, ref: > regions.id]
+  name varchar(255) [not null]
+  code varchar(20)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table regions {
+  id bigint [pk, increment, not null]
+  country_id bigint [not null, ref: > countries.id]
+  name varchar(255) [not null]
+  code varchar(20)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table shipping_statuses {
+  id bigint [pk, increment, not null]
+  external_code varchar(255) [not null]
+  name varchar(255) [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}
+
+Table tax_classes {
+  id bigint [pk, increment, not null]
+  name varchar(255) [not null]
+  is_default boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
+}

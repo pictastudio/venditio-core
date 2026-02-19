@@ -5,63 +5,51 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/pictastudio/venditio/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/pictastudio/venditio/actions?query=workflow%3A)
 [![Total Downloads](https://img.shields.io/packagist/dt/pictastudio/venditio.svg?style=flat-square)](https://packagist.org/packages/pictastudio/venditio)
 
-**Venditio** it's a headless e-commerce tool.
-It provides the functionality for an e-commerce laravel based application, giving you the freedom to choose the frontend stack.
-
-We offer [**Venditio admin**](https://github.com/pictastudio/venditio-admin) a complementary package that provides an admin panel written with [filamentphp](https://filamentphp.com/)
+Venditio is a headless ecommerce package for Laravel.
+It provides API-only ecommerce primitives while host applications own auth, frontend, and rendering.
 
 ## Installation
-
-You can install the package via composer:
 
 ```bash
 composer require pictastudio/venditio
 ```
 
-## Product Variants
-
-Venditio models product variants by treating a base `Product` as the parent and variant products as the purchasable items.
-This allows you to represent multiple option combinations while keeping a single product identity.
-
-We have a t-shirt `Product` with id 1 that could have variants in both color and size
-
-Considering these variants:
-
-| size | color |
-| ---- | ----- |
-| S    | black |
-| M    | white |
-| L    | red   |
-
-All the variants are computed using `product_variants` and `product_variant_options`. Each concrete variant is stored as a `products` row with a `parent_id` that points to the base product. The variant row is the purchasable item and is the one that should be assigned a unique [sku](https://corporatefinanceinstitute.com/resources/accounting/stock-keeping-unit-sku/#:~:text=A%20stock%20keeping%20unit%20or,and%20more%20efficient%20record%2Dkeeping).
-
-| product_id | size | color |
-| ---------- | ---- | ----- |
-| 1          | S    | black |
-| 1          | M    | black |
-| 1          | L    | black |
-| 1          | S    | white |
-| 1          | M    | white |
-| 1          | L    | white |
-| 1          | S    | red   |
-| 1          | M    | red   |
-| 1          | L    | red   |
-
-## Usage
-
 ## Documentation
 
-- Architecture and package design: `docs/ARCHITECTURE.md`
-- API reference and examples: `docs/API.md`
+- Architecture: `docs/ARCHITECTURE.md`
+- API reference: `docs/API.md`
+- Database schema (DBML): `database.dbml`
+
+## Product Variants Model
+
+Venditio models variants using a parent/child product strategy:
+
+- A base product is a row in `products` with `parent_id = null`
+- Each purchasable variant is another row in `products` with `parent_id` set to the base product id
+- Variant axes live in `product_variants` (for example `Color`, `Size`)
+- Axis values live in `product_variant_options` (for example `Red`, `M`)
+- Assigned option values for each variant product are stored in `product_configuration`
+
+This keeps a single product identity while still allowing independent SKU/inventory/pricing per concrete variant.
 
 ## Configuration
 
-No edition or mode selection is required. All behavior is configured via the `venditio` config file.
+All behavior is configured through `config/venditio.php`.
 
-### Auth
+### Key sections
 
-Add the `HasApiTokens` trait to your user model if not already present and then update the model in the config so the package can use the correct one
-Also extend the User model from Venditio
+- `routes.api`: route enable/prefix/name/middleware/pagination and resource wrapping
+- `models`: model overrides (all package models are replaceable)
+- `validations`: validation contract to implementation bindings
+- `authorize_using_policies`: optional policy/gate authorization
+- `price_lists`: optional multi-price feature
+- `discounts`: discount calculator/bindings/rules configuration
+- `product_variants`: variant naming/copy behavior
+
+### User model and auth integration
+
+Authentication is not enforced by default.
+If your host app uses Sanctum, add `HasApiTokens` to your user model and point the package user model config to it:
 
 ```php
 namespace App\Models;
@@ -73,10 +61,7 @@ class User extends VenditioUser
 {
     use HasApiTokens;
 }
-
 ```
-
-then update the class in `config/venditio`
 
 ```php
 'models' => [
@@ -85,12 +70,14 @@ then update the class in `config/venditio`
 ],
 ```
 
-Register policies in your host application (for example in `App\Providers\AuthServiceProvider`):
+### Optional policy integration
+
+Register policies in the host app and keep `venditio.authorize_using_policies` enabled:
 
 ```php
-use Illuminate\Support\Facades\Gate;
 use App\Models\Product;
 use App\Policies\ProductPolicy;
+use Illuminate\Support\Facades\Gate;
 
 public function boot(): void
 {
@@ -98,291 +85,64 @@ public function boot(): void
 }
 ```
 
-When `venditio.authorize_using_policies` is `true`, Venditio controllers call `Gate::authorize(...)` for CRUD actions only if a policy/gate exists for the model.
+Controllers call authorization only when enabled and when a policy/gate definition exists.
 
-### Models
+### Validation customization
 
-Inside the config you will find a section dedicated to models configuration
-
-```php
-/*
-|--------------------------------------------------------------------------
-| Models
-|--------------------------------------------------------------------------
-|
-| Specify the models to use
-|
-*/
-'models' => [
-    'address' => Simple\Models\Address::class,
-    'brand' => Simple\Models\Brand::class,
-    'cart' => Simple\Models\Cart::class,
-    'cart_line' => Simple\Models\CartLine::class,
-    'country' => Simple\Models\Country::class,
-    'country_tax_class' => Simple\Models\CountryTaxClass::class,
-    'currency' => Simple\Models\Currency::class,
-    'discount' => Simple\Models\Discount::class,
-    'inventory' => Simple\Models\Inventory::class,
-    'order' => Simple\Models\Order::class,
-    'order_line' => Simple\Models\OrderLine::class,
-    'product' => Simple\Models\Product::class,
-    'product_category' => Simple\Models\ProductCategory::class,
-    'shipping_status' => Simple\Models\ShippingStatus::class,
-    'tax_class' => Simple\Models\TaxClass::class,
-    'user' => Simple\Models\User::class,
-    'product_custom_field' => Advanced\Models\ProductCustomField::class,
-    'product_type' => Advanced\Models\ProductType::class,
-    'product_variant' => Advanced\Models\ProductVariant::class,
-    'product_variant_option' => Advanced\Models\ProductVariantOption::class,
-],
-```
-
-#### Relations
-
-Relations inside models are defined dynamically by resolving the configured model class from the config.
+Validation rules are resolved from contracts in `config('venditio.validations')`.
+Override a resource by rebinding its contract to your implementation.
 
 ```php
-// brand relation from Simple\Models\Product model
-public function brand(): BelongsTo
-{
-    return $this->belongsTo(resolve_model('brand'));
-}
-```
-
-### Validation rules
-
-Validation rules are managed inside separate classes than FormRequests
-
-```php
-namespace PictaStudio\Venditio\Validations;
-
-use Illuminate\Validation\Rule;
-use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
-
-class AddressValidation implements AddressValidationRules
-{
-    public function getStoreValidationRules(): array
-    {
-        return [
-            'type' => [
-                'required',
-                'string',
-                Rule::enum(config('venditio.addresses.type_enum')),
-            ],
-            'is_default' => 'sometimes|boolean',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            // ...
-        ];
-    }
-
-    public function getUpdateValidationRules(): array
-    {
-        return [
-            'type' => [
-                'sometimes',
-                'string',
-                Rule::enum(config('venditio.addresses.type_enum')),
-            ],
-            'is_default' => 'sometimes|boolean',
-            'first_name' => 'sometimes|string|max:255',
-            'last_name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|max:255',
-            // ...
-        ];
-    }
-}
-```
-
-this classes are then resolved out of the container when needed
-
-```php
-namespace PictaStudio\Venditio\Http\Requests\V1\Address;
-
-use Illuminate\Foundation\Http\FormRequest;
-use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
-
-class StoreAddressRequest extends FormRequest
-{
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(AddressValidationRules $addressValidationRules): array
-    {
-        return $addressValidationRules->getStoreValidationRules();
-    }
-}
-```
-
-Customize validation rules by modifying the class bind in laravel container
-
-```php
-use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
 use App\Validations\AddressValidation;
+use PictaStudio\Venditio\Validations\Contracts\AddressValidationRules;
 
-// inside AppServiceProvider boot method
 public function boot(): void
 {
     $this->app->singleton(AddressValidationRules::class, AddressValidation::class);
 }
 ```
 
-### Dto
-
-The package uses Dtos inside the pipelines and you can modify the class it uses inside the the config file
-The important thing is that those classes need to implement the provided interfaces
-
-for Order dto: PictaStudio\Venditio\Dto\Contracts\OrderDtoContract
-for Cart dto: PictaStudio\Venditio\Dto\Contracts\CartDtoContract
-
-### Helper functions
-
-Utility functions used across the package to simplify resolving the correct namespaced classes
+### Identifier generator customization
 
 ```php
-/**
- * @param  string  $model  String that identifies the model (one of the keys from config('venditio.models'))
- */
-function resolve_model(string $model): string
-{
-    return config('venditio.models.' . $model);
-}
+use PictaStudio\Venditio\Contracts\CartIdentifierGeneratorInterface;
+use PictaStudio\Venditio\Contracts\OrderIdentifierGeneratorInterface;
 
-function query(string $model): Builder
-{
-    return resolve_model($model)::query();
-}
-
-function get_fresh_model_instance(string $model): Model
-{
-    return new (resolve_model($model));
-}
+$this->app->singleton(CartIdentifierGeneratorInterface::class, App\Generators\CartIdentifierGenerator::class);
+$this->app->singleton(OrderIdentifierGeneratorInterface::class, App\Generators\OrderIdentifierGenerator::class);
 ```
 
-### Api
+## Commands
 
-#### Routes
+### Release stock for abandoned carts
 
-Routes are registered once, without runtime branching
+Enabled by default and configurable from:
 
-```php
-Route::apiResource('products', ProductController::class)->only(['index', 'show']);
-```
+- `venditio.commands.release_stock_for_abandoned_carts.enabled`
+- `venditio.commands.release_stock_for_abandoned_carts.inactive_for_minutes`
+- `venditio.commands.release_stock_for_abandoned_carts.schedule_every_minutes`
 
-#### Controllers
-
-Controllers live directly under `Http\Controllers\Api` and do not switch at runtime.
-
-#### Http Resources
-
-Example of an http resource, with the array key (`product.images`) we are telling which attribute we want to mutate and then the closure accepts as a parameter the value of that attribute
-You can use dot notation to access attributes because under the hood it uses `Arr::get` and `Arr::set` methods
-
-```php
-protected function transformAttributes(): array
-{
-    return [
-        'product.images' => fn (?array $images) => (
-            collect($images)
-                ->map(fn (array $image) => [
-                    'alt' => $image['alt'],
-                    'img' => asset('storage/' . $image['img']),
-                ])
-                ->toArray()
-        ),
-        'product.files' => fn (?array $files) => (
-            collect($files)
-                ->map(fn (array $file) => [
-                    'name' => $file['name'],
-                    'file' => asset('storage/' . $file['file']),
-                ])
-                ->toArray()
-        ),
-    ];
-}
-```
-
-### Cart
-
-#### Generator
-
-Customize cart identifier generator by modifying the binding in laravel container
-
-```php
-$this->app->singleton(CartIdentifierGeneratorInterface::class, CartIdentifierGenerator::class);
-```
-
-### Order
-
-#### Generator
-
-Customize order identifier generator by modifying the binding in laravel container
-
-```php
-$this->app->singleton(OrderIdentifierGeneratorInterface::class, OrderIdentifierGenerator::class);
-```
-
-Example of custom generator class
-
-```php
-namespace App\Generators;
-
-use PictaStudio\Venditio\Models\Order;
-use PictaStudio\Venditio\Orders\Contracts\OrderIdentifierGeneratorInterface;
-
-class OrderIdentifierGenerator implements OrderIdentifierGeneratorInterface
-{
-    public function generate(Order $order): string
-    {
-        // implement your custom logic here
-    }
-}
-```
-
-### Commands
-
-the package provides some console commands to deal with common use cases
-
-#### Carts
-
-- ReleaseStockForAbandonedCarts
-  checks all carts with a pending status which by default are `processing` and `active`
-  pending statuses are customizable by changing the `getPendingStatuses()` function in `CartStatus` enum which is located in the config file under `carts.status_enum`
-
-#### Bruno API Collection
-
-- PublishBrunoCollection
-  publishes the Bruno request collection into the host app at `bruno/venditio`
+### Publish Bruno collection
 
 ```bash
 php artisan vendor:publish --tag=venditio-bruno
 ```
 
-## Structure
+## High-level structure
 
-```
-// folder structure (high level)
-
+```text
 src/
 |--- Actions
 |--- Contracts
-|--- Helpers
+|--- Discounts
+|--- Dto
+|--- Enums
 |--- Http
-|--- Packages
-    |--- Simple   // models, enums, validations, factories (internal module)
-    |--- Advanced // variant system models, validations, factories (internal module)
+|--- Models
+|--- Pipelines
+|--- Pricing
+|--- Validations
 ```
-
-TODO:
-
-- [ ] update outdated docs
-- [ ] docs on global available helpers
-- [ ] pipelines docs
-- [ ] docs on `OrderStatus` enum and `Contracts\OrderStatus` on how it's used and the logic behind it
-- [ ] fix updating cart lines in `CartUpdatePipeline` (add line/s and recalculate cart totals)
 
 ## Testing
 

@@ -1,47 +1,58 @@
 # Venditio API Reference
 
-This document describes the HTTP APIs exposed by Venditio. All routes are optional and versioned.
+This document describes the HTTP APIs exposed by Venditio.
 
 ## Base URL and Versioning
 
-Default base path is:
+Default base path:
 
-- `/venditio/api/v1`
+- `/api/venditio/v1`
 
-Configure via:
+Configured via:
 
+- `venditio.routes.api.enable`
 - `venditio.routes.api.v1.prefix`
+- `venditio.routes.api.v1.name`
+- `venditio.routes.api.v1.middleware`
 
-## Auth and Middleware
+## Auth and Authorization
 
-- No authentication is enforced by default.
-- Middleware is configurable via `venditio.routes.api.v1.middleware`.
-- Policy checks are optional and enabled by `venditio.authorize_using_policies`.
-- Policies/gates must be registered by the host app (for example in `AuthServiceProvider` via `Gate::policy(...)`).
+- No authentication middleware is enforced by default.
+- Policy checks are optional and controlled by `venditio.authorize_using_policies`.
+- When enabled, controllers authorize only if a matching gate/policy is registered by the host app.
+
+## Response and Errors
+
+- Responses are returned with Laravel API Resources.
+- Resource wrapping is controlled by `venditio.routes.api.json_resource_enable_wrapping`.
+- Timestamps in resources are controlled by `venditio.routes.api.include_timestamps`.
+- Validation errors use standard Laravel `422` payloads.
 
 ## Common Query Parameters
 
-The following filters apply to most index endpoints via `applyBaseFilters`.
+Most index endpoints support:
 
-- `all` boolean, when true returns all records without pagination
-- `id[]` array of ids to filter by
-- `per_page` page size for pagination
+- `all` boolean, returns full collection (no pagination)
+- `id[]` array of ids
+- `per_page` pagination size
 
-Some endpoints add extra filters.
+Additional supported filters:
 
-- `product_type_id` for `/product_variants`
-- `product_variant_id` for `/product_variant_options`
-- `product_id` for `/price_list_prices`
-- `price_list_id` for `/price_list_prices`
-- `as_tree` boolean for `/product_categories` (returns nested categories with `children`; forces full, non-paginated result)
+- `user_id` on `/carts`
+- `country_id` on `/regions`
+- `region_id` on `/provinces`
+- `province_id` on `/municipalities`
+- `product_type_id` on `/product_variants`
+- `product_variant_id` on `/product_variant_options`
+- `product_id` and `price_list_id` on `/price_list_prices`
+- `as_tree` boolean on `/product_categories`
 
-## Response Shape
+Include parameters:
 
-- JSON responses use API Resources.
-- By default, timestamps are excluded unless `venditio.routes.api.include_timestamps` is true.
-- Validation errors return Laravel's standard 422 response with error details.
+- `/products`: `include=variants,variants_options_table` (and `price_lists` only when `venditio.price_lists.enabled=true`)
+- `/tax_classes`: `include[]=countries`
 
-## Resources
+## Endpoints
 
 ### Products
 
@@ -50,14 +61,8 @@ Some endpoints add extra filters.
 - `POST /products`
 - `PATCH /products/{product}`
 - `DELETE /products/{product}`
-
-Payload notes:
-
-- `category_ids` can be used to attach categories on create or update.
-- `product_type_id` is required for variant generation.
-- `measuring_unit` and `qty_for_unit` (optional) define unit of measure and quantity per unit (e.g. box of 6).
-- `price_calculated` is always returned and contains the resolved frontend price payload.
-- `include=price_lists` is available only when `venditio.price_lists.enabled` is true.
+- `GET /products/{product}/variants`
+- `POST /products/{product}/variants`
 
 ### Product Categories
 
@@ -66,70 +71,6 @@ Payload notes:
 - `POST /product_categories`
 - `PATCH /product_categories/{product_category}`
 - `DELETE /product_categories/{product_category}`
-
-### Brands
-
-- `GET /brands`
-- `GET /brands/{brand}`
-- `POST /brands`
-- `PATCH /brands/{brand}`
-- `DELETE /brands/{brand}`
-
-### Addresses
-
-- `GET /addresses`
-- `GET /addresses/{address}`
-- `POST /addresses`
-- `PATCH /addresses/{address}`
-- `DELETE /addresses/{address}`
-
-### Carts
-
-- `GET /carts`
-- `GET /carts/{cart}`
-- `POST /carts`
-- `PATCH /carts/{cart}`
-- `DELETE /carts/{cart}`
-- `POST /carts/{cart}/add_lines`
-- `PATCH /carts/{cart}/update_lines`
-
-### Orders
-
-- `GET /orders`
-- `GET /orders/{order}`
-- `POST /orders`
-- `PATCH /orders/{order}`
-
-### Discounts
-
-- `GET /discounts`
-- `GET /discounts/{discount}`
-- `POST /discounts`
-- `PATCH /discounts/{discount}`
-- `DELETE /discounts/{discount}`
-
-Discounts expose first-level rule columns:
-
-- `type`: `percentage` or `fixed`
-- `value`: discount amount
-- `code`: unique code
-- `active`, `starts_at`, `ends_at`: activation window
-- `max_uses`: max global usages
-- `max_uses_per_user`: max usages per user
-- `one_per_user`: shorthand for one usage per user
-- `discountable_type` + `discountable_id`: optional polymorphic target (for a user-specific discount use `discountable_type: "user"` and that user id)
-- `minimum_order_total`: minimum subtotal required
-- `apply_once_per_cart`: apply to one line only when line-based
-- `apply_to_cart_total`: use as cart-level coupon
-- `free_shipping`: when cart-level discount is applied, shipping is set to 0
-
-### Discount Applications
-
-- `GET /discount_applications`
-- `GET /discount_applications/{discount_application}`
-- `POST /discount_applications`
-- `PATCH /discount_applications/{discount_application}`
-- `DELETE /discount_applications/{discount_application}`
 
 ### Product Types
 
@@ -155,211 +96,164 @@ Discounts expose first-level rule columns:
 - `PATCH /product_variant_options/{product_variant_option}`
 - `DELETE /product_variant_options/{product_variant_option}`
 
-### Product Variants for a Product
+### Product Custom Fields
 
-- `GET /products/{product}/variants`
-- `POST /products/{product}/variants`
+- `GET /product_custom_fields`
+- `GET /product_custom_fields/{product_custom_field}`
+- `POST /product_custom_fields`
+- `PATCH /product_custom_fields/{product_custom_field}`
+- `DELETE /product_custom_fields/{product_custom_field}`
 
-This endpoint generates concrete variant products from variant option combinations.
+### Brands
 
-### Price Lists (Optional Feature)
+- `GET /brands`
+- `GET /brands/{brand}`
+- `POST /brands`
+- `PATCH /brands/{brand}`
+- `DELETE /brands/{brand}`
+
+### Inventories
+
+- `GET /inventories`
+- `GET /inventories/{inventory}`
+- `POST /inventories`
+- `PATCH /inventories/{inventory}`
+- `DELETE /inventories/{inventory}`
+
+### Carts
+
+- `GET /carts`
+- `GET /carts/{cart}`
+- `POST /carts`
+- `PATCH /carts/{cart}`
+- `DELETE /carts/{cart}`
+- `POST /carts/{cart}/add_lines`
+- `PATCH /carts/{cart}/update_lines`
+- `POST /carts/{cart}/remove_lines`
+- `POST /carts/{cart}/add_discount`
+
+### Cart Lines
+
+- `GET /cart_lines`
+- `GET /cart_lines/{cart_line}`
+- `POST /cart_lines`
+- `PATCH /cart_lines/{cart_line}`
+- `DELETE /cart_lines/{cart_line}`
+
+### Orders
+
+- `GET /orders`
+- `GET /orders/{order}`
+- `POST /orders`
+- `PATCH /orders/{order}`
+- `DELETE /orders/{order}`
+
+### Order Lines
+
+- `GET /order_lines`
+- `GET /order_lines/{order_line}`
+- `POST /order_lines`
+- `PATCH /order_lines/{order_line}`
+- `DELETE /order_lines/{order_line}`
+
+### Discounts
+
+- `GET /discounts`
+- `GET /discounts/{discount}`
+- `POST /discounts`
+- `PATCH /discounts/{discount}`
+- `DELETE /discounts/{discount}`
+
+Discount columns are first-level fields on `discounts`:
+
+- `type`, `value`, `code`, `name`, `active`, `starts_at`, `ends_at`
+- `uses`, `max_uses`, `max_uses_per_user`, `one_per_user`
+- `apply_to_cart_total`, `apply_once_per_cart`, `minimum_order_total`, `free_shipping`
+- `discountable_type`, `discountable_id`
+
+### Discount Applications
+
+- `GET /discount_applications`
+- `GET /discount_applications/{discount_application}`
+- `POST /discount_applications`
+- `PATCH /discount_applications/{discount_application}`
+- `DELETE /discount_applications/{discount_application}`
+
+### Addresses
+
+- `GET /addresses`
+- `GET /addresses/{address}`
+- `POST /addresses`
+- `PATCH /addresses/{address}`
+- `DELETE /addresses/{address}`
+
+### Countries, Regions, Provinces, Municipalities (Read-only)
+
+- `GET /countries`
+- `GET /countries/{country}`
+- `GET /regions`
+- `GET /regions/{region}`
+- `GET /provinces`
+- `GET /provinces/{province}`
+- `GET /municipalities`
+- `GET /municipalities/{municipality}`
+
+### Taxing and Shipping Metadata
+
+- `GET /country_tax_classes`
+- `GET /country_tax_classes/{country_tax_class}`
+- `POST /country_tax_classes`
+- `PATCH /country_tax_classes/{country_tax_class}`
+- `DELETE /country_tax_classes/{country_tax_class}`
+- `GET /tax_classes`
+- `GET /tax_classes/{tax_class}`
+- `POST /tax_classes`
+- `PATCH /tax_classes/{tax_class}`
+- `DELETE /tax_classes/{tax_class}`
+- `GET /shipping_statuses`
+- `GET /shipping_statuses/{shipping_status}`
+- `POST /shipping_statuses`
+- `PATCH /shipping_statuses/{shipping_status}`
+- `DELETE /shipping_statuses/{shipping_status}`
+
+### Currencies
+
+- `GET /currencies`
+- `GET /currencies/{currency}`
+- `POST /currencies`
+- `PATCH /currencies/{currency}`
+- `DELETE /currencies/{currency}`
+
+### Price Lists (Feature-flagged)
 
 - `GET /price_lists`
 - `GET /price_lists/{price_list}`
 - `POST /price_lists`
 - `PATCH /price_lists/{price_list}`
 - `DELETE /price_lists/{price_list}`
-
-### Price List Prices (Optional Feature)
-
 - `GET /price_list_prices`
 - `GET /price_list_prices/{price_list_price}`
 - `POST /price_list_prices`
 - `PATCH /price_list_prices/{price_list_price}`
 - `DELETE /price_list_prices/{price_list_price}`
 
-Feature flag:
+If `venditio.price_lists.enabled=false`, these endpoints return `404`.
 
-- `venditio.price_lists.enabled` must be true.
+## Variant Workflow Example
 
-## Variant Workflow
-
-1. Create a product type.
-2. Create variant axes for that type, for example Color and Size.
-3. Create options for each axis, for example Red, Blue, S, M.
-4. Create a base product with `product_type_id` set.
-5. Generate variant products using `POST /products/{product}/variants`.
-
-### Example: Create Product Type
-
-```http
-POST /venditio/api/v1/product_types
-Content-Type: application/json
-
-{
-  "name": "Apparel",
-  "active": true
-}
-```
-
-### Example: Create Variant Axes
-
-```http
-POST /venditio/api/v1/product_variants
-Content-Type: application/json
-
-{
-  "product_type_id": 1,
-  "name": "Color",
-  "sort_order": 1
-}
-```
-
-```http
-POST /venditio/api/v1/product_variants
-Content-Type: application/json
-
-{
-  "product_type_id": 1,
-  "name": "Size",
-  "sort_order": 2
-}
-```
-
-### Example: Create Variant Options
-
-```http
-POST /venditio/api/v1/product_variant_options
-Content-Type: application/json
-
-{
-  "product_variant_id": 10,
-  "name": "red",
-  "sort_order": 1
-}
-```
-
-```http
-POST /venditio/api/v1/product_variant_options
-Content-Type: application/json
-
-{
-  "product_variant_id": 11,
-  "name": "m",
-  "sort_order": 2
-}
-```
-
-### Example: Create Base Product
-
-```http
-POST /venditio/api/v1/products
-Content-Type: application/json
-
-{
-  "brand_id": 1,
-  "tax_class_id": 1,
-  "product_type_id": 1,
-  "name": "T-shirt",
-  "status": "published"
-}
-```
-
-### Example: Generate Variant Products
-
-```http
-POST /venditio/api/v1/products/100/variants
-Content-Type: application/json
-
-{
-  "variants": [
-    {
-      "variant_id": 10,
-      "option_ids": [101, 102]
-    },
-    {
-      "variant_id": 11,
-      "option_ids": [201, 202, 203]
-    }
-  ]
-}
-```
-
-Response includes the created variant products and a `meta` object with counts.
-
-## Validation and Errors
-
-- Validation errors return HTTP 422 with error messages in the standard Laravel format.
-- Validation rules are provided by classes bound via `config('venditio.validations')` (contract → implementation). Override or remove entries there to customize or disable validation per resource.
-- Variant generation validates that:
-  - The base product has a `product_type_id`
-  - Variant axes belong to that product type
-  - Options belong to their axis
-  - Variant ids are unique in the payload
-  - The base product is not itself a variant
-
-## Discount Examples
-
-### Example: Create Cart Total Discount With Free Shipping
-
-```http
-POST /venditio/api/v1/discounts
-Content-Type: application/json
-
-{
-  "name": "Checkout 10 + free shipping",
-  "type": "percentage",
-  "value": 10,
-  "code": "CHECKOUT10FREE",
-  "active": true,
-  "starts_at": "2026-02-12 09:00:00",
-  "apply_to_cart_total": true,
-  "free_shipping": true,
-  "minimum_order_total": 100,
-  "max_uses": 500,
-  "max_uses_per_user": 3
-}
-```
-
-### Example: Create Discount Reserved To One User
-
-```http
-POST /venditio/api/v1/discounts
-Content-Type: application/json
-
-{
-  "name": "VIP user discount",
-  "type": "fixed",
-  "value": 20,
-  "code": "VIP20",
-  "active": true,
-  "starts_at": "2026-02-12 09:00:00",
-  "discountable_type": "user",
-  "discountable_id": 42,
-  "one_per_user": true
-}
-```
-
-### Example: Update Discount Limits
-
-```http
-PATCH /venditio/api/v1/discounts/10
-Content-Type: application/json
-
-{
-  "max_uses": 1000,
-  "max_uses_per_user": 5,
-  "minimum_order_total": 150
-}
-```
+1. Create product type.
+2. Create variant axes for the type.
+3. Create options for each axis.
+4. Create a base product with `product_type_id`.
+5. Generate variant products via `POST /api/venditio/v1/products/{product}/variants`.
 
 ## Configuration Highlights
 
 See `config/venditio.php` for:
 
-- Routes configuration and versioning
-- Pagination defaults
-- Product variant naming and copy behavior
-- Model overrides
-- Price lists feature flag (`price_lists.enabled`)
-- Price resolver binding (`price_lists.resolver`)
+- route prefix/version/middleware
+- model overrides
+- validations binding map
+- policy enable toggle
+- price list feature flag and resolver
+- discount rule pipelines
