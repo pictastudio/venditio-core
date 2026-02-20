@@ -3,10 +3,13 @@
 namespace PictaStudio\Venditio\Http\Requests\V1\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
+use PictaStudio\Venditio\Http\Requests\V1\Concerns\InteractsWithTranslatableInput;
 use PictaStudio\Venditio\Validations\Contracts\BrandValidationRules;
 
 class UpdateBrandRequest extends FormRequest
 {
+    use InteractsWithTranslatableInput;
+
     public function authorize(): bool
     {
         return true;
@@ -15,5 +18,11 @@ class UpdateBrandRequest extends FormRequest
     public function rules(BrandValidationRules $brandValidationRules): array
     {
         return $brandValidationRules->getUpdateValidationRules();
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->prepareTranslatableInput();
+        $this->prepareTranslatedSlugInput();
     }
 }

@@ -4,12 +4,15 @@ namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
+use PictaStudio\Venditio\Validations\Concerns\InteractsWithTranslatableRules;
 use PictaStudio\Venditio\Validations\Contracts\ProductValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductValidation implements ProductValidationRules
 {
+    use InteractsWithTranslatableRules;
+
     public function getStoreValidationRules(): array
     {
         return [
@@ -33,7 +36,8 @@ class ProductValidation implements ProductValidationRules
                 'integer',
                 Rule::exists($this->tableFor('tax_class'), 'id'),
             ],
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
             'status' => [
                 'required',
                 'string',
@@ -82,6 +86,12 @@ class ProductValidation implements ProductValidationRules
             'inventory.price' => ['sometimes', 'numeric', 'min:0'],
             'inventory.price_includes_tax' => ['sometimes', 'boolean'],
             'inventory.purchase_price' => ['nullable', 'numeric', 'min:0'],
+            ...$this->translatableLocaleRules([
+                'name' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'description' => ['sometimes', 'nullable', 'string'],
+                'description_short' => ['sometimes', 'nullable', 'string'],
+            ]),
         ];
     }
 
@@ -112,7 +122,8 @@ class ProductValidation implements ProductValidationRules
                 'integer',
                 Rule::exists($this->tableFor('tax_class'), 'id'),
             ],
-            'name' => ['sometimes', 'string', 'max:255'],
+            'name' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
             'status' => [
                 'sometimes',
                 'string',
@@ -161,6 +172,12 @@ class ProductValidation implements ProductValidationRules
             'inventory.price' => ['sometimes', 'numeric', 'min:0'],
             'inventory.price_includes_tax' => ['sometimes', 'boolean'],
             'inventory.purchase_price' => ['nullable', 'numeric', 'min:0'],
+            ...$this->translatableLocaleRules([
+                'name' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'description' => ['sometimes', 'nullable', 'string'],
+                'description_short' => ['sometimes', 'nullable', 'string'],
+            ]),
         ];
     }
 

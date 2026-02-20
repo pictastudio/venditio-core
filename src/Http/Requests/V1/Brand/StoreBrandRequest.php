@@ -3,10 +3,13 @@
 namespace PictaStudio\Venditio\Http\Requests\V1\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
+use PictaStudio\Venditio\Http\Requests\V1\Concerns\InteractsWithTranslatableInput;
 use PictaStudio\Venditio\Validations\Contracts\BrandValidationRules;
 
 class StoreBrandRequest extends FormRequest
 {
+    use InteractsWithTranslatableInput;
+
     public function authorize(): bool
     {
         return true;
@@ -15,5 +18,22 @@ class StoreBrandRequest extends FormRequest
     public function rules(BrandValidationRules $brandValidationRules): array
     {
         return $brandValidationRules->getStoreValidationRules();
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($this->hasTranslatableValue('name')) {
+                return;
+            }
+
+            $validator->errors()->add('name', 'The name field is required.');
+        });
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->prepareTranslatableInput();
+        $this->prepareTranslatedSlugInput();
     }
 }

@@ -5,17 +5,22 @@ namespace PictaStudio\Venditio\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
+use PictaStudio\Translatable\Translatable;
 use PictaStudio\Venditio\Models\Scopes\Active;
 use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
-class ProductType extends Model
+class ProductType extends Model implements TranslatableContract
 {
     use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use SoftDeletes;
+    use Translatable;
+
+    public array $translatedAttributes = ['name', 'slug'];
 
     protected $guarded = [
         'id',

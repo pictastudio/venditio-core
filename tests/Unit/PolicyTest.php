@@ -3,11 +3,14 @@
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use PictaStudio\Venditio\Http\Controllers\Api\Controller;
 use PictaStudio\Venditio\Models\Brand;
 
 use function Pest\Laravel\actingAs;
+
+uses(RefreshDatabase::class);
 
 it('checks authorization using the registered policy when authorize_using_policies is true', function () {
     config(['venditio.authorize_using_policies' => true]);

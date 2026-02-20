@@ -25,7 +25,14 @@ it('creates a product category', function () {
     $categoryId = $response->json('id');
 
     expect($categoryId)->not->toBeNull();
-    assertDatabaseHas('product_categories', ['id' => $categoryId, 'name' => 'Shoes']);
+    assertDatabaseHas('product_categories', ['id' => $categoryId]);
+    assertDatabaseHas('translations', [
+        'translatable_type' => (new ProductCategory)->getMorphClass(),
+        'translatable_id' => $categoryId,
+        'locale' => app()->getLocale(),
+        'attribute' => 'name',
+        'value' => 'Shoes',
+    ]);
 });
 
 it('updates a product category', function () {
@@ -45,8 +52,14 @@ it('updates a product category', function () {
 
     assertDatabaseHas('product_categories', [
         'id' => $category->getKey(),
-        'name' => 'New Name',
         'sort_order' => 2,
+    ]);
+    assertDatabaseHas('translations', [
+        'translatable_type' => (new ProductCategory)->getMorphClass(),
+        'translatable_id' => $category->getKey(),
+        'locale' => app()->getLocale(),
+        'attribute' => 'name',
+        'value' => 'New Name',
     ]);
 });
 

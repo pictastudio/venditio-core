@@ -3,6 +3,7 @@
 namespace PictaStudio\Venditio\Http\Requests\V1\ProductType;
 
 use Illuminate\Foundation\Http\FormRequest;
+use PictaStudio\Venditio\Http\Requests\V1\Concerns\InteractsWithTranslatableInput;
 use PictaStudio\Venditio\Models\Scopes\Active;
 use PictaStudio\Venditio\Validations\Contracts\ProductTypeValidationRules;
 
@@ -10,6 +11,8 @@ use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class StoreProductTypeRequest extends FormRequest
 {
+    use InteractsWithTranslatableInput;
+
     public function authorize(): bool
     {
         return true;
@@ -23,6 +26,10 @@ class StoreProductTypeRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            if (!$this->hasTranslatableValue('name')) {
+                $validator->errors()->add('name', 'The name field is required.');
+            }
+
             if ($this->boolean('is_default') !== true) {
                 return;
             }
@@ -38,5 +45,11 @@ class StoreProductTypeRequest extends FormRequest
                 );
             }
         });
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->prepareTranslatableInput();
+        $this->prepareTranslatedSlugInput();
     }
 }

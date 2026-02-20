@@ -32,7 +32,14 @@ it('creates a product with categories', function () {
     $productId = $response->json('id');
 
     expect($productId)->not->toBeNull();
-    assertDatabaseHas('products', ['id' => $productId, 'name' => 'Sample Product']);
+    assertDatabaseHas('products', ['id' => $productId]);
+    assertDatabaseHas('translations', [
+        'translatable_type' => (new Product)->getMorphClass(),
+        'translatable_id' => $productId,
+        'locale' => app()->getLocale(),
+        'attribute' => 'name',
+        'value' => 'Sample Product',
+    ]);
     assertDatabaseHas('product_category_product', [
         'product_id' => $productId,
         'product_category_id' => $category->getKey(),

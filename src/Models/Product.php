@@ -5,13 +5,15 @@ namespace PictaStudio\Venditio\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany, HasOne};
+use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
+use PictaStudio\Translatable\Translatable;
 use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange};
 use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
-class Product extends Model
+class Product extends Model implements TranslatableContract
 {
     use HasDiscounts;
     use HasFactory;
@@ -19,6 +21,14 @@ class Product extends Model
     use HasSlug;
     use LogsActivity;
     use SoftDeletes;
+    use Translatable;
+
+    public array $translatedAttributes = [
+        'name',
+        'slug',
+        'description',
+        'description_short',
+    ];
 
     protected $guarded = [
         'id',

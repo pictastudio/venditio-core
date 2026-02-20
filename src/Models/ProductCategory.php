@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Nevadskiy\Tree\AsTree;
+use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
+use PictaStudio\Translatable\Translatable;
 use PictaStudio\Venditio\Models\Scopes\{Active, Ordered};
 use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
-class ProductCategory extends Model
+class ProductCategory extends Model implements TranslatableContract
 {
     use AsTree;
     use HasDiscounts;
@@ -19,6 +21,9 @@ class ProductCategory extends Model
     use HasHelperMethods;
     use LogsActivity;
     use SoftDeletes;
+    use Translatable;
+
+    public array $translatedAttributes = ['name', 'slug'];
 
     protected $guarded = [
         'id',

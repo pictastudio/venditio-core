@@ -5,6 +5,7 @@ namespace PictaStudio\Venditio\Tests;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase as Orchestra;
+use PictaStudio\Translatable\TranslatableServiceProvider;
 use PictaStudio\Venditio\VenditioServiceProvider;
 
 class TestCase extends Orchestra
@@ -38,6 +39,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
+            TranslatableServiceProvider::class,
             VenditioServiceProvider::class,
         ];
     }
