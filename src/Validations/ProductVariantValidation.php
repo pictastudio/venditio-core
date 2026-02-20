@@ -17,8 +17,8 @@ class ProductVariantValidation implements ProductVariantValidationRules
                 'integer',
                 Rule::exists($this->tableFor('product_type'), 'id'),
             ],
-            'name' => 'required|string|max:255',
-            'sort_order' => 'required|integer|min:0',
+            'name' => ['required', 'string', 'max:255'],
+            'sort_order' => ['required', 'integer', 'min:0'],
         ];
     }
 
@@ -30,8 +30,8 @@ class ProductVariantValidation implements ProductVariantValidationRules
                 'integer',
                 Rule::exists($this->tableFor('product_type'), 'id'),
             ],
-            'name' => 'sometimes|string|max:255',
-            'sort_order' => 'sometimes|integer|min:0',
+            'name' => ['sometimes', 'string', 'max:255'],
+            'sort_order' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 

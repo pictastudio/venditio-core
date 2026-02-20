@@ -19,7 +19,7 @@ class StoreCountryTaxClassRequest extends FormRequest
         return [
             'country_id' => ['required', 'integer', Rule::exists($this->tableFor('country'), 'id')],
             'tax_class_id' => ['required', 'integer', Rule::exists($this->tableFor('tax_class'), 'id')],
-            'rate' => 'required|numeric|min:0',
+            'rate' => ['required', 'numeric', 'min:0'],
         ];
     }
 

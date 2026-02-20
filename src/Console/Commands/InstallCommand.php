@@ -3,12 +3,8 @@
 namespace PictaStudio\Venditio\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Collection;
-use PictaStudio\Venditio\Models\Cart;
-use PictaStudio\Venditio\VenditioServiceProvider;
 
 use function Laravel\Prompts\confirm;
-use function PictaStudio\Venditio\Helpers\Functions\query;
 
 class InstallCommand extends Command
 {

@@ -21,13 +21,13 @@ class UpdateCurrencyRequest extends FormRequest
         return [
             'country_ids' => ['sometimes', 'array'],
             'country_ids.*' => ['integer', Rule::exists($this->tableFor('country'), 'id')],
-            'name' => 'sometimes|string|max:100',
+            'name' => ['sometimes', 'string', 'max:100'],
             'code' => ['sometimes', 'string', 'size:3', Rule::unique('currencies', 'code')->ignore($currencyId)],
-            'symbol' => 'nullable|string|max:10',
-            'exchange_rate' => 'sometimes|numeric|min:0',
-            'decimal_places' => 'sometimes|integer|min:0|max:9',
-            'is_enabled' => 'sometimes|boolean',
-            'is_default' => 'sometimes|boolean',
+            'symbol' => ['nullable', 'string', 'max:10'],
+            'exchange_rate' => ['sometimes', 'numeric', 'min:0'],
+            'decimal_places' => ['sometimes', 'integer', 'min:0', 'max:9'],
+            'is_enabled' => ['sometimes', 'boolean'],
+            'is_default' => ['sometimes', 'boolean'],
         ];
     }
 

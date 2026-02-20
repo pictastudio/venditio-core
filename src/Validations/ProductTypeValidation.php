@@ -9,18 +9,18 @@ class ProductTypeValidation implements ProductTypeValidationRules
     public function getStoreValidationRules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'active' => 'sometimes|boolean',
-            'is_default' => 'sometimes|boolean',
+            'name' => ['required', 'string', 'max:255'],
+            'active' => ['sometimes', 'boolean'],
+            'is_default' => ['sometimes', 'boolean'],
         ];
     }
 
     public function getUpdateValidationRules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'active' => 'sometimes|boolean',
-            'is_default' => 'sometimes|boolean',
+            'name' => ['sometimes', 'string', 'max:255'],
+            'active' => ['sometimes', 'boolean'],
+            'is_default' => ['sometimes', 'boolean'],
         ];
     }
 }

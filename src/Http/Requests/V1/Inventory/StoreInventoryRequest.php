@@ -18,12 +18,12 @@ class StoreInventoryRequest extends FormRequest
     {
         return [
             'product_id' => ['required', 'integer', Rule::exists($this->tableFor('product'), 'id')],
-            'stock' => 'sometimes|integer|min:0',
-            'stock_reserved' => 'sometimes|integer|min:0',
-            'stock_min' => 'nullable|integer|min:0',
-            'price' => 'required|numeric|min:0',
-            'price_includes_tax' => 'sometimes|boolean',
-            'purchase_price' => 'nullable|numeric|min:0',
+            'stock' => ['sometimes', 'integer', 'min:0'],
+            'stock_reserved' => ['sometimes', 'integer', 'min:0'],
+            'stock_min' => ['nullable', 'integer', 'min:0'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'price_includes_tax' => ['sometimes', 'boolean'],
+            'purchase_price' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 

@@ -18,11 +18,11 @@ class UpdateProductCustomFieldRequest extends FormRequest
     {
         return [
             'product_type_id' => ['sometimes', 'integer', Rule::exists($this->tableFor('product_type'), 'id')],
-            'name' => 'sometimes|string|max:255',
-            'required' => 'sometimes|boolean',
-            'sort_order' => 'sometimes|integer|min:0',
-            'type' => 'sometimes|string|max:255',
-            'options' => 'nullable|array',
+            'name' => ['sometimes', 'string', 'max:255'],
+            'required' => ['sometimes', 'boolean'],
+            'sort_order' => ['sometimes', 'integer', 'min:0'],
+            'type' => ['sometimes', 'string', 'max:255'],
+            'options' => ['nullable', 'array'],
         ];
     }
 

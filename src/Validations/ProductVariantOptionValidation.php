@@ -21,9 +21,9 @@ class ProductVariantOptionValidation implements ProductVariantOptionValidationRu
                 'required',
                 'string',
             ],
-            'image' => 'sometimes|nullable|string',
-            'hex_color' => 'sometimes|nullable|string|max:20',
-            'sort_order' => 'required|integer|min:0',
+            'image' => ['sometimes', 'nullable', 'string'],
+            'hex_color' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'sort_order' => ['required', 'integer', 'min:0'],
         ];
     }
 
@@ -35,10 +35,10 @@ class ProductVariantOptionValidation implements ProductVariantOptionValidationRu
                 'integer',
                 Rule::exists($this->tableFor('product_variant'), 'id'),
             ],
-            'name' => 'sometimes|string',
-            'image' => 'sometimes|nullable|string',
-            'hex_color' => 'sometimes|nullable|string|max:20',
-            'sort_order' => 'sometimes|integer|min:0',
+            'name' => ['sometimes', 'string'],
+            'image' => ['sometimes', 'nullable', 'string'],
+            'hex_color' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'sort_order' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 

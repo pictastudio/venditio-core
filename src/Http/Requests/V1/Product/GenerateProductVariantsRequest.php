@@ -20,13 +20,13 @@ class GenerateProductVariantsRequest extends FormRequest
         $optionTable = (new (resolve_model('product_variant_option')))->getTable();
 
         return [
-            'variants' => 'required|array|min:1',
+            'variants' => ['required', 'array', 'min:1'],
             'variants.*.variant_id' => [
                 'required',
                 'integer',
                 Rule::exists($variantTable, 'id'),
             ],
-            'variants.*.option_ids' => 'required|array|min:1',
+            'variants.*.option_ids' => ['required', 'array', 'min:1'],
             'variants.*.option_ids.*' => [
                 'integer',
                 Rule::exists($optionTable, 'id'),

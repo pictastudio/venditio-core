@@ -14,8 +14,8 @@ class UpdateShippingStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'external_code' => 'sometimes|string|max:255',
-            'name' => 'sometimes|string|max:255',
+            'external_code' => ['sometimes', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'max:255'],
         ];
     }
 }

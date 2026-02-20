@@ -18,11 +18,11 @@ class StoreProductCustomFieldRequest extends FormRequest
     {
         return [
             'product_type_id' => ['required', 'integer', Rule::exists($this->tableFor('product_type'), 'id')],
-            'name' => 'required|string|max:255',
-            'required' => 'sometimes|boolean',
-            'sort_order' => 'required|integer|min:0',
-            'type' => 'required|string|max:255',
-            'options' => 'nullable|array',
+            'name' => ['required', 'string', 'max:255'],
+            'required' => ['sometimes', 'boolean'],
+            'sort_order' => ['required', 'integer', 'min:0'],
+            'type' => ['required', 'string', 'max:255'],
+            'options' => ['nullable', 'array'],
         ];
     }
 

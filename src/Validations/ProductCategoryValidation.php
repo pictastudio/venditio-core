@@ -17,9 +17,9 @@ class ProductCategoryValidation implements ProductCategoryValidationRules
                 'integer',
                 Rule::exists($this->tableFor('product_category'), 'id'),
             ],
-            'name' => 'required|string|max:255',
-            'active' => 'sometimes|boolean',
-            'sort_order' => 'required|integer|min:0',
+            'name' => ['required', 'string', 'max:255'],
+            'active' => ['sometimes', 'boolean'],
+            'sort_order' => ['required', 'integer', 'min:0'],
         ];
     }
 
@@ -32,9 +32,9 @@ class ProductCategoryValidation implements ProductCategoryValidationRules
                 'integer',
                 Rule::exists($this->tableFor('product_category'), 'id'),
             ],
-            'name' => 'sometimes|string|max:255',
-            'active' => 'sometimes|boolean',
-            'sort_order' => 'sometimes|integer|min:0',
+            'name' => ['sometimes', 'string', 'max:255'],
+            'active' => ['sometimes', 'boolean'],
+            'sort_order' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 

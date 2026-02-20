@@ -23,11 +23,11 @@ class PriceListPriceValidation implements PriceListPriceValidationRules
                     ->where(fn ($query) => $query->where('product_id', $productId))
                     ->withoutTrashed(),
             ],
-            'price' => 'required|numeric|min:0',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'price_includes_tax' => 'sometimes|boolean',
-            'is_default' => 'sometimes|boolean',
-            'metadata' => 'nullable|array',
+            'price' => ['required', 'numeric', 'min:0'],
+            'purchase_price' => ['nullable', 'numeric', 'min:0'],
+            'price_includes_tax' => ['sometimes', 'boolean'],
+            'is_default' => ['sometimes', 'boolean'],
+            'metadata' => ['nullable', 'array'],
         ];
     }
 
@@ -48,11 +48,11 @@ class PriceListPriceValidation implements PriceListPriceValidationRules
                     ->withoutTrashed()
                     ->ignore($priceListPriceId),
             ],
-            'price' => 'sometimes|numeric|min:0',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'price_includes_tax' => 'sometimes|boolean',
-            'is_default' => 'sometimes|boolean',
-            'metadata' => 'nullable|array',
+            'price' => ['sometimes', 'numeric', 'min:0'],
+            'purchase_price' => ['nullable', 'numeric', 'min:0'],
+            'price_includes_tax' => ['sometimes', 'boolean'],
+            'is_default' => ['sometimes', 'boolean'],
+            'metadata' => ['nullable', 'array'],
         ];
     }
 

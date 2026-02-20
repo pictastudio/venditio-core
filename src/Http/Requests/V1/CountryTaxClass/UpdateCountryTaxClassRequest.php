@@ -19,7 +19,7 @@ class UpdateCountryTaxClassRequest extends FormRequest
         return [
             'country_id' => ['sometimes', 'integer', Rule::exists($this->tableFor('country'), 'id')],
             'tax_class_id' => ['sometimes', 'integer', Rule::exists($this->tableFor('tax_class'), 'id')],
-            'rate' => 'sometimes|numeric|min:0',
+            'rate' => ['sometimes', 'numeric', 'min:0'],
         ];
     }
 

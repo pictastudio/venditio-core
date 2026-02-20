@@ -137,7 +137,7 @@ class CartController extends Controller
         $this->authorizeIfConfigured('update', $cart);
 
         $validated = $this->validateData(request()->all(), [
-            'line_ids' => 'required|array|min:1',
+            'line_ids' => ['required', 'array', 'min:1'],
             'line_ids.*' => [
                 'integer',
                 Rule::exists((new (config('venditio.models.cart_line')))->getTable(), 'id'),
@@ -176,7 +176,7 @@ class CartController extends Controller
         $this->authorizeIfConfigured('update', $cart);
 
         $validated = $this->validateData(request()->all(), [
-            'discount_code' => 'required|string|max:255',
+            'discount_code' => ['required', 'string', 'max:255'],
         ]);
 
         $updatedCart = $this->runCartUpdatePipeline(
