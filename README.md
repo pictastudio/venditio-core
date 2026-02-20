@@ -14,6 +14,12 @@ It provides API-only ecommerce primitives while host applications own auth, fron
 composer require pictastudio/venditio
 ```
 
+### Install Venditio
+
+```bash
+php artisan venditio:install
+```
+
 ## Documentation
 
 - Architecture: `docs/ARCHITECTURE.md`

@@ -17,7 +17,7 @@ class ReleaseStockForAbandonedCarts extends Command
     public function handle(): int
     {
         if (!config('venditio.commands.release_stock_for_abandoned_carts.enabled', true)) {
-            $this->info('`carts:update-abandoned` is disabled by configuration.');
+            $this->components->info('`carts:update-abandoned` is disabled by configuration.');
 
             return self::SUCCESS;
         }
@@ -45,7 +45,7 @@ class ReleaseStockForAbandonedCarts extends Command
             );
 
         logger()->info('[ReleaseStockForAbandonedCarts] Abandoned carts updated successfully. Updated carts count: ' . count($updatedCarts), ['carts' => $updatedCarts]);
-        $this->info('Abandoned carts updated successfully. Updated carts count: ' . count($updatedCarts));
+        $this->components->info('Abandoned carts updated successfully. Updated carts count: ' . count($updatedCarts));
 
         return self::SUCCESS;
     }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
-use PictaStudio\Venditio\Console\Commands\ReleaseStockForAbandonedCarts;
+use PictaStudio\Venditio\Console\Commands\{ReleaseStockForAbandonedCarts, InstallCommand};
 use PictaStudio\Venditio\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductPriceResolverInterface, ProductSkuGeneratorInterface};
 use PictaStudio\Venditio\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\Venditio\Dto\{CartDto, CartLineDto, OrderDto};
@@ -31,7 +31,15 @@ class VenditioServiceProvider extends PackageServiceProvider
         $package
             ->name('venditio')
             ->hasConfigFile()
-            ->hasCommand(ReleaseStockForAbandonedCarts::class)
+            // ->hasInstallCommand(function(InstallCommand $command): void {
+            //     $command
+            //         ->publishConfigFile()
+            //         ->publishAssets()
+            //         ->publishMigrations()
+            //         ->askToRunMigrations()
+            //         ->copyAndRegisterServiceProviderInApp();
+            // })
+            ->hasCommands([ReleaseStockForAbandonedCarts::class, InstallCommand::class])
             ->hasMigrations([
                 'create_addresses_table',
                 'create_countries_table',
