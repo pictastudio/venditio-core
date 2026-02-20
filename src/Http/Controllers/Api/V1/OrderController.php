@@ -5,6 +5,7 @@ namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Validation\Rule;
+use PictaStudio\Venditio\Actions\Orders\GenerateOrderInvoice;
 use PictaStudio\Venditio\Http\Controllers\Api\Controller;
 use PictaStudio\Venditio\Http\Requests\V1\Order\{StoreOrderRequest, UpdateOrderRequest};
 use PictaStudio\Venditio\Http\Resources\V1\OrderResource;
@@ -58,6 +59,19 @@ class OrderController extends Controller
         $this->authorizeIfConfigured('view', $order);
 
         return OrderResource::make($order->load('lines'));
+    }
+
+    public function invoice(Order $order, GenerateOrderInvoice $generateOrderInvoice)
+    {
+        $this->authorizeIfConfigured('view', $order);
+
+        $invoice = $generateOrderInvoice->execute($order);
+        $disposition = request()->boolean('download') ? 'attachment' : 'inline';
+
+        return response($invoice->contents(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => sprintf('%s; filename="%s"', $disposition, $invoice->fileName()),
+        ]);
     }
 
     public function update(UpdateOrderRequest $request, Order $order): JsonResource

@@ -28,6 +28,12 @@ Route::post('carts/{cart}/remove_lines', [CartController::class, 'removeLines'])
 Route::post('carts/{cart}/add_discount', [CartController::class, 'addDiscount'])->name('carts.addDiscount');
 Route::patch('carts/{cart}/update_lines', [CartController::class, 'updateLines'])->name('carts.updateLines');
 Route::apiResource('orders', OrderController::class);
+if (config('venditio.order.invoice.enabled', true) && config('venditio.order.invoice.route.enabled', true)) {
+    Route::get(
+        config('venditio.order.invoice.route.uri', 'orders/{order}/invoice'),
+        [OrderController::class, 'invoice']
+    )->name(config('venditio.order.invoice.route.name', 'orders.invoice'));
+}
 Route::apiResource('addresses', AddressController::class);
 Route::apiResource('brands', BrandController::class);
 Route::apiResource('inventories', InventoryController::class);

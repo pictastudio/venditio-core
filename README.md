@@ -51,6 +51,7 @@ All behavior is configured through `config/venditio.php`.
 - `price_lists`: optional multi-price feature
 - `discounts`: discount calculator/bindings/rules configuration
 - `product_variants`: variant naming/copy behavior
+- `order.invoice`: PDF invoice generation pipeline and route settings
 
 ### User model and auth integration
 
@@ -116,6 +117,25 @@ use PictaStudio\Venditio\Contracts\OrderIdentifierGeneratorInterface;
 
 $this->app->singleton(CartIdentifierGeneratorInterface::class, App\Generators\CartIdentifierGenerator::class);
 $this->app->singleton(OrderIdentifierGeneratorInterface::class, App\Generators\OrderIdentifierGenerator::class);
+```
+
+### Invoice PDF customization
+
+Venditio ships with a default order invoice PDF endpoint:
+
+- `GET /api/venditio/v1/orders/{order}/invoice`
+- `GET /api/venditio/v1/orders/{order}/invoice?download=1`
+
+The invoice stack is fully swappable via config:
+
+```php
+'order' => [
+    'invoice' => [
+        'data_factory' => App\Invoices\MyOrderInvoiceDataFactory::class,
+        'template' => App\Invoices\MyOrderInvoiceTemplate::class,
+        'renderer' => App\Invoices\MyOrderInvoiceRenderer::class,
+    ],
+],
 ```
 
 ## Commands

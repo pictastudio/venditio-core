@@ -9,12 +9,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
 use PictaStudio\Venditio\Console\Commands\{InstallCommand, ReleaseStockForAbandonedCarts};
-use PictaStudio\Venditio\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, ProductPriceResolverInterface, ProductSkuGeneratorInterface};
+use PictaStudio\Venditio\Contracts\{CartIdentifierGeneratorInterface, CartTotalDiscountCalculatorInterface, DiscountCalculatorInterface, DiscountUsageRecorderInterface, DiscountablesResolverInterface, OrderIdentifierGeneratorInterface, OrderInvoiceDataFactoryInterface, OrderInvoiceRendererInterface, OrderInvoiceTemplateInterface, ProductPriceResolverInterface, ProductSkuGeneratorInterface};
 use PictaStudio\Venditio\Discounts\{CartTotalDiscountCalculator, DiscountCalculator, DiscountUsageRecorder, DiscountablesResolver};
 use PictaStudio\Venditio\Dto\{CartDto, CartLineDto, OrderDto};
 use PictaStudio\Venditio\Dto\Contracts\{CartDtoContract, CartLineDtoContract, OrderDtoContract};
 use PictaStudio\Venditio\Facades\Venditio as VenditioFacade;
 use PictaStudio\Venditio\Generators\{CartIdentifierGenerator, OrderIdentifierGenerator, ProductSkuGenerator};
+use PictaStudio\Venditio\Invoices\{DefaultOrderInvoiceDataFactory, DefaultOrderInvoiceTemplate, DompdfOrderInvoiceRenderer};
 use PictaStudio\Venditio\Models\User;
 use PictaStudio\Venditio\Pricing\DefaultProductPriceResolver;
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
@@ -93,6 +94,7 @@ class VenditioServiceProvider extends PackageServiceProvider
         $this->bindDiscountClasses();
         $this->bindPricingClasses();
         $this->bindIdentifierGenerators();
+        $this->bindOrderInvoiceClasses();
     }
 
     private function bindIdentifierGenerators(): void
@@ -119,6 +121,24 @@ class VenditioServiceProvider extends PackageServiceProvider
         $this->app->singleton(
             ProductPriceResolverInterface::class,
             config('venditio.price_lists.resolver', DefaultProductPriceResolver::class)
+        );
+    }
+
+    private function bindOrderInvoiceClasses(): void
+    {
+        $this->app->singleton(
+            OrderInvoiceDataFactoryInterface::class,
+            config('venditio.order.invoice.data_factory', DefaultOrderInvoiceDataFactory::class)
+        );
+
+        $this->app->singleton(
+            OrderInvoiceTemplateInterface::class,
+            config('venditio.order.invoice.template', DefaultOrderInvoiceTemplate::class)
+        );
+
+        $this->app->singleton(
+            OrderInvoiceRendererInterface::class,
+            config('venditio.order.invoice.renderer', DompdfOrderInvoiceRenderer::class)
         );
     }
 

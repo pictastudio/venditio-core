@@ -1,6 +1,6 @@
 <?php
 
-use PictaStudio\Venditio\{Discounts, Dto, Enums, Generators, Models, Pricing};
+use PictaStudio\Venditio\{Discounts, Dto, Enums, Generators, Invoices, Models, Pricing};
 use PictaStudio\Venditio\Facades\Venditio;
 use PictaStudio\Venditio\Pipelines\{Cart, CartLine, Order};
 use PictaStudio\Venditio\Validations;
@@ -209,6 +209,63 @@ return [
         //     'delivered' => 'delivered',
         //     'cancelled' => 'cancelled',
         // ],
+
+        'invoice' => [
+            'enabled' => true,
+            'filename_prefix' => 'invoice',
+            'number_prefix' => 'INV',
+            'locale' => 'it',
+            'brand_mark' => '',
+            'logo' => '',
+            'data_factory' => Invoices\DefaultOrderInvoiceDataFactory::class,
+            'template' => Invoices\DefaultOrderInvoiceTemplate::class,
+            'renderer' => Invoices\DompdfOrderInvoiceRenderer::class,
+            'route' => [
+                'enabled' => true,
+                'uri' => 'orders/{order}/invoice',
+                'name' => 'orders.invoice',
+            ],
+            'pdf' => [
+                'paper' => 'letter',
+                'orientation' => 'portrait',
+                'default_font' => 'DejaVu Sans',
+                'enable_remote_assets' => false,
+                'font_subsetting' => false,
+                'temp_dir' => null,
+                'font_cache_dir' => null,
+            ],
+            'currency' => [
+                'code' => 'USD',
+                'decimals' => 2,
+                'decimal_separator' => ',',
+                'thousands_separator' => '.',
+            ],
+            'seller' => [
+                'name' => 'Venditio',
+                'address_lines' => [],
+                'phone' => null,
+                'email' => null,
+                'footer_lines' => [],
+            ],
+            'default_payment_method' => 'N/A',
+            'default_tax_country' => 'Tax',
+            'labels' => [
+                'document_title' => 'Ricevuta',
+                'invoice_number' => 'Numero fattura',
+                'receipt_number' => 'Numero ricevuta',
+                'payment_date' => 'Data di pagamento',
+                'billing_address' => 'Indirizzo di fatturazione',
+                'payment_of' => 'Pagamento di',
+                'paid_on' => 'effettuato in data',
+                'subtotal' => 'Subtotale',
+                'net_total' => 'Totale al netto delle imposte',
+                'tax' => 'IVA',
+                'on' => 'su',
+                'total' => 'Totale',
+                'amount_paid' => 'Importo pagato',
+                'page_number' => 'Pagina 1 di 1',
+            ],
+        ],
     ],
 
     /*

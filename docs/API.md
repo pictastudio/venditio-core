@@ -144,9 +144,16 @@ Include parameters:
 
 - `GET /orders`
 - `GET /orders/{order}`
+- `GET /orders/{order}/invoice`
 - `POST /orders`
 - `PATCH /orders/{order}`
 - `DELETE /orders/{order}`
+
+Invoice endpoint behavior:
+
+- returns `application/pdf`
+- `?download=1` switches `Content-Disposition` from `inline` to `attachment`
+- route can be customized or disabled from `venditio.order.invoice.route`
 
 ### Order Lines
 

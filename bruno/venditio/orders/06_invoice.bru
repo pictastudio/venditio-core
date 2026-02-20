@@ -1,0 +1,23 @@
+meta {
+  name: Invoice orders
+  type: http
+  seq: 36
+}
+
+get {
+  url: {{baseUrl}}/orders/:id/invoice
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+params:query {
+  ~download: 1
+}
+
+headers {
+  Accept: application/pdf
+}

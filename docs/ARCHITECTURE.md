@@ -16,6 +16,7 @@ It is headless by design: host applications own authentication, UI, and renderin
 - `src/Http`: API controllers, requests, resources
 - `src/Models`: domain models
 - `src/Actions`: reusable state-changing operations
+- `src/Invoices`: invoice data/template/renderer implementations
 - `src/Pipelines`: cart, cart-line, and order orchestration pipelines
 - `src/Discounts`: discount calculators, context, rules, usage recording
 - `src/Validations`: validation contract implementations
@@ -34,6 +35,7 @@ It configures:
 - API route registration (when enabled)
 - validation contract bindings from config
 - discount/pricing/identifier-generator bindings
+- order invoice data/template/renderer bindings
 - polymorphic morph map
 - scheduled command registration
 
@@ -102,6 +104,7 @@ Main configuration sections:
 - `product_variants`
 - `price_lists`
 - `discounts`
+- `order.invoice`
 - `commands`
 - `scopes`
 
