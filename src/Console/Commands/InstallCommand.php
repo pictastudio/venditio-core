@@ -22,6 +22,9 @@ class InstallCommand extends Command
         $this->components->info('Publishing venditio migrations...');
         $this->call('vendor:publish', ['--tag' => 'venditio-migrations']);
 
+        $this->components->info('Publishing venditio seed data...');
+        $this->call('vendor:publish', ['--tag' => 'venditio-data']);
+
         if (confirm('Do you want to publish bruno api files?', false)) {
             $this->components->info('Publishing bruno api files...');
             $this->call('vendor:publish', ['--tag' => 'venditio-bruno']);

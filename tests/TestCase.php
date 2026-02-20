@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PictaStudio\Translatable\TranslatableServiceProvider;
 use PictaStudio\Venditio\VenditioServiceProvider;
+use ReflectionClass;
 
 class TestCase extends Orchestra
 {
@@ -15,6 +16,15 @@ class TestCase extends Orchestra
         parent::setUp();
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        $translatableMigrationsPath = dirname(
+            (new ReflectionClass(TranslatableServiceProvider::class))->getFileName(),
+            2
+        ) . '/database/migrations';
+
+        if (is_dir($translatableMigrationsPath)) {
+            $this->loadMigrationsFrom($translatableMigrationsPath);
+        }
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'PictaStudio\\Venditio\\Database\\Factories\\' . class_basename($modelName) . 'Factory'

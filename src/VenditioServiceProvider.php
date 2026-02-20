@@ -202,6 +202,10 @@ class VenditioServiceProvider extends PackageServiceProvider
 
     private function registerPublishableAssets(): void
     {
+        if (!$this->app->runningInConsole()) {
+            return;
+        }
+
         $this->publishes([
             $this->package->basePath('/../bruno/venditio') => base_path('bruno/venditio'),
         ], 'venditio-bruno');
