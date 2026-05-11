@@ -2,6 +2,22 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.8.2 - 2026-05-11
+
+### What's Changed
+
+This patch release makes the package migration publishing list complete again so host applications receive every Venditio migration when publishing package assets.
+
+### Fixes
+
+- **Migration publishing completeness** - Added the missing product collection metadata, related products, inventory stock management, and catalog image collection migrations to the service provider publish list.
+
+### Tests
+
+- Added feature coverage that compares every package migration file against the `venditio-migrations` publish group.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.8.1...v2.8.2
+
 ## v2.8.1 - 2026-05-11
 
 ### What's Changed
