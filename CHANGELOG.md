@@ -2,6 +2,31 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.8.3 - 2026-05-11
+
+### What's Changed
+
+This patch release improves product category and tag tree deletion behavior by preserving descendant structure by default while adding an explicit recursive deletion option for host applications.
+
+### Features
+
+- **Recursive tree deletion controls** - Added `delete_children` support to product category and tag delete endpoints so callers can recursively delete a node and every descendant when requested.
+
+### Fixes
+
+- **Tree child promotion on delete** - Deleting a product category or tag now moves direct children to the deleted node's parent and rebuilds descendant paths instead of always releasing children to the root.
+- **Subtree product association checks** - Recursive product category and tag deletes now require `force=1` when any affected descendant is connected to products and clear related pivots for the deleted subtree when forced.
+
+### Tooling
+
+- **Tree delete documentation** - Updated the API reference and Bruno delete requests to document `delete_children`, `force`, and default child promotion behavior.
+
+### Tests
+
+- Added feature coverage for default child promotion, recursive category/tag deletion, forced subtree association cleanup, and Venditio nested config merge behavior.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.8.2...v2.8.3
+
 ## v2.8.2 - 2026-05-11
 
 ### What's Changed
