@@ -2,6 +2,26 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.8.1 - 2026-05-11
+
+### What's Changed
+
+This patch release preserves nullable country seed fields during the Venditio data migration and adds release-publisher workflow metadata for repository-local agent and Cursor usage.
+
+### Fixes
+
+- **Country seed nullable fields** - Stopped filtering empty values out of seeded country rows so nullable fields such as `capital` are preserved as empty strings during the Venditio data migration.
+
+### Tooling
+
+- **Release publisher workflow metadata** - Added repository-local release-publisher skill, agent metadata, and Cursor rule files for consistent semantic release publishing.
+
+### Tests
+
+- Added feature coverage for the Venditio data migration country seeding behavior, including nullable seeded fields.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.8.0...v2.8.1
+
 ## v2.8.0 - 2026-05-07
 
 ### What's Changed
