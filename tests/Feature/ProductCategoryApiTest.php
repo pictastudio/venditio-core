@@ -5,7 +5,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PictaStudio\Venditio\Models\{Product, ProductCategory, Tag};
 
-use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, deleteJson, getJson, patch, patchJson, post, postJson};
+use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, assertSoftDeleted, deleteJson, getJson, patch, patchJson, post, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -273,6 +273,91 @@ it('force deletes a product category and clears related pivots', function () {
         ->assertOk()
         ->assertJsonPath('0.id', $child->getKey())
         ->assertJsonPath('0.children.0.id', $grandchild->getKey());
+});
+
+it('promotes product category children to the deleted node parent by default', function () {
+    $root = ProductCategory::factory()->create([
+        'sort_order' => 1,
+    ]);
+    $middle = ProductCategory::factory()->create([
+        'parent_id' => $root->getKey(),
+        'sort_order' => 2,
+    ]);
+    $child = ProductCategory::factory()->create([
+        'parent_id' => $middle->getKey(),
+        'sort_order' => 3,
+    ]);
+    $grandchild = ProductCategory::factory()->create([
+        'parent_id' => $child->getKey(),
+        'sort_order' => 4,
+    ]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/product_categories/' . $middle->getKey())
+        ->assertNoContent();
+
+    $child->refresh();
+    $grandchild->refresh();
+
+    assertSoftDeleted('product_categories', ['id' => $middle->getKey()]);
+
+    expect($child->parent_id)->toBe($root->getKey())
+        ->and((string) $child->path)->toBe($root->getKey() . '.' . $child->getKey())
+        ->and((string) $grandchild->path)->toBe($root->getKey() . '.' . $child->getKey() . '.' . $grandchild->getKey());
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/product_categories?as_tree=1')
+        ->assertOk()
+        ->assertJsonPath('0.id', $root->getKey())
+        ->assertJsonPath('0.children.0.id', $child->getKey())
+        ->assertJsonPath('0.children.0.children.0.id', $grandchild->getKey());
+});
+
+it('recursively deletes product category children when requested', function () {
+    $parent = ProductCategory::factory()->create();
+    $child = ProductCategory::factory()->create([
+        'parent_id' => $parent->getKey(),
+    ]);
+    $grandchild = ProductCategory::factory()->create([
+        'parent_id' => $child->getKey(),
+    ]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/product_categories/' . $parent->getKey() . '?delete_children=1')
+        ->assertNoContent();
+
+    assertSoftDeleted('product_categories', ['id' => $parent->getKey()]);
+    assertSoftDeleted('product_categories', ['id' => $child->getKey()]);
+    assertSoftDeleted('product_categories', ['id' => $grandchild->getKey()]);
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/product_categories?as_tree=1')
+        ->assertOk()
+        ->assertJsonCount(0);
+});
+
+it('requires force when recursively deleting product categories with connected products', function () {
+    $parent = ProductCategory::factory()->create();
+    $child = ProductCategory::factory()->create([
+        'parent_id' => $parent->getKey(),
+    ]);
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $child->products()->sync([$product->getKey()]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/product_categories/' . $parent->getKey() . '?delete_children=1')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['products']);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/product_categories/' . $parent->getKey() . '?delete_children=1&force=1')
+        ->assertNoContent();
+
+    assertSoftDeleted('product_categories', ['id' => $parent->getKey()]);
+    assertSoftDeleted('product_categories', ['id' => $child->getKey()]);
+    assertDatabaseMissing('product_category_product', [
+        'product_category_id' => $child->getKey(),
+        'product_id' => $product->getKey(),
+    ]);
 });
 
 it('returns product categories as a tree when as_tree is true', function () {

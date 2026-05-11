@@ -123,7 +123,25 @@ class TagController extends Controller
     {
         $this->authorizeIfConfigured('delete', $tag);
 
-        if (!request()->boolean('force') && $tag->products()->withoutGlobalScopes()->exists()) {
+        $this->validateData(request()->query(), [
+            'force' => ['boolean'],
+            'delete_children' => ['boolean'],
+        ]);
+
+        $force = request()->boolean('force');
+        $deleteChildren = request()->boolean('delete_children');
+        $tagIds = $deleteChildren
+            ? $treePaths->idsForNodeAndDescendants($tag)
+            : [$tag->getKey()];
+        $productMorphClass = app(resolve_model('product'))->getMorphClass();
+
+        if (
+            !$force
+            && DB::table('taggables')
+                ->whereIn('tag_id', $tagIds)
+                ->where('taggable_type', $productMorphClass)
+                ->exists()
+        ) {
             throw ValidationException::withMessages([
                 'products' => [
                     'This tag has connected products. Use force=1 to delete it and detach related products.',
@@ -131,21 +149,26 @@ class TagController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($tag, $treePaths): void {
-            $tagKey = $tag->getKey();
+        DB::transaction(function () use ($tag, $treePaths, $tagIds, $deleteChildren): void {
             $tagMorphClass = $tag->getMorphClass();
 
             DB::table('taggables')
-                ->where('tag_id', $tagKey)
-                ->orWhere(function ($query) use ($tagKey, $tagMorphClass): void {
+                ->whereIn('tag_id', $tagIds)
+                ->orWhere(function ($query) use ($tagIds, $tagMorphClass): void {
                     $query->where('taggable_type', $tagMorphClass)
-                        ->where('taggable_id', $tagKey);
+                        ->whereIn('taggable_id', $tagIds);
                 })
                 ->delete();
 
-            $treePaths->releaseChildrenToRoot($tag);
+            if (!$deleteChildren) {
+                $treePaths->promoteChildren($tag);
+            }
 
-            $tag->delete();
+            resolve_model('tag')::withoutGlobalScopes()
+                ->whereIn($tag->getKeyName(), $tagIds)
+                ->get()
+                ->each
+                ->delete();
         });
 
         return response()->noContent();

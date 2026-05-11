@@ -12,6 +12,7 @@ delete {
 
 params:query {
   ~force: 0
+  ~delete_children: 0
 }
 
 params:path {
@@ -34,8 +35,9 @@ docs {
 
   query params:
   - force (boolean): Optional. When true, deletes even if products are connected and clears related taggable rows.
+  - delete_children (boolean): Optional. When true, recursively deletes every child tag below the target.
   - Without force, deleting a tag with connected products returns a validation error on `products`.
-  - Note: deleting a tag clears taggable associations, releases direct child tags from the deleted parent, and rebuilds their tree paths.
+  - By default, deleting a tag clears taggable associations, moves direct child tags to the deleted tag's parent, and rebuilds their tree paths.
 
   path params:
   - id-or-slug: Replace with target resource identifier.

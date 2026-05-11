@@ -51,7 +51,7 @@ Additional supported filters:
 - `invoice_id`, `return_request_id`, and `identifier` on `/orders/{order}/credit_notes`
 - `/return_reasons`: `code`, `name`, `description`, `is_active`
 - `/return_requests`: `order_id`, `user_id`, `return_reason_id`, `is_accepted`, `is_verified`
-- `as_tree` boolean on `/product_categories`
+- `as_tree` boolean on `/product_categories` and `/tags`
 - `/products`: `include_variants` boolean, `exclude_variants` boolean, `brand_ids[]`, `category_ids[]`, `collection_ids[]`, `price`, `price_operator` (`>`, `<`, `>=`, `<=`, `=`)
   - supports `sort_by=price` with `sort_dir=asc|desc`
   - default behavior is controlled by `venditio.product.exclude_variants_from_index` (`true` by default)
@@ -76,6 +76,12 @@ Export-specific query parameters:
 - `/exports/products`: `columns[]` (or `columns=id,name,sku`) and optional `filename`
 - `/exports/orders`: `columns[]` (or `columns=order_id,line_id,...`) and optional `filename`
 - both export endpoints support the same list filters used by `/products` and `/orders`
+
+Tree delete query parameters:
+
+- `DELETE /product_categories/{productCategory}` and `DELETE /tags/{tag}` preserve descendants by default: direct children move to the deleted node's parent, then paths are rebuilt recursively.
+- `delete_children` boolean recursively deletes the target node and every descendant.
+- `force` boolean is required when deleting any affected product category or tag that is connected to products; when forced, related pivots/associations for all deleted tree nodes are cleared.
 
 Invoice-specific notes:
 

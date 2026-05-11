@@ -39,4 +39,45 @@ class RebuildTreePaths
             $this->rebuild($child);
         }
     }
+
+    public function promoteChildren(Model $parent): void
+    {
+        $newParentId = $parent->getAttribute('parent_id');
+        $newParent = $newParentId === null
+            ? null
+            : $parent->newQueryWithoutScopes()->find($newParentId);
+
+        $children = $parent->newQueryWithoutScopes()
+            ->where('parent_id', $parent->getKey())
+            ->get();
+
+        foreach ($children as $child) {
+            $child->setAttribute('parent_id', $newParentId);
+            $child->saveQuietly();
+
+            if ($newParent === null) {
+                $child->unsetRelation('parent');
+            }
+
+            $this->rebuild($child, $newParent);
+        }
+    }
+
+    public function idsForNodeAndDescendants(Model $node): array
+    {
+        $ids = [$node->getKey()];
+
+        $children = $node->newQueryWithoutScopes()
+            ->where('parent_id', $node->getKey())
+            ->get();
+
+        foreach ($children as $child) {
+            $ids = [
+                ...$ids,
+                ...$this->idsForNodeAndDescendants($child),
+            ];
+        }
+
+        return $ids;
+    }
 }

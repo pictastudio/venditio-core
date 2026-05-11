@@ -12,6 +12,7 @@ delete {
 
 params:query {
   ~force: 0
+  ~delete_children: 0
 }
 
 params:path {
@@ -34,8 +35,9 @@ docs {
 
   query params:
   - force (boolean): Optional. When true, deletes even if products are connected and clears related product/tag pivot rows.
+  - delete_children (boolean): Optional. When true, recursively deletes every child category below the target.
   - Without force, deleting a product category with connected products returns a validation error on `products`.
-  - Deleting a parent product category preserves direct child categories, clears their parent_id, and rebuilds their tree paths.
+  - By default, deleting a parent product category preserves direct child categories, moves them to the deleted category's parent, and rebuilds their tree paths.
 
   path params:
   - id-or-slug: Replace with target resource identifier.

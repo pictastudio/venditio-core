@@ -140,9 +140,18 @@ class ProductCategoryController extends Controller
     {
         $this->authorizeIfConfigured('delete', $productCategory);
 
-        $force = request()->boolean('force');
+        $this->validateData(request()->query(), [
+            'force' => ['boolean'],
+            'delete_children' => ['boolean'],
+        ]);
 
-        if (!$force && $productCategory->products()->withoutGlobalScopes()->exists()) {
+        $force = request()->boolean('force');
+        $deleteChildren = request()->boolean('delete_children');
+        $categoryIds = $deleteChildren
+            ? $treePaths->idsForNodeAndDescendants($productCategory)
+            : [$productCategory->getKey()];
+
+        if (!$force && DB::table('product_category_product')->whereIn('product_category_id', $categoryIds)->exists()) {
             throw ValidationException::withMessages([
                 'products' => [
                     'This product category has connected products. Use force=1 to delete it and detach related products.',
@@ -150,20 +159,28 @@ class ProductCategoryController extends Controller
             ]);
         }
 
-        if ($force) {
-            DB::transaction(function () use ($productCategory, $treePaths): void {
-                $productCategory->products()->detach();
-                $productCategory->tags()->detach();
+        DB::transaction(function () use ($productCategory, $treePaths, $categoryIds, $force, $deleteChildren): void {
+            if ($force) {
+                DB::table('product_category_product')
+                    ->whereIn('product_category_id', $categoryIds)
+                    ->delete();
 
-                $treePaths->releaseChildrenToRoot($productCategory);
+                DB::table('taggables')
+                    ->where('taggable_type', $productCategory->getMorphClass())
+                    ->whereIn('taggable_id', $categoryIds)
+                    ->delete();
+            }
 
-                $productCategory->delete();
-            });
+            if (!$deleteChildren) {
+                $treePaths->promoteChildren($productCategory);
+            }
 
-            return response()->noContent();
-        }
-
-        $productCategory->delete();
+            resolve_model('product_category')::withoutGlobalScopes()
+                ->whereIn($productCategory->getKeyName(), $categoryIds)
+                ->get()
+                ->each
+                ->delete();
+        });
 
         return response()->noContent();
     }

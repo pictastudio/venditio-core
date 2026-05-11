@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 use PictaStudio\Venditio\Enums\ProductStatus;
 use PictaStudio\Venditio\Models\{Brand, Product, ProductCategory, ProductCollection, ProductType, Tag, TaxClass};
 
-use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, deleteJson, getJson, patchJson, post, postJson};
+use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, assertSoftDeleted, deleteJson, getJson, patchJson, post, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -529,6 +529,138 @@ it('force deletes a tag while clearing polymorphic associations and child parent
         ->assertOk()
         ->assertJsonPath('0.id', $child->getKey())
         ->assertJsonPath('0.children.0.id', $grandchild->getKey());
+});
+
+it('promotes tag children to the deleted node parent by default', function () {
+    $root = Tag::factory()->create([
+        'sort_order' => 1,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $middle = Tag::factory()->create([
+        'parent_id' => $root->getKey(),
+        'sort_order' => 2,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $child = Tag::factory()->create([
+        'parent_id' => $middle->getKey(),
+        'sort_order' => 3,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $grandchild = Tag::factory()->create([
+        'parent_id' => $child->getKey(),
+        'sort_order' => 4,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/tags/' . $middle->getKey())
+        ->assertNoContent();
+
+    $child->refresh();
+    $grandchild->refresh();
+
+    assertSoftDeleted('tags', ['id' => $middle->getKey()]);
+
+    expect($child->parent_id)->toBe($root->getKey())
+        ->and((string) $child->path)->toBe($root->getKey() . '.' . $child->getKey())
+        ->and((string) $grandchild->path)->toBe($root->getKey() . '.' . $child->getKey() . '.' . $grandchild->getKey());
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/tags?as_tree=1')
+        ->assertOk()
+        ->assertJsonPath('0.id', $root->getKey())
+        ->assertJsonPath('0.children.0.id', $child->getKey())
+        ->assertJsonPath('0.children.0.children.0.id', $grandchild->getKey());
+});
+
+it('recursively deletes tag children when requested and clears deleted tag associations', function () {
+    $parent = Tag::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $child = Tag::factory()->create([
+        'parent_id' => $parent->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $grandchild = Tag::factory()->create([
+        'parent_id' => $child->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $relatedTag = Tag::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $child->tags()->sync([$relatedTag->getKey()]);
+    $relatedTag->tags()->sync([$grandchild->getKey()]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/tags/' . $parent->getKey() . '?delete_children=1')
+        ->assertNoContent();
+
+    assertSoftDeleted('tags', ['id' => $parent->getKey()]);
+    assertSoftDeleted('tags', ['id' => $child->getKey()]);
+    assertSoftDeleted('tags', ['id' => $grandchild->getKey()]);
+    assertDatabaseMissing('taggables', [
+        'taggable_type' => $child->getMorphClass(),
+        'taggable_id' => $child->getKey(),
+    ]);
+    assertDatabaseMissing('taggables', [
+        'tag_id' => $grandchild->getKey(),
+    ]);
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/tags?as_tree=1')
+        ->assertOk()
+        ->assertJsonCount(1)
+        ->assertJsonPath('0.id', $relatedTag->getKey());
+});
+
+it('requires force when recursively deleting tags with connected products', function () {
+    $parent = Tag::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $child = Tag::factory()->create([
+        'parent_id' => $parent->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $product = Product::factory()->create([
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $product->tags()->sync([$child->getKey()]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/tags/' . $parent->getKey() . '?delete_children=1')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['products']);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . '/tags/' . $parent->getKey() . '?delete_children=1&force=1')
+        ->assertNoContent();
+
+    assertSoftDeleted('tags', ['id' => $parent->getKey()]);
+    assertSoftDeleted('tags', ['id' => $child->getKey()]);
+    assertDatabaseMissing('taggables', [
+        'tag_id' => $child->getKey(),
+        'taggable_type' => $product->getMorphClass(),
+        'taggable_id' => $product->getKey(),
+    ]);
 });
 
 it('orders tags by sort_order within each tree branch', function () {
