@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Publisher"
+  short_description: "Create semver tags and GitHub releases"
+  default_prompt: "Use $release-publisher to create the next release for this repository."
