@@ -2,6 +2,32 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.8.4 - 2026-05-13
+
+### What's Changed
+
+This patch release makes list and tree ordering deterministic across API responses, with branch-scoped ordering for product categories and tags plus clearer request examples for default sort behavior.
+
+### Features
+
+- **Branch-scoped tree ordering** - Product categories and tags now order children and descendants by `sort_order` within each sibling branch, with primary keys used as deterministic tie-breakers.
+- **Default list ordering** - List endpoints now apply a default order when no explicit sort is requested, using `sort_order` where available and newest IDs first otherwise.
+
+### Fixes
+
+- **Bulk tree update response ordering** - Bulk product category and tag updates now return refreshed records in their persisted default order after parent or sort changes are applied.
+- **Tree sort order validation** - Product category and tag create, update, and bulk update payloads now require `sort_order` values to start at `1`, matching branch-scoped numbering semantics.
+
+### Tooling
+
+- **Bruno list examples** - Updated Bruno list requests to use deterministic default sort examples and documented branch-scoped tree ordering for category and tag requests.
+
+### Tests
+
+- Added feature coverage for default list ordering, tree branch ordering at multiple depths, `sort_order` validation, and bulk tree update response ordering.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.8.3...v2.8.4
+
 ## v2.8.3 - 2026-05-11
 
 ### What's Changed
