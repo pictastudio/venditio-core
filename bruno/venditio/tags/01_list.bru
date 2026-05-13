@@ -14,7 +14,7 @@ params:query {
   ~all: 0
   ~page: 1
   ~per_page: 30
-  ~sort_by: parent_id
+  ~sort_by: sort_order
   ~sort_dir: asc
   ~exclude_all_scopes: 0
   ~exclude_active_scope: 0
@@ -106,7 +106,7 @@ docs {
   - with_trashed (boolean): Include soft deleted records in results.
   - only_trashed (boolean): Return only soft deleted records.
   - is_active (boolean): Alias filter for active state.
-  - as_tree (boolean): When true, returns tags as a hierarchical tree.
+  - as_tree (boolean): When true, returns tags as a hierarchical tree ordered by sort_order within each sibling branch.
   - include (string|array): Optional includes: product_type, discounts, valid_discounts, expired_discounts.
 
   path params:

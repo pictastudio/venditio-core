@@ -79,6 +79,34 @@ it('updates a product category', function () {
     ]);
 });
 
+it('requires product category sort_order to start at one for api writes', function () {
+    postJson(config('venditio.routes.api.v1.prefix') . '/product_categories', [
+        'name' => 'Invalid Category',
+        'sort_order' => 0,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort_order']);
+
+    $category = ProductCategory::factory()->create([
+        'sort_order' => 1,
+    ]);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . "/product_categories/{$category->getKey()}", [
+        'sort_order' => 0,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort_order']);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . '/product_categories/bulk/update', [
+        'categories' => [
+            [
+                'id' => $category->getKey(),
+                'parent_id' => null,
+                'sort_order' => 0,
+            ],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['categories.0.sort_order']);
+});
+
 it('stores a product category with tags', function () {
     $tag = Tag::factory()->create([
         'active' => true,
@@ -404,10 +432,22 @@ it('orders product categories by sort_order within each tree branch', function (
         'sort_order' => 30,
     ]);
 
-    ProductCategory::factory()->create([
+    $rootAChildEarly = ProductCategory::factory()->create([
         'name' => 'Root A Child Early',
         'parent_id' => $rootA->getKey(),
         'sort_order' => 5,
+    ]);
+
+    ProductCategory::factory()->create([
+        'name' => 'Root A Grandchild Late',
+        'parent_id' => $rootAChildEarly->getKey(),
+        'sort_order' => 2,
+    ]);
+
+    ProductCategory::factory()->create([
+        'name' => 'Root A Grandchild Early',
+        'parent_id' => $rootAChildEarly->getKey(),
+        'sort_order' => 1,
     ]);
 
     ProductCategory::factory()->create([
@@ -429,7 +469,17 @@ it('orders product categories by sort_order within each tree branch', function (
         ->assertJsonPath('0.children.0.name', 'Root B Child Early')
         ->assertJsonPath('0.children.1.name', 'Root B Child Late')
         ->assertJsonPath('1.children.0.name', 'Root A Child Early')
-        ->assertJsonPath('1.children.1.name', 'Root A Child Late');
+        ->assertJsonPath('1.children.1.name', 'Root A Child Late')
+        ->assertJsonPath('1.children.0.children.0.name', 'Root A Grandchild Early')
+        ->assertJsonPath('1.children.0.children.1.name', 'Root A Grandchild Late');
+
+    expect($rootA->children()->pluck('name')->all())->toBe([
+        'Root A Child Early',
+        'Root A Child Late',
+    ])->and($rootAChildEarly->children()->pluck('name')->all())->toBe([
+        'Root A Grandchild Early',
+        'Root A Grandchild Late',
+    ]);
 });
 
 it('returns root product categories ordered by sort_order on the index', function () {
@@ -537,7 +587,11 @@ it('applies bulk-updated category sort_order when rebuilding the tree', function
                 'sort_order' => 5,
             ],
         ],
-    ])->assertOk();
+    ])->assertOk()
+        ->assertJsonPath('0.id', $secondChild->getKey())
+        ->assertJsonPath('0.sort_order', 5)
+        ->assertJsonPath('1.id', $firstChild->getKey())
+        ->assertJsonPath('1.sort_order', 30);
 
     getJson(config('venditio.routes.api.v1.prefix') . '/product_categories?as_tree=1')
         ->assertOk()

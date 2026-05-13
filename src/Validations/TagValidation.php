@@ -43,7 +43,7 @@ class TagValidation implements TagValidationRules
             'active' => ['sometimes', 'boolean'],
             'show_in_menu' => ['sometimes', 'boolean'],
             'in_evidence' => ['sometimes', 'boolean'],
-            'sort_order' => ['required', 'integer', 'min:0'],
+            'sort_order' => ['required', 'integer', 'min:1'],
             'visible_from' => ['nullable', 'date'],
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             'product_ids' => ['nullable', 'array'],
@@ -96,7 +96,7 @@ class TagValidation implements TagValidationRules
             'active' => ['sometimes', 'boolean'],
             'show_in_menu' => ['sometimes', 'boolean'],
             'in_evidence' => ['sometimes', 'boolean'],
-            'sort_order' => ['sometimes', 'integer', 'min:0'],
+            'sort_order' => ['sometimes', 'integer', 'min:1'],
             'visible_from' => ['nullable', 'date'],
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             'product_ids' => ['nullable', 'array'],
@@ -134,7 +134,7 @@ class TagValidation implements TagValidationRules
                 'integer',
                 Rule::exists($this->tableFor('tag'), 'id'),
             ],
-            'tags.*.sort_order' => ['required', 'integer', 'min:0'],
+            'tags.*.sort_order' => ['required', 'integer', 'min:1'],
         ];
     }
 

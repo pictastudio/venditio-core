@@ -29,7 +29,6 @@ class UpdateMultipleTags
                 ->get()
                 ->keyBy(fn (Tag $tag): int => (int) $tag->getKey());
 
-            $updatedTags = new Collection;
             $tagsToRebuild = [];
 
             foreach ($tags as $tagPayload) {
@@ -56,8 +55,6 @@ class UpdateMultipleTags
 
                 $this->propagateProductTypeToChildren($tag->refresh());
 
-                $updatedTags->push($tag->refresh()->load(['productType', 'tags']));
-
                 if ($isParentChanging) {
                     $tagsToRebuild[] = (int) $tag->getKey();
                 }
@@ -74,7 +71,10 @@ class UpdateMultipleTags
                 $this->treePaths->rebuild($tag);
             }
 
-            return $updatedTags;
+            return resolve_model('tag')::query()
+                ->with(['productType', 'tags'])
+                ->whereKey($tagIds)
+                ->get();
         });
     }
 

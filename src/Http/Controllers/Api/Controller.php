@@ -12,7 +12,7 @@ use Illuminate\Http\{JsonResponse, Response};
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\{Rule, ValidationException};
-use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange, ProductStatusActive};
+use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange, Ordered, ProductStatusActive};
 use PictaStudio\Venditio\Traits\ValidatesData;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
@@ -121,6 +121,8 @@ class Controller extends BaseController
                 $validatedFilters['sort_by'],
                 $validatedFilters['sort_dir'] ?? 'asc'
             );
+        } else {
+            $this->applyDefaultOrdering($query, $modelInstance, $sortableColumns);
         }
 
         if (isset($validatedFilters['id'])) {
@@ -190,6 +192,38 @@ class Controller extends BaseController
         return $query->paginate(
             (int) ($validatedFilters['per_page'] ?? config('venditio.routes.api.v1.pagination.per_page'))
         );
+    }
+
+    protected function applyDefaultOrdering(Builder $query, mixed $modelInstance, array $sortableColumns): void
+    {
+        if (in_array('sort_order', $sortableColumns, true)) {
+            if ($this->queryHasOrders($query) || $this->modelUsesOrderedScope($modelInstance)) {
+                return;
+            }
+
+            $query
+                ->orderBy($modelInstance->qualifyColumn('sort_order'))
+                ->orderBy($modelInstance->getQualifiedKeyName());
+
+            return;
+        }
+
+        $query->orderByDesc($modelInstance->getQualifiedKeyName());
+    }
+
+    protected function queryHasOrders(Builder $query): bool
+    {
+        $baseQuery = $query->getQuery();
+
+        return filled($baseQuery->orders ?? null)
+            || filled($baseQuery->unionOrders ?? null);
+    }
+
+    protected function modelUsesOrderedScope(mixed $modelInstance): bool
+    {
+        return is_object($modelInstance)
+            && method_exists($modelInstance, 'hasGlobalScope')
+            && $modelInstance::hasGlobalScope(Ordered::class);
     }
 
     public function successJsonResponse(array|string $data = [], ?string $message = null, int $status = Response::HTTP_OK): JsonResponse

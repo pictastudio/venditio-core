@@ -22,12 +22,12 @@ body:json {
       {
         "id": 1,
         "parent_id": null,
-        "sort_order": 10
+        "sort_order": 1
       },
       {
         "id": 2,
         "parent_id": 1,
-        "sort_order": 20
+        "sort_order": 1
       }
     ]
   }
@@ -36,6 +36,7 @@ body:json {
 docs {
   summary:
   - Bulk update product_categories parent_id and sort_order
+  - Sibling ordering is scoped per parent, so child branches can start sort_order numbering from 1 again.
 
   endpoint:
   - method: PATCH
@@ -51,5 +52,5 @@ docs {
   - categories (array, required, min: 1)
   - categories.*.id (integer, required, distinct)
   - categories.*.parent_id (integer|null, required key)
-  - categories.*.sort_order (integer, required, min: 0)
+  - categories.*.sort_order (integer, required, min: 1)
 }

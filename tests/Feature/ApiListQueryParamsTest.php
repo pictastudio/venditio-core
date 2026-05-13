@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\Venditio\Models\{Brand, PriceList, Tag};
+use PictaStudio\Venditio\Models\{Brand, PriceList, ProductCollection, ReturnReason, Tag};
 
 use function Pest\Laravel\getJson;
 
@@ -80,6 +80,58 @@ it('filters brands by category-style catalog columns', function () {
         ->all();
 
     expect($ids)->toBe([$menuBrand->getKey()]);
+});
+
+it('orders list endpoints by id descending by default when the resource has no sort_order', function () {
+    ProductCollection::factory()->count(3)->create();
+
+    $response = getJson(config('venditio.routes.api.v1.prefix') . '/product_collections?all=1')
+        ->assertOk();
+
+    $expectedIds = ProductCollection::query()
+        ->orderByDesc('id')
+        ->pluck('id')
+        ->all();
+
+    $responseIds = collect(apiListData($response->json()))
+        ->pluck('id')
+        ->all();
+
+    expect($responseIds)->toBe($expectedIds);
+});
+
+it('orders list endpoints by sort_order by default when the resource has sort_order', function () {
+    $first = ReturnReason::query()->create([
+        'code' => 'first',
+        'name' => 'First',
+        'active' => true,
+        'sort_order' => 20,
+    ]);
+    $second = ReturnReason::query()->create([
+        'code' => 'second',
+        'name' => 'Second',
+        'active' => true,
+        'sort_order' => 10,
+    ]);
+    $third = ReturnReason::query()->create([
+        'code' => 'third',
+        'name' => 'Third',
+        'active' => true,
+        'sort_order' => 30,
+    ]);
+
+    $response = getJson(config('venditio.routes.api.v1.prefix') . '/return_reasons?all=1')
+        ->assertOk();
+
+    $responseIds = collect(apiListData($response->json()))
+        ->pluck('id')
+        ->all();
+
+    expect($responseIds)->toBe([
+        $second->getKey(),
+        $first->getKey(),
+        $third->getKey(),
+    ]);
 });
 
 it('filters string columns with case-insensitive partial matching', function () {

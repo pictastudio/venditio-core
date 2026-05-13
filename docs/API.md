@@ -52,6 +52,7 @@ Additional supported filters:
 - `/return_reasons`: `code`, `name`, `description`, `is_active`
 - `/return_requests`: `order_id`, `user_id`, `return_reason_id`, `is_accepted`, `is_verified`
 - `as_tree` boolean on `/product_categories` and `/tags`
+  - tree responses order root nodes by `sort_order`; each child branch is ordered independently by `sort_order`, so numbering starts at `1` for roots and starts at `1` again for every sibling branch
 - `/products`: `include_variants` boolean, `exclude_variants` boolean, `brand_ids[]`, `category_ids[]`, `collection_ids[]`, `price`, `price_operator` (`>`, `<`, `>=`, `<=`, `=`)
   - supports `sort_by=price` with `sort_dir=asc|desc`
   - default behavior is controlled by `venditio.product.exclude_variants_from_index` (`true` by default)
@@ -128,6 +129,8 @@ Credit-note-specific notes:
 - `DELETE /product_collections/{product_collection}`
 
 Product categories and product collections accept a nullable `metadata` object for API-owned structured metadata such as SEO fields.
+
+Product categories and tags use branch-scoped `sort_order` values for tree ordering. API write payloads require `sort_order >= 1`; duplicate values are allowed and are returned deterministically by primary key as a tie-breaker.
 
 Products accept `related_product_ids` in write payloads to sync directional, manually curated related products. Products, product categories, product collections, brands, and tags accept `tag_ids` in write payloads where supported; the IDs are synced to the resource through the `taggables` polymorphic association.
 

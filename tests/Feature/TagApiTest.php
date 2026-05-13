@@ -35,6 +35,37 @@ it('creates tags and supports product_type include and filter', function () {
         ->and(data_get($response->json(), '0.product_type.id'))->toBe($productType->getKey());
 });
 
+it('requires tag sort_order to start at one for api writes', function () {
+    postJson(config('venditio.routes.api.v1.prefix') . '/tags', [
+        'name' => 'Invalid Tag',
+        'sort_order' => 0,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort_order']);
+
+    $tag = Tag::factory()->create([
+        'sort_order' => 1,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . "/tags/{$tag->getKey()}", [
+        'sort_order' => 0,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort_order']);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . '/tags/bulk/update', [
+        'tags' => [
+            [
+                'id' => $tag->getKey(),
+                'parent_id' => null,
+                'sort_order' => 0,
+            ],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['tags.0.sort_order']);
+});
+
 it('stores tag images as a catalog images collection', function () {
     Storage::fake('public');
     $uploadDatePath = now()->format('Y/m/d');
@@ -689,10 +720,28 @@ it('orders tags by sort_order within each tree branch', function () {
         'visible_until' => null,
     ]);
 
-    Tag::factory()->create([
+    $rootAChildEarly = Tag::factory()->create([
         'name' => 'Root A Child Early',
         'parent_id' => $rootA->getKey(),
         'sort_order' => 5,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    Tag::factory()->create([
+        'name' => 'Root A Grandchild Late',
+        'parent_id' => $rootAChildEarly->getKey(),
+        'sort_order' => 2,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    Tag::factory()->create([
+        'name' => 'Root A Grandchild Early',
+        'parent_id' => $rootAChildEarly->getKey(),
+        'sort_order' => 1,
         'active' => true,
         'visible_from' => null,
         'visible_until' => null,
@@ -723,7 +772,17 @@ it('orders tags by sort_order within each tree branch', function () {
         ->assertJsonPath('0.children.0.name', 'Root B Child Early')
         ->assertJsonPath('0.children.1.name', 'Root B Child Late')
         ->assertJsonPath('1.children.0.name', 'Root A Child Early')
-        ->assertJsonPath('1.children.1.name', 'Root A Child Late');
+        ->assertJsonPath('1.children.1.name', 'Root A Child Late')
+        ->assertJsonPath('1.children.0.children.0.name', 'Root A Grandchild Early')
+        ->assertJsonPath('1.children.0.children.1.name', 'Root A Grandchild Late');
+
+    expect($rootA->children()->pluck('name')->all())->toBe([
+        'Root A Child Early',
+        'Root A Child Late',
+    ])->and($rootAChildEarly->children()->pluck('name')->all())->toBe([
+        'Root A Grandchild Early',
+        'Root A Grandchild Late',
+    ]);
 });
 
 it('bulk updates tag parent_id and sort_order', function () {
@@ -768,11 +827,11 @@ it('bulk updates tag parent_id and sort_order', function () {
         ],
     ])
         ->assertOk()
-        ->assertJsonPath('0.id', $firstChild->getKey())
-        ->assertJsonPath('0.sort_order', 30)
-        ->assertJsonPath('1.id', $secondChild->getKey())
-        ->assertJsonPath('1.parent_id', $root->getKey())
-        ->assertJsonPath('1.sort_order', 5);
+        ->assertJsonPath('0.id', $secondChild->getKey())
+        ->assertJsonPath('0.parent_id', $root->getKey())
+        ->assertJsonPath('0.sort_order', 5)
+        ->assertJsonPath('1.id', $firstChild->getKey())
+        ->assertJsonPath('1.sort_order', 30);
 
     getJson(config('venditio.routes.api.v1.prefix') . '/tags?as_tree=1')
         ->assertOk()

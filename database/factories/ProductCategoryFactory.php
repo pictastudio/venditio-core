@@ -16,7 +16,7 @@ class ProductCategoryFactory extends Factory
             'active' => true,
             'show_in_menu' => fake()->boolean(),
             'in_evidence' => fake()->boolean(),
-            'sort_order' => fake()->unique()->numberBetween(0, 1000),
+            'sort_order' => fake()->unique()->numberBetween(1, 1000),
             'visible_from' => null,
             'visible_until' => null,
         ];

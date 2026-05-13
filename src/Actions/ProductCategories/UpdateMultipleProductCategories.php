@@ -29,7 +29,6 @@ class UpdateMultipleProductCategories
                 ->get()
                 ->keyBy(fn (ProductCategory $category): int => (int) $category->getKey());
 
-            $updatedCategories = new Collection;
             $categoriesToRebuild = [];
 
             foreach ($categories as $categoryPayload) {
@@ -51,8 +50,6 @@ class UpdateMultipleProductCategories
                 ]);
                 $category->saveQuietly();
 
-                $updatedCategories->push($category->refresh());
-
                 if ($isParentChanging) {
                     $categoriesToRebuild[] = (int) $category->getKey();
                 }
@@ -69,7 +66,9 @@ class UpdateMultipleProductCategories
                 $this->treePaths->rebuild($category);
             }
 
-            return $updatedCategories;
+            return resolve_model('product_category')::query()
+                ->whereKey($categoryIds)
+                ->get();
         });
     }
 }
