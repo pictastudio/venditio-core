@@ -5,7 +5,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PictaStudio\Venditio\Models\{Brand, Product, Tag};
 
-use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, getJson, patch, patchJson, post, postJson};
+use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing, assertSoftDeleted, deleteJson, getJson, patch, patchJson, post, postJson};
 
 uses(RefreshDatabase::class);
 
@@ -311,4 +311,54 @@ it('rejects unsupported brand includes', function () {
     getJson(config('venditio.routes.api.v1.prefix') . '/brands?include=unknown')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['include.0']);
+});
+
+it('rejects deleting a brand with connected products unless forced', function () {
+    $brand = Brand::factory()->create(['active' => true]);
+    $product = Product::factory()->create([
+        'brand_id' => $brand->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . "/brands/{$brand->getKey()}")
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['products']);
+
+    assertDatabaseHas('products', [
+        'id' => $product->getKey(),
+        'brand_id' => $brand->getKey(),
+    ]);
+});
+
+it('force deletes a brand and detaches connected products', function () {
+    $brand = Brand::factory()->create(['active' => true]);
+    $product = Product::factory()->create([
+        'brand_id' => $brand->getKey(),
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $tag = Tag::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $brand->tags()->sync([$tag->getKey()]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . "/brands/{$brand->getKey()}?force=1")
+        ->assertNoContent();
+
+    assertSoftDeleted('brands', ['id' => $brand->getKey()]);
+    assertDatabaseHas('products', [
+        'id' => $product->getKey(),
+        'brand_id' => null,
+    ]);
+    assertDatabaseMissing('taggables', [
+        'tag_id' => $tag->getKey(),
+        'taggable_type' => $brand->getMorphClass(),
+        'taggable_id' => $brand->getKey(),
+    ]);
 });

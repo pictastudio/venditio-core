@@ -5,7 +5,8 @@ namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\{Rule, ValidationException};
 use PictaStudio\Venditio\Actions\Brands\{CreateBrand, UpdateBrand};
 use PictaStudio\Venditio\Actions\CatalogImages\DeleteCatalogImage;
 use PictaStudio\Venditio\Http\Controllers\Api\Controller;
@@ -76,6 +77,30 @@ class BrandController extends Controller
     public function destroy(Brand $brand)
     {
         $this->authorizeIfConfigured('delete', $brand);
+
+        $this->validateData(request()->query(), [
+            'force' => ['boolean'],
+        ]);
+
+        $force = request()->boolean('force');
+
+        if (!$force && $brand->products()->withoutGlobalScopes()->exists()) {
+            throw ValidationException::withMessages([
+                'products' => [
+                    'This brand has connected products. Use force=1 to delete it and detach related products.',
+                ],
+            ]);
+        }
+
+        if ($force) {
+            DB::transaction(function () use ($brand): void {
+                $brand->products()->withoutGlobalScopes()->update(['brand_id' => null]);
+                $brand->tags()->detach();
+                $brand->delete();
+            });
+
+            return response()->noContent();
+        }
 
         $brand->delete();
 

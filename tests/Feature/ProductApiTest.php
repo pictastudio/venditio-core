@@ -892,6 +892,43 @@ it('validates products index brand_ids, category_ids, and collection_ids filters
         ->assertJsonValidationErrors(['brand_ids.0', 'category_ids.0', 'collection_ids.0']);
 });
 
+it('excludes products from index by not_ids filter', function () {
+    $includedProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $excludedProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $response = getJson(
+        config('venditio.routes.api.v1.prefix')
+        . '/products?all=1&not_ids[]=' . $excludedProduct->getKey()
+    )->assertOk();
+
+    $json = $response->json();
+    $items = is_array(data_get($json, 'data'))
+        ? data_get($json, 'data')
+        : $json;
+
+    $ids = collect($items)
+        ->pluck('id')
+        ->all();
+
+    expect($ids)
+        ->toContain($includedProduct->getKey())
+        ->not->toContain($excludedProduct->getKey());
+});
+
+it('validates products index not_ids filter', function () {
+    getJson(config('venditio.routes.api.v1.prefix') . '/products?not_ids[]=999999')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['not_ids.0']);
+});
+
 it('filters products index by inventory price with operator', function () {
     $productLow = Product::factory()->create([
         'active' => true,
