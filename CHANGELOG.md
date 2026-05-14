@@ -2,6 +2,30 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.8.5 - 2026-05-14
+
+### What's Changed
+
+This patch release adds a product index exclusion filter and protects brand deletes from silently leaving products attached to deleted brands.
+
+### Features
+
+- **Product exclusion filter** - Added `not_ids[]` support to the product index endpoint so callers can exclude specific product IDs from list results.
+
+### Fixes
+
+- **Brand delete guard** - Deleting a brand with connected products now returns a validation error unless `force=1` is provided; forced deletes detach products from the brand and clear brand tag associations before soft deleting the brand.
+
+### Tooling
+
+- **Bruno product list example** - Updated the product list Bruno request to document and exercise the `not_ids[]` filter.
+
+### Tests
+
+- Added feature coverage for `not_ids[]` filtering and validation, plus guarded and forced brand deletion behavior.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.8.4...v2.8.5
+
 ## v2.8.4 - 2026-05-13
 
 ### What's Changed
