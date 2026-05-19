@@ -14,7 +14,7 @@ return new class extends Migration
             $table->json('metadata')->nullable()->after('description');
             $table->json('images')->nullable()->after('metadata');
             $table->boolean('show_in_menu')->default(false)->after('active');
-            $table->boolean('in_evidence')->default(false)->after('show_in_menu');
+            $table->boolean('highlighted')->default(false)->after('show_in_menu');
             $table->dateTime('visible_from')->nullable()->index()->after('sort_order');
             $table->dateTime('visible_until')->nullable()->index()->after('visible_from');
         });
@@ -30,7 +30,7 @@ return new class extends Migration
             'metadata',
             'images',
             'show_in_menu',
-            'in_evidence',
+            'highlighted',
             'visible_from',
             'visible_until',
         ])

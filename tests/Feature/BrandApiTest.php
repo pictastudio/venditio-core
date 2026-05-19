@@ -17,7 +17,7 @@ it('stores and exposes category-style catalog fields on brands', function () {
         'metadata' => ['seo' => ['title' => 'Outdoor Lab']],
         'active' => true,
         'show_in_menu' => true,
-        'in_evidence' => true,
+        'highlighted' => true,
         'sort_order' => 1,
     ])->assertCreated()
         ->assertJsonFragment([
@@ -26,7 +26,7 @@ it('stores and exposes category-style catalog fields on brands', function () {
             'description' => 'Brand description',
             'active' => true,
             'show_in_menu' => true,
-            'in_evidence' => true,
+            'highlighted' => true,
             'sort_order' => 1,
         ]);
 
@@ -34,7 +34,7 @@ it('stores and exposes category-style catalog fields on brands', function () {
         'id' => $response->json('id'),
         'active' => true,
         'show_in_menu' => true,
-        'in_evidence' => true,
+        'highlighted' => true,
         'sort_order' => 1,
     ]);
 });

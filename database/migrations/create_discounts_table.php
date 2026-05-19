@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
             $table->nullableMorphs('discountable');
-            $table->string('type', 20)->comment('percentage, fixed');
+            $table->string('type', 20)->comment('percentage, fixed, fixed_price');
             $table->decimal('value', 10, 2);
             $table->string('name')->nullable();
             $table->string('code', 50)->unique();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('free_shipping')->default(false)->comment('if true, shipping fee is set to zero when discount is applied');
             $table->decimal('minimum_order_total', 10, 2)->nullable()->comment('minimum cart/order total required to apply discount');
             $table->integer('priority')->default(0)->comment('the order of priority');
-            $table->boolean('stop_after_propagation')->default(false)->comment('whether this discount will stop others after propagating');
+            $table->boolean('standalone')->default(false)->comment('whether this discount must be applied alone');
             $table->datetimes();
             $table->softDeletesDatetime();
         });

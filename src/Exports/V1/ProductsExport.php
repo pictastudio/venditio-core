@@ -45,7 +45,7 @@ class ProductsExport implements FromCollection, WithColumnFormatting, WithHeadin
     private const BOOLEAN_COLUMNS = [
         'active',
         'new',
-        'in_evidence',
+        'highlighted',
         'price_includes_tax',
     ];
 

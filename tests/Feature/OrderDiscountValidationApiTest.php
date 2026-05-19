@@ -69,7 +69,7 @@ function createOrderDiscountValidationProduct(TaxClass $taxClass): PictaStudio\V
         'status' => ProductStatus::Published,
         'active' => true,
         'new' => true,
-        'in_evidence' => true,
+        'highlighted' => true,
         'sku' => 'ORDER-DISCOUNT-VALIDATION-001',
         'visible_from' => now()->subDay(),
         'visible_until' => now()->addDay(),

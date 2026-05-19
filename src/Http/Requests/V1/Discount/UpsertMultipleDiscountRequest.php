@@ -14,6 +14,8 @@ use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_model};
 
 class UpsertMultipleDiscountRequest extends FormRequest
 {
+    private const PRODUCT_PRIORITY = 2147483647;
+
     private ?Collection $existingDiscounts = null;
 
     public function authorize(): bool
@@ -68,7 +70,7 @@ class UpsertMultipleDiscountRequest extends FormRequest
             $rules["discounts.{$index}.first_purchase_only"] = ['sometimes', 'boolean'];
             $rules["discounts.{$index}.minimum_order_total"] = ['nullable', 'numeric', 'min:0'];
             $rules["discounts.{$index}.priority"] = ['sometimes', 'integer'];
-            $rules["discounts.{$index}.stop_after_propagation"] = ['sometimes', 'boolean'];
+            $rules["discounts.{$index}.standalone"] = ['sometimes', 'boolean'];
         }
 
         return $rules;
@@ -128,6 +130,10 @@ class UpsertMultipleDiscountRequest extends FormRequest
                 if (filled($discountPayload['code'] ?? null)) {
                     $reservedCodes[mb_strtolower((string) $discountPayload['code'])] = true;
 
+                    if ($this->effectiveDiscountableType($discountPayload, $existingDiscount) === 'product') {
+                        $discountPayload['priority'] = self::PRODUCT_PRIORITY;
+                    }
+
                     return $discountPayload;
                 }
 
@@ -135,15 +141,27 @@ class UpsertMultipleDiscountRequest extends FormRequest
                     $discountPayload['code'] = $existingDiscount->code;
                     $reservedCodes[mb_strtolower($existingDiscount->code)] = true;
 
+                    if ($this->effectiveDiscountableType($discountPayload, $existingDiscount) === 'product') {
+                        $discountPayload['priority'] = self::PRODUCT_PRIORITY;
+                    }
+
                     return $discountPayload;
                 }
 
                 if (!$this->hasDiscountableTarget($discountPayload, $existingDiscount)) {
+                    if ($this->effectiveDiscountableType($discountPayload, $existingDiscount) === 'product') {
+                        $discountPayload['priority'] = self::PRODUCT_PRIORITY;
+                    }
+
                     return $discountPayload;
                 }
 
                 $discountPayload['code'] = $this->generateAutomaticCode($reservedCodes);
                 $reservedCodes[mb_strtolower($discountPayload['code'])] = true;
+
+                if ($this->effectiveDiscountableType($discountPayload, $existingDiscount) === 'product') {
+                    $discountPayload['priority'] = self::PRODUCT_PRIORITY;
+                }
 
                 return $discountPayload;
             })
@@ -245,6 +263,19 @@ class UpsertMultipleDiscountRequest extends FormRequest
                         'The ends_at field must be a date after or equal to starts_at.'
                     );
                 }
+
+                if (
+                    $this->effectiveDiscountType($discountPayload, $existingDiscount) === DiscountType::FixedPrice->value
+                    && (
+                        $this->effectiveDiscountableType($discountPayload, $existingDiscount) !== 'product'
+                        || blank($this->effectiveDiscountableId($discountPayload, $existingDiscount))
+                    )
+                ) {
+                    $validator->errors()->add(
+                        "discounts.{$index}.type",
+                        'The fixed_price discount type is only available for product discountable targets.'
+                    );
+                }
             }
         });
     }
@@ -311,6 +342,37 @@ class UpsertMultipleDiscountRequest extends FormRequest
         return $existingDiscount instanceof Discount
             && filled($existingDiscount->discountable_type)
             && filled($existingDiscount->discountable_id);
+    }
+
+    private function effectiveDiscountableType(array $discountPayload, ?Discount $existingDiscount = null): ?string
+    {
+        if (array_key_exists('discountable_type', $discountPayload)) {
+            return $discountPayload['discountable_type'];
+        }
+
+        return $existingDiscount?->discountable_type;
+    }
+
+    private function effectiveDiscountableId(array $discountPayload, ?Discount $existingDiscount = null): mixed
+    {
+        if (array_key_exists('discountable_id', $discountPayload)) {
+            return $discountPayload['discountable_id'];
+        }
+
+        return $existingDiscount?->discountable_id;
+    }
+
+    private function effectiveDiscountType(array $discountPayload, ?Discount $existingDiscount = null): ?string
+    {
+        $type = array_key_exists('type', $discountPayload)
+            ? $discountPayload['type']
+            : $existingDiscount?->type;
+
+        if ($type instanceof DiscountType) {
+            return $type->value;
+        }
+
+        return is_string($type) ? $type : null;
     }
 
     private function generateAutomaticCode(array $reservedCodes): string

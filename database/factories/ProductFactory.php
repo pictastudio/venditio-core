@@ -21,7 +21,7 @@ class ProductFactory extends Factory
             'status' => ProductStatus::Published->value,
             'active' => fake()->boolean(),
             'new' => fake()->boolean(),
-            'in_evidence' => fake()->boolean(),
+            'highlighted' => fake()->boolean(),
             'sku' => fake()->unique()->isbn13(),
             'ean' => fake()->unique()->ean13(),
             'visible_from' => fake()->dateTimeBetween('-1 year', 'now'),

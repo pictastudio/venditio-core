@@ -39,7 +39,7 @@ class Brand extends Model implements TranslatableContract
         return [
             'active' => 'boolean',
             'show_in_menu' => 'boolean',
-            'in_evidence' => 'boolean',
+            'highlighted' => 'boolean',
             'metadata' => 'json',
             'images' => 'json',
         ];

@@ -24,6 +24,7 @@ body:json {
     "discountable_type": "product_collection",
     "discountable_id": 1,
     "name": "Updated example",
+    "standalone": false,
     "starts_at": null
   }
 }
@@ -47,7 +48,7 @@ docs {
   - Available fields:
   - discountable_type (allowed: product, product_category, product_collection, product_type, brand, user)
   - discountable_id
-  - type
+  - type (allowed: percentage, fixed, fixed_price; fixed_price requires discountable_type=product)
   - value
   - name
   - code
@@ -63,5 +64,6 @@ docs {
   - free_shipping
   - minimum_order_total
   - priority
-  - stop_after_propagation
+  - standalone
+  - Note: product-scoped discounts are saved with maximum priority.
 }

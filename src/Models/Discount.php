@@ -20,6 +20,8 @@ class Discount extends Model
     use LogsActivity;
     use SoftDeletes;
 
+    private const PRODUCT_PRIORITY = 2147483647;
+
     protected $guarded = [
         'id',
         'created_at',
@@ -42,6 +44,8 @@ class Discount extends Model
             'free_shipping' => 'boolean',
             'first_purchase_only' => 'boolean',
             'minimum_order_total' => 'decimal:2',
+            'priority' => 'integer',
+            'standalone' => 'boolean',
         ];
     }
 
@@ -51,6 +55,14 @@ class Discount extends Model
             Active::class,
             // InDateRange::class,
         ]);
+
+        static::saving(function (Discount $discount): void {
+            if ($discount->discountable_type !== (new (resolve_model('product')))->getMorphClass()) {
+                return;
+            }
+
+            $discount->priority = self::PRODUCT_PRIORITY;
+        });
     }
 
     public function discountable(): MorphTo

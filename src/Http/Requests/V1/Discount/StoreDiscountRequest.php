@@ -12,6 +12,8 @@ use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_model};
 
 class StoreDiscountRequest extends FormRequest
 {
+    private const PRODUCT_PRIORITY = 2147483647;
+
     public function authorize(): bool
     {
         return true;
@@ -56,11 +58,11 @@ class StoreDiscountRequest extends FormRequest
             'first_purchase_only' => ['sometimes', 'boolean'],
             'minimum_order_total' => ['nullable', 'numeric', 'min:0'],
             'priority' => ['sometimes', 'integer'],
-            'stop_after_propagation' => ['sometimes', 'boolean'],
+            'standalone' => ['sometimes', 'boolean'],
         ];
     }
 
-    public function prepareForValidation()
+    public function prepareForValidation(): void
     {
         $payload = [
             'starts_at' => Date::parse($this->starts_at),
@@ -70,7 +72,33 @@ class StoreDiscountRequest extends FormRequest
             $payload['code'] = $this->generateAutomaticCode();
         }
 
+        if ($this->input('discountable_type') === 'product') {
+            $payload['priority'] = self::PRODUCT_PRIORITY;
+        }
+
         $this->merge($payload);
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            if (!$this->isFixedPriceDiscount()) {
+                return;
+            }
+
+            if ($this->input('discountable_type') === 'product' && filled($this->input('discountable_id'))) {
+                return;
+            }
+
+            $validator->errors()->add(
+                'type',
+                'The fixed_price discount type is only available for product discountable targets.'
+            );
+        });
     }
 
     private function tableFor(?string $model): string
@@ -94,6 +122,14 @@ class StoreDiscountRequest extends FormRequest
     private function shouldGenerateAutomaticCode(): bool
     {
         return $this->hasDiscountableTarget() && blank($this->input('code'));
+    }
+
+    private function isFixedPriceDiscount(): bool
+    {
+        $type = $this->input('type');
+
+        return $type === DiscountType::FixedPrice->value
+            || $type === DiscountType::FixedPrice;
     }
 
     private function generateAutomaticCode(): string

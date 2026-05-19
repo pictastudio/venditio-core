@@ -132,7 +132,7 @@ class DiscountCalculator implements DiscountCalculatorInterface
                         : $discount->type,
                     'value' => round((float) ($discount->value ?? 0), 2),
                     'priority' => (int) ($discount->priority ?? 0),
-                    'stop_after_propagation' => (bool) ($discount->stop_after_propagation ?? false),
+                    'standalone' => (bool) ($discount->standalone ?? false),
                     'amount' => round($unitAmount * $qty, 2),
                     'unit_amount' => $unitAmount,
                     'unit_price_before' => $unitPriceBefore,
@@ -145,70 +145,98 @@ class DiscountCalculator implements DiscountCalculatorInterface
 
     private function resolveApplicableDiscounts(Model $line, DiscountContext $context, float $unitPrice): Collection
     {
-        $discounts = $this->queryDiscountsForLine($line, $context);
+        $discounts = $this->queryDiscountsForLine($line, $context)
+            ->filter(fn (Discount $discount) => $this->passesRules($discount, $line, $context))
+            ->values();
 
         if ($discounts->isEmpty()) {
             return collect();
         }
 
-        $currentUnitPrice = $unitPrice;
-        $excludedDiscountIds = [];
-        $appliedDiscounts = collect();
+        $discounts = $this->sortDiscounts($discounts, $unitPrice);
+        $cumulativeDiscounts = $this->evaluateCumulativeDiscounts(
+            $discounts->reject(fn (Discount $discount): bool => (bool) ($discount->standalone ?? false)),
+            $unitPrice,
+        );
+        $standaloneDiscounts = $this->evaluateStandaloneDiscounts(
+            $discounts->filter(fn (Discount $discount): bool => (bool) ($discount->standalone ?? false)),
+            $unitPrice,
+        );
+        $winningDiscounts = $this->chooseWinningDiscounts($cumulativeDiscounts, $standaloneDiscounts);
 
-        while ($currentUnitPrice > 0) {
-            $evaluation = $this->resolveNextDiscountEvaluation(
-                $discounts,
-                $line,
-                $context,
-                $currentUnitPrice,
-                $excludedDiscountIds,
-            );
-
-            if ($evaluation === null) {
-                break;
-            }
-
-            /** @var Discount $discount */
+        $winningDiscounts->each(function (array $evaluation) use ($context): void {
             $discount = $evaluation['discount'];
-            $amount = (float) $evaluation['amount'];
-
-            $appliedDiscounts->push($evaluation);
-            $excludedDiscountIds[] = (string) $discount->getKey();
             $context->markDiscountAsAppliedInCart($discount);
-            $currentUnitPrice = round(max(0, $currentUnitPrice - $amount), 2);
+        });
 
-            if ((bool) $discount->stop_after_propagation) {
-                break;
-            }
-        }
-
-        return $appliedDiscounts;
+        return $winningDiscounts;
     }
 
-    private function resolveNextDiscountEvaluation(
-        Collection $discounts,
-        Model $line,
-        DiscountContext $context,
-        float $unitPrice,
-        array $excludedDiscountIds,
-    ): ?array {
-        $evaluatedDiscounts = $discounts
-            ->reject(fn (Discount $discount) => in_array((string) $discount->getKey(), $excludedDiscountIds, true))
-            ->filter(fn (Discount $discount) => $this->passesRules($discount, $line, $context))
+    private function sortDiscounts(Collection $discounts, float $unitPrice): Collection
+    {
+        return $discounts
             ->map(fn (Discount $discount): array => [
                 'discount' => $discount,
                 'amount' => $this->calculateUnitDiscount($discount, $unitPrice),
             ])
-            ->filter(fn (array $evaluation) => $evaluation['amount'] > 0)
+            ->sort(fn (array $a, array $b): int => $this->sortByPriorityAndAmount($a, $b))
+            ->map(fn (array $evaluation): Discount => $evaluation['discount'])
             ->values();
+    }
 
-        if ($evaluatedDiscounts->isEmpty()) {
-            return null;
+    private function evaluateCumulativeDiscounts(Collection $discounts, float $unitPrice): Collection
+    {
+        $currentUnitPrice = round(max(0, $unitPrice), 2);
+        $evaluations = collect();
+
+        foreach ($discounts as $discount) {
+            if (!$discount instanceof Discount || $currentUnitPrice <= 0) {
+                continue;
+            }
+
+            $amount = $this->calculateUnitDiscount($discount, $currentUnitPrice);
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $evaluations->push([
+                'discount' => $discount,
+                'amount' => $amount,
+            ]);
+
+            $currentUnitPrice = round(max(0, $currentUnitPrice - $amount), 2);
         }
 
-        return $evaluatedDiscounts
-            ->sort(fn (array $a, array $b) => $this->sortByPriorityAndAmount($a, $b))
-            ->first();
+        return $evaluations->values();
+    }
+
+    private function evaluateStandaloneDiscounts(Collection $discounts, float $unitPrice): Collection
+    {
+        return $discounts
+            ->map(fn (Discount $discount): array => [
+                'discount' => $discount,
+                'amount' => $this->calculateUnitDiscount($discount, $unitPrice),
+            ])
+            ->filter(fn (array $evaluation): bool => $evaluation['amount'] > 0)
+            ->sort(fn (array $a, array $b): int => $this->sortByPriorityAndAmount($a, $b))
+            ->values();
+    }
+
+    private function chooseWinningDiscounts(Collection $cumulativeDiscounts, Collection $standaloneDiscounts): Collection
+    {
+        $cumulativeAmount = round((float) $cumulativeDiscounts->sum('amount'), 2);
+        $standaloneWinner = $standaloneDiscounts->first();
+
+        if (!is_array($standaloneWinner)) {
+            return $cumulativeDiscounts;
+        }
+
+        if (round((float) $standaloneWinner['amount'], 2) > $cumulativeAmount) {
+            return collect([$standaloneWinner]);
+        }
+
+        return $cumulativeDiscounts;
     }
 
     private function queryDiscountsForLine(Model $line, DiscountContext $context): Collection
@@ -256,6 +284,7 @@ class DiscountCalculator implements DiscountCalculatorInterface
         $rawDiscount = match ($discount->type) {
             DiscountType::Percentage => $unitPrice * ((float) $discount->value / 100),
             DiscountType::Fixed => (float) $discount->value,
+            DiscountType::FixedPrice => $unitPrice - (float) $discount->value,
             default => 0,
         };
 
@@ -272,10 +301,28 @@ class DiscountCalculator implements DiscountCalculatorInterface
         $leftPriority = (int) $left->priority;
         $rightPriority = (int) $right->priority;
 
+        if ($this->isProductScoped($left) !== $this->isProductScoped($right)) {
+            return $this->isProductScoped($right) <=> $this->isProductScoped($left);
+        }
+
         if ($leftPriority !== $rightPriority) {
             return $rightPriority <=> $leftPriority;
         }
 
-        return $b['amount'] <=> $a['amount'];
+        $amountComparison = $b['amount'] <=> $a['amount'];
+
+        if ($amountComparison !== 0) {
+            return $amountComparison;
+        }
+
+        return (int) $left->getKey() <=> (int) $right->getKey();
+    }
+
+    private function isProductScoped(Discount $discount): bool
+    {
+        $productModel = resolve_model('product');
+        $productMorphClass = (new $productModel)->getMorphClass();
+
+        return $discount->discountable_type === $productMorphClass;
     }
 }

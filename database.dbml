@@ -48,7 +48,7 @@ Table brands {
   images json
   active boolean [not null, default: true]
   show_in_menu boolean [not null, default: false]
-  in_evidence boolean [not null, default: false]
+  highlighted boolean [not null, default: false]
   sort_order smallint [not null, default: 0]
   created_at datetime [not null]
   updated_at datetime [not null]
@@ -188,7 +188,7 @@ Table discounts {
   id bigint [pk, increment, not null]
   discountable_type varchar(255)
   discountable_id bigint
-  type varchar(20) [not null, note: 'percentage, fixed']
+  type varchar(20) [not null, note: 'percentage, fixed, fixed_price']
   value decimal(10,2) [not null]
   name varchar(255)
   code varchar(50) [not null, unique]
@@ -205,7 +205,7 @@ Table discounts {
   first_purchase_only boolean [not null, default: false]
   minimum_order_total decimal(10,2)
   priority int [not null, default: 0]
-  stop_after_propagation boolean [not null, default: false]
+  standalone boolean [not null, default: false]
   created_at datetime [not null]
   updated_at datetime [not null]
   deleted_at datetime
@@ -568,7 +568,7 @@ Table products {
   status varchar(20) [not null]
   active boolean [not null, default: true]
   new boolean [not null, default: true]
-  in_evidence boolean [not null, default: true]
+  highlighted boolean [not null, default: true]
   sku varchar(255) [not null, unique]
   ean varchar(255)
   visible_from datetime

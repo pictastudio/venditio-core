@@ -367,7 +367,12 @@ Discount columns are first-level fields on `discounts`:
 - `type`, `value`, `code`, `name`, `active`, `starts_at`, `ends_at`
 - `uses`, `max_uses`, `max_uses_per_user`, `one_per_user`
 - `apply_to_cart_total`, `apply_once_per_cart`, `minimum_order_total`, `free_shipping`, `first_purchase_only`
-- `discountable_type`, `discountable_id`
+- `priority`, `standalone`, `discountable_type`, `discountable_id`
+
+Supported discount `type` values are `percentage`, `fixed`, and `fixed_price`.
+`fixed_price` is only valid for `product`-scoped discounts and treats `value` as the target unit price.
+Product-scoped discounts are saved with maximum priority and are applied before broader automatic line discounts.
+When `standalone` is true, the discount is evaluated by itself and is applied only if it beats the combined non-standalone discount stack.
 
 `discountable_type` accepts package morph aliases such as `product`, `product_category`, `product_collection`, `product_type`, `brand`, and `user`.
 

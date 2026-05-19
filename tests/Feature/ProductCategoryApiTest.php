@@ -651,18 +651,22 @@ it('stores and exposes additional catalog fields on product categories', functio
         'description' => 'Category description',
         'metadata' => ['seo' => ['title' => 'Accessories']],
         'show_in_menu' => true,
-        'in_evidence' => true,
+        'highlighted' => true,
         'visible_from' => now()->subDay()->toDateTimeString(),
         'visible_until' => now()->addDay()->toDateTimeString(),
         'sort_order' => 1,
-    ])->assertCreated();
+    ])->assertCreated()
+        ->assertJsonFragment([
+            'show_in_menu' => true,
+            'highlighted' => true,
+        ]);
 
     $categoryId = $response->json('id');
 
     assertDatabaseHas('product_categories', [
         'id' => $categoryId,
         'show_in_menu' => true,
-        'in_evidence' => true,
+        'highlighted' => true,
     ]);
 });
 

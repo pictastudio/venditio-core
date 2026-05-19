@@ -61,18 +61,18 @@ it('filters brands by related tag ids', function () {
 it('filters brands by category-style catalog columns', function () {
     $menuBrand = Brand::factory()->create([
         'show_in_menu' => true,
-        'in_evidence' => false,
+        'highlighted' => false,
         'sort_order' => 10,
     ]);
 
     Brand::factory()->create([
         'show_in_menu' => false,
-        'in_evidence' => true,
+        'highlighted' => true,
         'sort_order' => 20,
     ]);
 
     $response = getJson(
-        config('venditio.routes.api.v1.prefix') . '/brands?all=1&show_in_menu=1&sort_order=10'
+        config('venditio.routes.api.v1.prefix') . '/brands?all=1&show_in_menu=1&highlighted=0&sort_order=10'
     )->assertOk();
 
     $ids = collect(apiListData($response->json()))
@@ -221,6 +221,10 @@ it('validates query params and rejects unknown or invalid query values', functio
     getJson(config('venditio.routes.api.v1.prefix') . '/brands?unknown_param=1')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['unknown_param']);
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/brands?in_evidence=1')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['in_evidence']);
 
     getJson(config('venditio.routes.api.v1.prefix') . '/brands?sort_by=not_a_column&sort_dir=invalid&page=0&per_page=invalid')
         ->assertUnprocessable()

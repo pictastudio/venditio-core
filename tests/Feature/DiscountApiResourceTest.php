@@ -120,6 +120,7 @@ it('generates a discount code automatically when creating a discount scoped to a
         'discountable_type' => 'product',
         'discountable_id' => $product->getKey(),
         'code' => $code,
+        'priority' => 2147483647,
     ]);
 });
 
@@ -147,6 +148,67 @@ it('allows creating discounts scoped to product collections', function () {
         'discountable_type' => 'product_collection',
         'discountable_id' => $collection->getKey(),
     ]);
+});
+
+it('creates fixed price discounts only for product discountable targets', function () {
+    $product = Product::factory()->create([
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => now()->subDay(),
+        'visible_until' => now()->addDay(),
+    ]);
+
+    $collection = ProductCollection::factory()->create([
+        'active' => true,
+        'visible_from' => now()->subDay(),
+        'visible_until' => now()->addDay(),
+    ]);
+
+    $prefix = config('venditio.routes.api.v1.prefix');
+
+    $response = postJson($prefix . '/discounts', [
+        'discountable_type' => 'product',
+        'discountable_id' => $product->getKey(),
+        'type' => DiscountType::FixedPrice->value,
+        'value' => 49.9,
+        'name' => 'Fixed Price Product',
+        'priority' => 1,
+        'standalone' => true,
+        'starts_at' => now()->subHour()->toDateTimeString(),
+        'ends_at' => now()->addDay()->toDateTimeString(),
+    ])->assertCreated()
+        ->assertJsonPath('discountable_type', 'product')
+        ->assertJsonPath('type', DiscountType::FixedPrice->value)
+        ->assertJsonPath('value', 49.9)
+        ->assertJsonPath('priority', 2147483647)
+        ->assertJsonPath('standalone', true);
+
+    assertDatabaseHas('discounts', [
+        'id' => $response->json('id'),
+        'discountable_type' => 'product',
+        'discountable_id' => $product->getKey(),
+        'type' => DiscountType::FixedPrice->value,
+        'value' => 49.90,
+        'priority' => 2147483647,
+        'standalone' => true,
+    ]);
+
+    postJson($prefix . '/discounts', [
+        'discountable_type' => 'product_collection',
+        'discountable_id' => $collection->getKey(),
+        'type' => DiscountType::FixedPrice->value,
+        'value' => 49.9,
+        'starts_at' => now()->subHour()->toDateTimeString(),
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['type']);
+
+    postJson($prefix . '/discounts', [
+        'type' => DiscountType::FixedPrice->value,
+        'value' => 49.9,
+        'code' => 'GLOBAL-FIXED-PRICE',
+        'starts_at' => now()->subHour()->toDateTimeString(),
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['type']);
 });
 
 it('requires code when creating a discount not scoped to a discountable resource', function () {
@@ -187,6 +249,35 @@ it('sets starts_at to the current date when updating a discount with a null star
     } finally {
         Date::setTestNow();
     }
+});
+
+it('forces maximum priority when updating product scoped discounts', function () {
+    $product = Product::factory()->create([
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => now()->subDay(),
+        'visible_until' => now()->addDay(),
+    ]);
+    $discount = Discount::factory()->create([
+        'discountable_type' => 'product',
+        'discountable_id' => $product->getKey(),
+        'priority' => 0,
+        'code' => 'PRODUCT-PRIORITY',
+    ]);
+
+    $prefix = config('venditio.routes.api.v1.prefix');
+
+    patchJson($prefix . '/discounts/' . $discount->getKey(), [
+        'name' => 'Product Priority Updated',
+        'priority' => 5,
+    ])->assertOk()
+        ->assertJsonPath('id', $discount->getKey())
+        ->assertJsonPath('priority', 2147483647);
+
+    assertDatabaseHas('discounts', [
+        'id' => $discount->getKey(),
+        'priority' => 2147483647,
+    ]);
 });
 
 it('sets starts_at to the current date when bulk updating a discount with a null starts_at', function () {
@@ -321,6 +412,30 @@ it('filters discount index by discountable_type using exact matching', function 
     expect($filteredIds)->toBe([$productDiscount->getKey()]);
 });
 
+it('filters discount index by standalone flag', function () {
+    $standaloneDiscount = Discount::factory()->create([
+        'code' => 'STANDALONE-ONLY',
+        'standalone' => true,
+    ]);
+
+    Discount::factory()->create([
+        'code' => 'STACKABLE-ONLY',
+        'standalone' => false,
+    ]);
+
+    $prefix = config('venditio.routes.api.v1.prefix');
+
+    $filteredIds = collect(
+        discountApiListData(
+            getJson($prefix . '/discounts?all=1&standalone=1')
+                ->assertOk()
+                ->json()
+        )
+    )->pluck('id')->all();
+
+    expect($filteredIds)->toBe([$standaloneDiscount->getKey()]);
+});
+
 it('bulk upserts discounts by updating existing discounts and creating new ones', function () {
     $product = Product::factory()->create([
         'status' => ProductStatus::Published,
@@ -359,6 +474,8 @@ it('bulk upserts discounts by updating existing discounts and creating new ones'
                 'starts_at' => now()->subHour()->toDateTimeString(),
                 'ends_at' => now()->addDay()->toDateTimeString(),
                 'apply_once_per_cart' => true,
+                'priority' => 3,
+                'standalone' => true,
             ],
         ],
     ])->assertOk()
@@ -375,6 +492,8 @@ it('bulk upserts discounts by updating existing discounts and creating new ones'
             'type' => DiscountType::Fixed->value,
             'value' => 7.5,
             'apply_once_per_cart' => true,
+            'priority' => 2147483647,
+            'standalone' => true,
         ]);
 
     $createdDiscountId = collect($response->json())
@@ -400,6 +519,8 @@ it('bulk upserts discounts by updating existing discounts and creating new ones'
         'value' => 7.50,
         'code' => $createdCode,
         'apply_once_per_cart' => true,
+        'priority' => 2147483647,
+        'standalone' => true,
     ]);
 });
 

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->json('images')->nullable()->after('metadata');
             $table->boolean('active')->default(true)->after('name');
             $table->boolean('show_in_menu')->default(false)->after('active');
-            $table->boolean('in_evidence')->default(false)->after('show_in_menu');
-            $table->smallInteger('sort_order')->default(0)->after('in_evidence');
+            $table->boolean('highlighted')->default(false)->after('show_in_menu');
+            $table->smallInteger('sort_order')->default(0)->after('highlighted');
         });
     }
 
@@ -29,7 +29,7 @@ return new class extends Migration
             'images',
             'active',
             'show_in_menu',
-            'in_evidence',
+            'highlighted',
             'sort_order',
         ])
             ->filter(fn (string $column): bool => Schema::hasColumn('brands', $column))

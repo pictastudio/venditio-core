@@ -201,7 +201,6 @@ it('propagates multiple applicable discounts on the same cart line', function ()
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'stop_after_propagation' => false,
     ]);
     $category->discounts()->create([
         'type' => DiscountType::Percentage,
@@ -210,7 +209,6 @@ it('propagates multiple applicable discounts on the same cart line', function ()
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'stop_after_propagation' => false,
     ]);
 
     $cart = CartCreationPipeline::make()->run(
@@ -230,7 +228,7 @@ it('propagates multiple applicable discounts on the same cart line', function ()
         ->and((float) $line->unit_final_price)->toBe(45.0);
 });
 
-it('stops propagation on cart line discounts when stop_after_propagation is true', function () {
+it('applies product discounts before broader discounts regardless of priority', function () {
     $taxClass = TaxClass::factory()->create();
     setupTaxEnvironment($taxClass);
 
@@ -248,7 +246,6 @@ it('stops propagation on cart line discounts when stop_after_propagation is true
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
         'priority' => 10,
-        'stop_after_propagation' => true,
     ]);
     $product->discounts()->create([
         'type' => DiscountType::Percentage,
@@ -258,7 +255,6 @@ it('stops propagation on cart line discounts when stop_after_propagation is true
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
         'priority' => 0,
-        'stop_after_propagation' => false,
     ]);
 
     $cart = CartCreationPipeline::make()->run(
@@ -274,8 +270,189 @@ it('stops propagation on cart line discounts when stop_after_propagation is true
 
     $line = $cart->lines->first();
 
+    expect((float) $line->unit_discount)->toBe(55.0)
+        ->and((float) $line->unit_final_price)->toBe(45.0)
+        ->and(data_get($line->product_data, 'price_calculated.discounts_applied.0.code'))->toBe('PRD10STOP')
+        ->and(data_get($line->product_data, 'price_calculated.discounts_applied.1.code'))->toBe('CAT50STOP');
+});
+
+it('applies the cumulative non standalone discount stack when it beats standalone discounts', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(100, $taxClass);
+    $category = ProductCategory::factory()->create([
+        'active' => true,
+    ]);
+    $product->categories()->attach($category->getKey());
+
+    $product->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 30,
+        'code' => 'PRD30-CUM',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'standalone' => false,
+    ]);
+    $category->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 20,
+        'code' => 'CAT20-CUM',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'standalone' => false,
+    ]);
+    $category->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 40,
+        'code' => 'CAT40-STAND',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'standalone' => true,
+    ]);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $line = $cart->lines->first();
+    $appliedDiscounts = data_get($line->product_data, 'price_calculated.discounts_applied');
+
     expect((float) $line->unit_discount)->toBe(50.0)
-        ->and((float) $line->unit_final_price)->toBe(50.0);
+        ->and((float) $line->unit_final_price)->toBe(50.0)
+        ->and(collect($appliedDiscounts)->pluck('code')->all())->toBe(['PRD30-CUM', 'CAT20-CUM']);
+});
+
+it('applies a standalone discount by itself when it beats the cumulative stack', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(100, $taxClass);
+    $category = ProductCategory::factory()->create([
+        'active' => true,
+    ]);
+    $product->categories()->attach($category->getKey());
+
+    $product->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 10,
+        'code' => 'PRD10-CUM',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'standalone' => false,
+    ]);
+    $category->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 5,
+        'code' => 'CAT5-CUM',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'standalone' => false,
+    ]);
+    $category->discounts()->create([
+        'type' => DiscountType::Fixed,
+        'value' => 40,
+        'code' => 'CAT40-STAND-WINS',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+        'standalone' => true,
+    ]);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $line = $cart->lines->first();
+    $appliedDiscounts = data_get($line->product_data, 'price_calculated.discounts_applied');
+
+    expect((float) $line->unit_discount)->toBe(40.0)
+        ->and((float) $line->unit_final_price)->toBe(60.0)
+        ->and(collect($appliedDiscounts)->pluck('code')->all())->toBe(['CAT40-STAND-WINS'])
+        ->and(data_get($appliedDiscounts, '0.standalone'))->toBeTrue();
+});
+
+it('applies fixed price discounts as a target unit price', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(100, $taxClass);
+    $product->discounts()->create([
+        'type' => DiscountType::FixedPrice,
+        'value' => 65,
+        'code' => 'PRICE65',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+    ]);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $line = $cart->lines->first();
+
+    expect((float) $line->unit_discount)->toBe(35.0)
+        ->and((float) $line->unit_final_price)->toBe(65.0)
+        ->and(data_get($line->product_data, 'price_calculated.discounts_applied.0.type'))->toBe('fixed_price');
+});
+
+it('does not apply fixed price discounts when the target price is not lower', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupTaxEnvironment($taxClass);
+
+    $product = createProduct(100, $taxClass);
+    $product->discounts()->create([
+        'type' => DiscountType::FixedPrice,
+        'value' => 120,
+        'code' => 'PRICE120',
+        'active' => true,
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+    ]);
+
+    $cart = CartCreationPipeline::make()->run(
+        CartDto::fromArray([
+            'lines' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'qty' => 1,
+                ],
+            ],
+        ])
+    )->load('lines');
+
+    $line = $cart->lines->first();
+
+    expect((float) $line->unit_discount)->toBe(0.0)
+        ->and((float) $line->unit_final_price)->toBe(100.0)
+        ->and(data_get($line->product_data, 'price_calculated.discounts_applied'))->toBe([]);
 });
 
 it('applies discounts only once per cart when the rule is enabled', function () {
@@ -373,7 +550,6 @@ it('increments uses for all propagated line discounts when converting cart to or
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'stop_after_propagation' => false,
     ]);
     $categoryDiscount = $category->discounts()->create([
         'type' => DiscountType::Percentage,
@@ -382,7 +558,6 @@ it('increments uses for all propagated line discounts when converting cart to or
         'active' => true,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
-        'stop_after_propagation' => false,
     ]);
 
     $cart = createCartForUser($user, $product->getKey())->load('lines');

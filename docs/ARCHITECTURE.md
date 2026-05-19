@@ -62,6 +62,8 @@ Controllers are thin and delegate to actions/pipelines.
 ## Discounts
 
 Discount behavior is configurable and rule-based.
+Line discounts compare the cumulative non-standalone stack against each standalone discount and apply the option with the largest amount.
+Product-scoped discounts have maximum priority and always run before broader product/category/collection/type/brand/user scopes.
 
 Core components:
 

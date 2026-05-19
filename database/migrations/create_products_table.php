@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('status', 20)->index()->comment('draft, published, archived etc...');
             $table->boolean('active')->default(true);
             $table->boolean('new')->default(true);
-            $table->boolean('in_evidence')->default(true);
+            $table->boolean('highlighted')->default(true);
             $table->string('sku')->unique();
             $table->string('ean')->nullable();
             $table->dateTime('visible_from')->nullable()->index();

@@ -6,11 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Enums\DiscountType;
+use PictaStudio\Venditio\Models\Discount;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class UpdateDiscountRequest extends FormRequest
 {
+    private const PRODUCT_PRIORITY = 2147483647;
+
     public function authorize(): bool
     {
         return true;
@@ -50,17 +53,47 @@ class UpdateDiscountRequest extends FormRequest
             'first_purchase_only' => ['sometimes', 'boolean'],
             'minimum_order_total' => ['nullable', 'numeric', 'min:0'],
             'priority' => ['sometimes', 'integer'],
-            'stop_after_propagation' => ['sometimes', 'boolean'],
+            'standalone' => ['sometimes', 'boolean'],
         ];
     }
 
     public function prepareForValidation(): void
     {
+        $payload = [];
+
         if (array_key_exists('starts_at', $this->all()) && $this->input('starts_at') === null) {
-            $this->merge([
-                'starts_at' => Date::now(),
-            ]);
+            $payload['starts_at'] = Date::now();
         }
+
+        if ($this->effectiveDiscountableType() === 'product') {
+            $payload['priority'] = self::PRODUCT_PRIORITY;
+        }
+
+        if ($payload !== []) {
+            $this->merge($payload);
+        }
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            if (!$this->isFixedPriceDiscount()) {
+                return;
+            }
+
+            if ($this->effectiveDiscountableType() === 'product' && filled($this->effectiveDiscountableId())) {
+                return;
+            }
+
+            $validator->errors()->add(
+                'type',
+                'The fixed_price discount type is only available for product discountable targets.'
+            );
+        });
     }
 
     private function tableFor(?string $model): string
@@ -73,5 +106,40 @@ class UpdateDiscountRequest extends FormRequest
     private function discountsTable(): string
     {
         return (new (resolve_model('discount')))->getTable();
+    }
+
+    private function routeDiscount(): ?Discount
+    {
+        $discount = $this->route('discount');
+
+        return $discount instanceof Discount ? $discount : null;
+    }
+
+    private function effectiveDiscountableType(): ?string
+    {
+        if (array_key_exists('discountable_type', $this->all())) {
+            return $this->input('discountable_type');
+        }
+
+        return $this->routeDiscount()?->discountable_type;
+    }
+
+    private function effectiveDiscountableId(): mixed
+    {
+        if (array_key_exists('discountable_id', $this->all())) {
+            return $this->input('discountable_id');
+        }
+
+        return $this->routeDiscount()?->discountable_id;
+    }
+
+    private function isFixedPriceDiscount(): bool
+    {
+        $type = array_key_exists('type', $this->all())
+            ? $this->input('type')
+            : $this->routeDiscount()?->type;
+
+        return $type === DiscountType::FixedPrice->value
+            || $type === DiscountType::FixedPrice;
     }
 }

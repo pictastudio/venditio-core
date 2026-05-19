@@ -403,7 +403,7 @@ return [
                 'status',
                 'active',
                 'new',
-                'in_evidence',
+                'highlighted',
                 'sku',
                 'ean',
                 'visible_from',

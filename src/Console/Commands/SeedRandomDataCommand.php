@@ -427,7 +427,7 @@ class SeedRandomDataCommand extends Command
                 'images' => $this->buildCatalogImages($name),
                 'active' => true,
                 'show_in_menu' => (bool) random_int(0, 1),
-                'in_evidence' => (bool) random_int(0, 1),
+                'highlighted' => (bool) random_int(0, 1),
                 'sort_order' => $i,
             ]);
 
@@ -455,7 +455,7 @@ class SeedRandomDataCommand extends Command
                 'images' => $this->buildCatalogImages($name),
                 'active' => true,
                 'show_in_menu' => (bool) random_int(0, 1),
-                'in_evidence' => (bool) random_int(0, 1),
+                'highlighted' => (bool) random_int(0, 1),
                 'sort_order' => $i,
                 'visible_from' => now()->subDays(random_int(1, 30)),
                 'visible_until' => now()->addDays(random_int(30, 365)),
@@ -516,7 +516,7 @@ class SeedRandomDataCommand extends Command
                 'status' => $status,
                 'active' => true,
                 'new' => (bool) random_int(0, 1),
-                'in_evidence' => (bool) random_int(0, 1),
+                'highlighted' => (bool) random_int(0, 1),
                 'sku' => $sku,
                 'ean' => mb_str_pad((string) random_int(1, 9_999_999_999_999), 13, '0', STR_PAD_LEFT),
                 'visible_from' => now()->subDays(random_int(0, 30)),
@@ -644,6 +644,8 @@ class SeedRandomDataCommand extends Command
                 'one_per_user' => false,
                 'free_shipping' => false,
                 'minimum_order_total' => null,
+                'priority' => 2147483647,
+                'standalone' => false,
             ]);
 
             $productDiscounts = collect($discountMap->get($productId, []))
@@ -1299,6 +1301,7 @@ class SeedRandomDataCommand extends Command
         $amount = match ($type) {
             DiscountType::Percentage->value => round($unitPrice * ($value / 100), 2),
             DiscountType::Fixed->value => round($value, 2),
+            DiscountType::FixedPrice->value => round($unitPrice - $value, 2),
             default => 0.0,
         };
 

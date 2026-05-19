@@ -32,7 +32,7 @@ class BrandValidation implements BrandValidationRules
             'images.*.type' => ['nullable', 'string', Rule::in(CatalogImage::TYPES)],
             'active' => ['sometimes', 'boolean'],
             'show_in_menu' => ['sometimes', 'boolean'],
-            'in_evidence' => ['sometimes', 'boolean'],
+            'highlighted' => ['sometimes', 'boolean'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => [
@@ -67,7 +67,7 @@ class BrandValidation implements BrandValidationRules
             'images.*.type' => ['nullable', 'string', Rule::in(CatalogImage::TYPES)],
             'active' => ['sometimes', 'boolean'],
             'show_in_menu' => ['sometimes', 'boolean'],
-            'in_evidence' => ['sometimes', 'boolean'],
+            'highlighted' => ['sometimes', 'boolean'],
             'sort_order' => ['sometimes', 'integer', 'min:0'],
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => [

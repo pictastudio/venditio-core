@@ -15,7 +15,7 @@ class DiscountFactory extends Factory
         return [
             'discountable_type' => 'product',
             'discountable_id' => Product::factory(),
-            'type' => fake()->randomElement(DiscountType::cases())->value,
+            'type' => fake()->randomElement([DiscountType::Percentage, DiscountType::Fixed])->value,
             'value' => fake()->numberBetween(1, 100),
             'name' => fake()->word(),
             'code' => mb_strtoupper(fake()->bothify('DISC-#####')),
@@ -29,6 +29,8 @@ class DiscountFactory extends Factory
             'free_shipping' => false,
             'first_purchase_only' => false,
             'minimum_order_total' => null,
+            'priority' => 0,
+            'standalone' => false,
         ];
     }
 
@@ -43,6 +45,15 @@ class DiscountFactory extends Factory
     {
         return $this->state([
             'type' => DiscountType::Fixed,
+        ]);
+    }
+
+    public function fixedPrice(): self
+    {
+        return $this->state([
+            'discountable_type' => 'product',
+            'discountable_id' => Product::factory(),
+            'type' => DiscountType::FixedPrice,
         ]);
     }
 }

@@ -1499,7 +1499,6 @@ it('includes pricing source and ordered applied discounts when price_breakdown i
         'starts_at' => now()->subMinute(),
         'ends_at' => now()->addDay(),
         'priority' => 20,
-        'stop_after_propagation' => false,
     ]);
     $product->discounts()->create([
         'type' => DiscountType::Fixed,
@@ -1510,34 +1509,33 @@ it('includes pricing source and ordered applied discounts when price_breakdown i
         'starts_at' => now()->subMinute(),
         'ends_at' => now()->addDay(),
         'priority' => 10,
-        'stop_after_propagation' => false,
     ]);
 
     getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=price_breakdown")
         ->assertOk()
         ->assertJsonPath('price_calculated.price', 100)
-        ->assertJsonPath('price_calculated.price_final', 85)
+        ->assertJsonPath('price_calculated.price_final', 85.5)
         ->assertJsonPath('price_calculated.price_list.name', 'Wholesale')
         ->assertJsonPath('price_calculated.price_source.type', 'price_list')
         ->assertJsonPath('price_calculated.price_source.price_list_price_id', $wholesalePrice->getKey())
         ->assertJsonPath('price_calculated.price_source.price_list.id', $wholesale->getKey())
         ->assertJsonPath('price_calculated.price_source.price_list.code', 'WHL')
         ->assertJsonPath('price_calculated.discounts_applied.0.position', 1)
-        ->assertJsonPath('price_calculated.discounts_applied.0.code', 'CAT10-BREAKDOWN')
-        ->assertJsonPath('price_calculated.discounts_applied.0.name', 'Category 10%')
-        ->assertJsonPath('price_calculated.discounts_applied.0.discountable_type', $category->getMorphClass())
-        ->assertJsonPath('price_calculated.discounts_applied.0.discountable_id', $category->getKey())
-        ->assertJsonPath('price_calculated.discounts_applied.0.unit_amount', 10)
+        ->assertJsonPath('price_calculated.discounts_applied.0.code', 'PRD5-BREAKDOWN')
+        ->assertJsonPath('price_calculated.discounts_applied.0.discountable_type', $product->getMorphClass())
+        ->assertJsonPath('price_calculated.discounts_applied.0.discountable_id', $product->getKey())
+        ->assertJsonPath('price_calculated.discounts_applied.0.type', 'fixed')
+        ->assertJsonPath('price_calculated.discounts_applied.0.unit_amount', 5)
         ->assertJsonPath('price_calculated.discounts_applied.0.unit_price_before', 100)
-        ->assertJsonPath('price_calculated.discounts_applied.0.unit_price_after', 90)
+        ->assertJsonPath('price_calculated.discounts_applied.0.unit_price_after', 95)
         ->assertJsonPath('price_calculated.discounts_applied.1.position', 2)
-        ->assertJsonPath('price_calculated.discounts_applied.1.code', 'PRD5-BREAKDOWN')
-        ->assertJsonPath('price_calculated.discounts_applied.1.discountable_type', $product->getMorphClass())
-        ->assertJsonPath('price_calculated.discounts_applied.1.discountable_id', $product->getKey())
-        ->assertJsonPath('price_calculated.discounts_applied.1.type', 'fixed')
-        ->assertJsonPath('price_calculated.discounts_applied.1.unit_amount', 5)
-        ->assertJsonPath('price_calculated.discounts_applied.1.unit_price_before', 90)
-        ->assertJsonPath('price_calculated.discounts_applied.1.unit_price_after', 85);
+        ->assertJsonPath('price_calculated.discounts_applied.1.code', 'CAT10-BREAKDOWN')
+        ->assertJsonPath('price_calculated.discounts_applied.1.name', 'Category 10%')
+        ->assertJsonPath('price_calculated.discounts_applied.1.discountable_type', $category->getMorphClass())
+        ->assertJsonPath('price_calculated.discounts_applied.1.discountable_id', $category->getKey())
+        ->assertJsonPath('price_calculated.discounts_applied.1.unit_amount', 9.5)
+        ->assertJsonPath('price_calculated.discounts_applied.1.unit_price_before', 95)
+        ->assertJsonPath('price_calculated.discounts_applied.1.unit_price_after', 85.5);
 
     expect($retailPrice->getKey())->not->toBe($wholesalePrice->getKey());
 });
@@ -1571,7 +1569,6 @@ it('includes collection scoped discounts in the product price breakdown', functi
         'starts_at' => now()->subMinute(),
         'ends_at' => now()->addDay(),
         'priority' => 30,
-        'stop_after_propagation' => false,
     ]);
 
     getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=price_breakdown")
@@ -1612,7 +1609,6 @@ it('applies multiple propagated discounts to product price_final', function () {
         'ends_at' => now()->addDay(),
         'apply_to_cart_total' => false,
         'apply_once_per_cart' => false,
-        'stop_after_propagation' => false,
     ]);
     $category->discounts()->create([
         'type' => DiscountType::Percentage,
@@ -1624,7 +1620,6 @@ it('applies multiple propagated discounts to product price_final', function () {
         'ends_at' => now()->addDay(),
         'apply_to_cart_total' => false,
         'apply_once_per_cart' => false,
-        'stop_after_propagation' => false,
     ]);
 
     getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}")
@@ -1633,7 +1628,7 @@ it('applies multiple propagated discounts to product price_final', function () {
         ->assertJsonPath('price_calculated.price_final', 54.9);
 });
 
-it('stops discount propagation when stop_after_propagation is enabled', function () {
+it('prioritizes product discounts before broader discounts in product price previews', function () {
     $product = Product::factory()->create([
         'active' => true,
         'visible_from' => null,
@@ -1660,7 +1655,6 @@ it('stops discount propagation when stop_after_propagation is enabled', function
         'starts_at' => now()->subMinute(),
         'ends_at' => now()->addDay(),
         'priority' => 10,
-        'stop_after_propagation' => true,
     ]);
     $product->discounts()->create([
         'type' => DiscountType::Percentage,
@@ -1671,13 +1665,14 @@ it('stops discount propagation when stop_after_propagation is enabled', function
         'starts_at' => now()->subMinute(),
         'ends_at' => now()->addDay(),
         'priority' => 0,
-        'stop_after_propagation' => false,
     ]);
 
-    getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}")
+    getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=price_breakdown")
         ->assertOk()
         ->assertJsonPath('price_calculated.price', 100)
-        ->assertJsonPath('price_calculated.price_final', 61);
+        ->assertJsonPath('price_calculated.price_final', 54.9)
+        ->assertJsonPath('price_calculated.discounts_applied.0.code', 'PRD10-STOP')
+        ->assertJsonPath('price_calculated.discounts_applied.1.code', 'CAT50-STOP');
 });
 
 it('filters products index by tags', function () {

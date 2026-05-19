@@ -22,7 +22,7 @@ params:query {
   ~is_general: 0
   ~discountable_type: product
   ~discountable_id: 1
-  ~type: sample
+  ~type: fixed_price
   ~value: 10
   ~name: sample
   ~code: sample
@@ -42,7 +42,7 @@ params:query {
   ~free_shipping: 0
   ~minimum_order_total: 10
   ~priority: 1
-  ~stop_after_propagation: 0
+  ~standalone: 0
   ~created_at: 2026-01-01
   ~created_at_start: 2026-01-01
   ~created_at_end: 2026-12-31
@@ -82,7 +82,7 @@ docs {
   - is_general (boolean): When true, return only discounts without a discountable target. When false, return only scoped discounts.
   - discountable_type (string): Exact-match filter for discountable_type. Use package morph aliases such as product, product_category, product_collection, product_type, brand, or user.
   - discountable_id (integer): Exact-match filter for discountable_id.
-  - type (string): Exact-match filter for type.
+  - type (string): Exact-match filter for type. Supported values: percentage, fixed, fixed_price.
   - value (number): Exact-match filter for value.
   - name (string): Exact-match filter for name.
   - code (string): Exact-match filter for code.
@@ -102,7 +102,7 @@ docs {
   - free_shipping (boolean): Exact-match filter for free_shipping.
   - minimum_order_total (number): Exact-match filter for minimum_order_total.
   - priority (integer): Exact-match filter for priority.
-  - stop_after_propagation (boolean): Exact-match filter for stop_after_propagation.
+  - standalone (boolean): Exact-match filter for standalone.
   - created_at (date): Exact-match filter for created_at.
   - created_at_start (date): Filter created_at greater than or equal to this date.
   - created_at_end (date): Filter created_at less than or equal to this date.

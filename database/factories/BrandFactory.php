@@ -15,7 +15,7 @@ class BrandFactory extends Factory
             'name' => fake()->unique()->company(),
             'active' => true,
             'show_in_menu' => fake()->boolean(),
-            'in_evidence' => fake()->boolean(),
+            'highlighted' => fake()->boolean(),
             'sort_order' => fake()->unique()->numberBetween(0, 1000),
         ];
     }

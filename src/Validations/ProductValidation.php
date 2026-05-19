@@ -47,7 +47,7 @@ class ProductValidation implements ProductValidationRules
             ],
             'active' => ['sometimes', 'boolean'],
             'new' => ['sometimes', 'boolean'],
-            'in_evidence' => ['sometimes', 'boolean'],
+            'highlighted' => ['sometimes', 'boolean'],
             'sku' => [
                 'nullable',
                 'string',
@@ -148,7 +148,7 @@ class ProductValidation implements ProductValidationRules
             ],
             'active' => ['sometimes', 'boolean'],
             'new' => ['sometimes', 'boolean'],
-            'in_evidence' => ['sometimes', 'boolean'],
+            'highlighted' => ['sometimes', 'boolean'],
             'sku' => [
                 'nullable',
                 'string',

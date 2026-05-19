@@ -22,7 +22,7 @@ return new class extends Migration
             $table->json('images')->nullable();
             $table->boolean('active')->default(true);
             $table->boolean('show_in_menu')->default(false);
-            $table->boolean('in_evidence')->default(false);
+            $table->boolean('highlighted')->default(false);
             $table->smallInteger('sort_order');
             $table->dateTime('visible_from')->nullable()->index();
             $table->dateTime('visible_until')->nullable()->index();

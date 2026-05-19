@@ -46,7 +46,7 @@ class Product extends Model implements TranslatableContract
             'status' => config('venditio.product.status_enum'),
             'active' => 'boolean',
             'new' => 'boolean',
-            'in_evidence' => 'boolean',
+            'highlighted' => 'boolean',
             'visible_from' => 'datetime:Y-m-d H:i:s',
             'visible_until' => 'datetime:Y-m-d H:i:s',
             'images' => 'json',
