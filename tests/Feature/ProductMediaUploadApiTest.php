@@ -2,32 +2,74 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\{DB, Storage};
 use PictaStudio\Venditio\Enums\ProductStatus;
 use PictaStudio\Venditio\Models\{Product, TaxClass};
 
-use function Pest\Laravel\{deleteJson, getJson, patch, patchJson, postJson};
+use function Pest\Laravel\{deleteJson, getJson, patch, patchJson, post, postJson};
 
 uses(RefreshDatabase::class);
 
-it('rejects images and files payload on product store request', function () {
+it('stores product images as catalog images on product store request', function () {
+    Storage::fake('public');
+
+    $taxClass = TaxClass::factory()->create();
+
+    post(
+        config('venditio.routes.api.v1.prefix') . '/products',
+        [
+            'tax_class_id' => $taxClass->getKey(),
+            'name' => 'Media Product',
+            'status' => ProductStatus::Published->value,
+            'images' => [
+                [
+                    'file' => UploadedFile::fake()->image('thumb.jpg'),
+                    'type' => 'thumb',
+                    'alt' => 'Product thumb',
+                    'sort_order' => 10,
+                ],
+                [
+                    'file' => UploadedFile::fake()->image('cover.jpg'),
+                    'type' => 'cover',
+                    'alt' => 'Product cover',
+                    'sort_order' => 20,
+                ],
+            ],
+        ],
+        ['Accept' => 'application/json']
+    )->assertCreated()
+        ->assertJsonPath('images.0.type', 'thumb')
+        ->assertJsonPath('images.0.alt', 'Product thumb')
+        ->assertJsonPath('images.1.type', 'cover')
+        ->assertJsonMissingPath('images.0.thumbnail')
+        ->assertJsonMissingPath('images.0.active')
+        ->assertJsonMissingPath('images.0.shared_from_variant_option');
+
+    $product = Product::withoutGlobalScopes()->firstOrFail();
+
+    expect($product->images)->toHaveCount(2)
+        ->and(data_get($product->images, '0.type'))->toBe('thumb')
+        ->and(data_get($product->images, '1.type'))->toBe('cover');
+
+    Storage::disk('public')->assertExists((string) data_get($product->images, '0.src'));
+    Storage::disk('public')->assertExists((string) data_get($product->images, '1.src'));
+});
+
+it('rejects files payload on product store request', function () {
     $taxClass = TaxClass::factory()->create();
 
     postJson(config('venditio.routes.api.v1.prefix') . '/products', [
         'tax_class_id' => $taxClass->getKey(),
         'name' => 'Media Product',
-        'status' => ProductStatus::Published,
-        'images' => [
-            ['file' => 'not-a-file'],
-        ],
+        'status' => ProductStatus::Published->value,
         'files' => [
             ['file' => 'not-a-file'],
         ],
     ])->assertUnprocessable()
-        ->assertJsonValidationErrors(['images', 'files']);
+        ->assertJsonValidationErrors(['files']);
 });
 
-it('requires an uploaded file for each images/files item on product update', function () {
+it('requires an uploaded file for each new images/files item on product update', function () {
     $product = Product::factory()->create([
         'active' => true,
         'visible_from' => null,
@@ -55,11 +97,10 @@ it('uploads product images and files on update, appends them, and persists uniqu
         'images' => [
             [
                 'id' => 'existing-image',
+                'type' => 'cover',
                 'alt' => 'Existing image',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 10,
-                'active' => true,
-                'thumbnail' => false,
                 'src' => 'products/existing-image.jpg',
             ],
         ],
@@ -82,15 +123,14 @@ it('uploads product images and files on update, appends them, and persists uniqu
             'images' => [
                 [
                     'file' => UploadedFile::fake()->image('hero.jpg'),
+                    'type' => 'thumb',
                     'alt' => 'Hero image',
                     'mimetype' => 'image/custom-hero',
                     'sort_order' => 2,
-                    'thumbnail' => true,
                 ],
                 [
                     'file' => UploadedFile::fake()->image('gallery.jpg'),
                     'sort_order' => 1,
-                    'active' => true,
                 ],
             ],
             'files' => [
@@ -110,11 +150,11 @@ it('uploads product images and files on update, appends them, and persists uniqu
         ['Accept' => 'application/json']
     )->assertOk()
         ->assertJsonPath('images.0.sort_order', 1)
-        ->assertJsonPath('images.0.mimetype', 'image/jpeg')
-        ->assertJsonPath('images.0.thumbnail', false)
+        ->assertJsonPath('images.0.type', null)
+        ->assertJsonPath('images.1.type', 'thumb')
         ->assertJsonPath('images.1.mimetype', 'image/custom-hero')
-        ->assertJsonPath('images.1.thumbnail', true)
         ->assertJsonPath('images.2.id', 'existing-image')
+        ->assertJsonPath('images.2.type', 'cover')
         ->assertJsonPath('files.0.sort_order', 1)
         ->assertJsonPath('files.0.mimetype', 'text/plain')
         ->assertJsonPath('files.1.mimetype', 'application/x-custom-pdf')
@@ -127,15 +167,13 @@ it('uploads product images and files on update, appends them, and persists uniqu
         ->and(count($product->images))->toBe(3)
         ->and(count($product->files))->toBe(3)
         ->and(data_get($product->images, '0.alt'))->toBeNull()
+        ->and(data_get($product->images, '0.type'))->toBeNull()
         ->and(data_get($product->images, '0.mimetype'))->toBe('image/jpeg')
         ->and(data_get($product->images, '0.sort_order'))->toBe(1)
-        ->and(data_get($product->images, '0.active'))->toBeTrue()
-        ->and(data_get($product->images, '0.thumbnail'))->toBeFalse()
         ->and(data_get($product->images, '1.alt'))->toBe('Hero image')
+        ->and(data_get($product->images, '1.type'))->toBe('thumb')
         ->and(data_get($product->images, '1.mimetype'))->toBe('image/custom-hero')
         ->and(data_get($product->images, '1.sort_order'))->toBe(2)
-        ->and(data_get($product->images, '1.active'))->toBeTrue()
-        ->and(data_get($product->images, '1.thumbnail'))->toBeTrue()
         ->and(data_get($product->images, '2.id'))->toBe('existing-image')
         ->and(data_get($product->images, '2.sort_order'))->toBe(10)
         ->and(data_get($product->files, '0.alt'))->toBeNull()
@@ -153,10 +191,11 @@ it('uploads product images and files on update, appends them, and persists uniqu
         ->and(collect($product->files)->pluck('id')->filter()->unique()->count())->toBe(3);
 
     foreach ($product->images as $image) {
-        expect($image)->toHaveKeys(['id', 'src', 'alt', 'mimetype', 'sort_order', 'active', 'thumbnail']);
+        expect($image)->toHaveKeys(['id', 'type', 'src', 'alt', 'mimetype', 'sort_order'])
+            ->and($image)->not->toHaveKeys(['active', 'thumbnail', 'shared_from_variant_option']);
 
         if (data_get($image, 'id') !== 'existing-image') {
-            expect(str_starts_with((string) data_get($image, 'src'), "products/{$product->getKey()}/images/"))->toBeTrue();
+            expect(str_starts_with((string) data_get($image, 'src'), "products/{$product->getKey()}/"))->toBeTrue();
             Storage::disk('public')->assertExists((string) data_get($image, 'src'));
         }
     }
@@ -171,10 +210,80 @@ it('uploads product images and files on update, appends them, and persists uniqu
     }
 });
 
-it('deletes product media by unique id and removes the file from filesystem when configured', function () {
+it('replaces an existing typed product image by uploading another image with the same type', function () {
     Storage::fake('public');
 
-    config()->set('venditio.product.media.delete_files_from_filesystem', true);
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+        'images' => [
+            [
+                'id' => 'old-thumb',
+                'type' => 'thumb',
+                'alt' => 'Old thumb',
+                'mimetype' => 'image/jpeg',
+                'sort_order' => 0,
+                'src' => 'products/old-thumb.jpg',
+            ],
+        ],
+    ]);
+
+    patch(
+        config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}",
+        [
+            'images' => [
+                [
+                    'file' => UploadedFile::fake()->image('new-thumb.jpg'),
+                    'type' => 'thumb',
+                    'alt' => 'New thumb',
+                ],
+            ],
+        ],
+        ['Accept' => 'application/json']
+    )->assertOk()
+        ->assertJsonCount(1, 'images')
+        ->assertJsonPath('images.0.type', 'thumb')
+        ->assertJsonPath('images.0.alt', 'New thumb');
+
+    $product->refresh();
+
+    expect($product->images)->toHaveCount(1)
+        ->and(data_get($product->images, '0.id'))->toBe('old-thumb')
+        ->and(data_get($product->images, '0.type'))->toBe('thumb')
+        ->and(data_get($product->images, '0.alt'))->toBe('New thumb');
+});
+
+it('rejects duplicate product image types in one payload', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    patch(
+        config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}",
+        [
+            'images' => [
+                [
+                    'file' => UploadedFile::fake()->image('thumb-a.jpg'),
+                    'type' => 'thumb',
+                ],
+                [
+                    'file' => UploadedFile::fake()->image('thumb-b.jpg'),
+                    'type' => 'thumb',
+                ],
+            ],
+        ],
+        ['Accept' => 'application/json']
+    )->assertUnprocessable()
+        ->assertJsonValidationErrors(['images.1.type']);
+});
+
+it('deletes product images by unique id and removes the file from filesystem when configured', function () {
+    Storage::fake('public');
+
+    config()->set('venditio.catalog.images.delete_files_from_filesystem', true);
 
     $path = 'products/1/images/delete-me.jpg';
     Storage::disk('public')->put($path, 'content');
@@ -186,11 +295,43 @@ it('deletes product media by unique id and removes the file from filesystem when
         'images' => [
             [
                 'id' => 'delete-image',
+                'type' => 'thumb',
                 'alt' => 'Delete image',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 0,
-                'active' => true,
-                'thumbnail' => false,
+                'src' => $path,
+            ],
+        ],
+        'files' => [],
+    ]);
+
+    deleteJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}/images/delete-image")
+        ->assertNoContent();
+
+    $product->refresh();
+
+    expect($product->images)->toBeArray()->toHaveCount(0);
+    Storage::disk('public')->assertMissing($path);
+});
+
+it('keeps the legacy product media delete endpoint working for images', function () {
+    Storage::fake('public');
+
+    config()->set('venditio.catalog.images.delete_files_from_filesystem', true);
+
+    $path = 'products/1/images/delete-me.jpg';
+    Storage::disk('public')->put($path, 'content');
+
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+        'images' => [
+            [
+                'id' => 'delete-image',
+                'type' => 'thumb',
+                'mimetype' => 'image/jpeg',
+                'sort_order' => 0,
                 'src' => $path,
             ],
         ],
@@ -241,7 +382,7 @@ it('keeps the file on filesystem when media deletion is configured to skip file 
     Storage::disk('public')->assertExists($path);
 });
 
-it('updates existing product media metadata without requiring a new file upload', function () {
+it('updates existing product image and file metadata without requiring a new file upload', function () {
     $product = Product::factory()->create([
         'active' => true,
         'visible_from' => null,
@@ -249,12 +390,11 @@ it('updates existing product media metadata without requiring a new file upload'
         'images' => [
             [
                 'id' => 'image-1',
+                'type' => 'thumb',
                 'alt' => 'Old image alt',
                 'name' => 'old-image',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 3,
-                'active' => true,
-                'thumbnail' => false,
                 'src' => 'products/image-1.jpg',
             ],
         ],
@@ -275,9 +415,9 @@ it('updates existing product media metadata without requiring a new file upload'
         'images' => [
             [
                 'id' => 'image-1',
+                'type' => 'cover',
                 'alt' => 'Updated image alt',
                 'sort_order' => 1,
-                'thumbnail' => true,
             ],
         ],
         'files' => [
@@ -290,9 +430,10 @@ it('updates existing product media metadata without requiring a new file upload'
         ],
     ])->assertOk()
         ->assertJsonPath('images.0.id', 'image-1')
+        ->assertJsonPath('images.0.type', 'cover')
         ->assertJsonPath('images.0.alt', 'Updated image alt')
         ->assertJsonPath('images.0.sort_order', 1)
-        ->assertJsonPath('images.0.thumbnail', true)
+        ->assertJsonMissingPath('images.0.thumbnail')
         ->assertJsonPath('files.0.id', 'file-1')
         ->assertJsonPath('files.0.alt', 'Updated file alt')
         ->assertJsonPath('files.0.sort_order', 2)
@@ -301,9 +442,9 @@ it('updates existing product media metadata without requiring a new file upload'
     $product->refresh();
 
     expect(data_get($product->images, '0.src'))->toBe('products/image-1.jpg')
+        ->and(data_get($product->images, '0.type'))->toBe('cover')
         ->and(data_get($product->images, '0.alt'))->toBe('Updated image alt')
         ->and(data_get($product->images, '0.sort_order'))->toBe(1)
-        ->and(data_get($product->images, '0.thumbnail'))->toBeTrue()
         ->and(data_get($product->files, '0.src'))->toBe('products/file-1.pdf')
         ->and(data_get($product->files, '0.alt'))->toBe('Updated file alt')
         ->and(data_get($product->files, '0.sort_order'))->toBe(2)
@@ -325,13 +466,11 @@ it('updates variant-specific image metadata without touching other variants', fu
         'images' => [
             [
                 'id' => 'variant-image-1',
+                'type' => 'thumb',
                 'name' => 'Old variant image',
                 'alt' => 'Old variant alt',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 4,
-                'active' => true,
-                'thumbnail' => false,
-                'shared_from_variant_option' => false,
                 'src' => 'products/variant-image-1.jpg',
             ],
         ],
@@ -345,13 +484,11 @@ it('updates variant-specific image metadata without touching other variants', fu
         'images' => [
             [
                 'id' => 'variant-image-2',
+                'type' => 'thumb',
                 'name' => 'Other variant image',
                 'alt' => 'Other variant alt',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 2,
-                'active' => true,
-                'thumbnail' => false,
-                'shared_from_variant_option' => false,
                 'src' => 'products/variant-image-2.jpg',
             ],
         ],
@@ -364,7 +501,6 @@ it('updates variant-specific image metadata without touching other variants', fu
                 'name' => 'Updated variant image',
                 'alt' => 'Updated variant alt',
                 'sort_order' => 1,
-                'thumbnail' => true,
             ],
         ],
     ])->assertOk()
@@ -372,8 +508,8 @@ it('updates variant-specific image metadata without touching other variants', fu
         ->assertJsonPath('images.0.name', 'Updated variant image')
         ->assertJsonPath('images.0.alt', 'Updated variant alt')
         ->assertJsonPath('images.0.sort_order', 1)
-        ->assertJsonPath('images.0.thumbnail', true)
-        ->assertJsonPath('images.0.shared_from_variant_option', false);
+        ->assertJsonPath('images.0.type', 'thumb')
+        ->assertJsonMissingPath('images.0.shared_from_variant_option');
 
     $firstVariant->refresh();
     $secondVariant->refresh();
@@ -381,14 +517,13 @@ it('updates variant-specific image metadata without touching other variants', fu
     expect(data_get($firstVariant->images, '0.name'))->toBe('Updated variant image')
         ->and(data_get($firstVariant->images, '0.alt'))->toBe('Updated variant alt')
         ->and(data_get($firstVariant->images, '0.sort_order'))->toBe(1)
-        ->and(data_get($firstVariant->images, '0.thumbnail'))->toBeTrue()
-        ->and(data_get($firstVariant->images, '0.shared_from_variant_option'))->toBeFalse()
+        ->and(data_get($firstVariant->images, '0.type'))->toBe('thumb')
         ->and(data_get($secondVariant->images, '0.name'))->toBe('Other variant image')
         ->and(data_get($secondVariant->images, '0.alt'))->toBe('Other variant alt')
         ->and(data_get($secondVariant->images, '0.sort_order'))->toBe(2);
 });
 
-it('returns product media ordered by sort_order and filters inactive entries by the product active query params', function () {
+it('returns product images ordered by sort_order and filters inactive files by the product active query params', function () {
     $product = Product::factory()->create([
         'active' => true,
         'visible_from' => null,
@@ -396,20 +531,18 @@ it('returns product media ordered by sort_order and filters inactive entries by 
         'images' => [
             [
                 'id' => 'image-a',
-                'alt' => 'Hidden image',
+                'type' => 'cover',
+                'alt' => 'Cover image',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 3,
-                'active' => false,
-                'thumbnail' => false,
                 'src' => 'products/image-a.jpg',
             ],
             [
                 'id' => 'image-b',
-                'alt' => 'Visible image',
+                'type' => 'thumb',
+                'alt' => 'Thumb image',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 1,
-                'active' => true,
-                'thumbnail' => true,
                 'src' => 'products/image-b.jpg',
             ],
         ],
@@ -437,8 +570,9 @@ it('returns product media ordered by sort_order and filters inactive entries by 
 
     getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}")
         ->assertOk()
-        ->assertJsonCount(1, 'images')
+        ->assertJsonCount(2, 'images')
         ->assertJsonPath('images.0.id', 'image-b')
+        ->assertJsonPath('images.1.id', 'image-a')
         ->assertJsonCount(1, 'files')
         ->assertJsonPath('files.0.id', 'file-b');
 
@@ -451,8 +585,67 @@ it('returns product media ordered by sort_order and filters inactive entries by 
 
     getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?is_active=0&exclude_active_scope=1")
         ->assertOk()
-        ->assertJsonCount(1, 'images')
-        ->assertJsonPath('images.0.id', 'image-a')
+        ->assertJsonCount(2, 'images')
         ->assertJsonCount(1, 'files')
         ->assertJsonPath('files.0.id', 'file-a');
+});
+
+it('normalizes legacy product images to catalog image entries', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+        'images' => [],
+    ]);
+
+    DB::table('products')
+        ->where('id', $product->getKey())
+        ->update([
+            'images' => json_encode([
+                [
+                    'id' => 'shared-legacy',
+                    'alt' => 'Shared legacy image',
+                    'mimetype' => 'image/jpeg',
+                    'sort_order' => 1,
+                    'active' => true,
+                    'thumbnail' => true,
+                    'shared_from_variant_option' => true,
+                    'src' => "products/{$product->getKey()}/variant_options/10/images/shared.jpg",
+                ],
+                [
+                    'id' => 'thumb-legacy',
+                    'alt' => 'Thumb legacy image',
+                    'mimetype' => 'image/jpeg',
+                    'sort_order' => 2,
+                    'active' => true,
+                    'thumbnail' => true,
+                    'src' => "products/{$product->getKey()}/images/thumb.jpg",
+                ],
+                [
+                    'id' => 'cover-legacy',
+                    'alt' => 'Cover legacy image',
+                    'mimetype' => 'image/jpeg',
+                    'sort_order' => 3,
+                    'active' => true,
+                    'thumbnail' => false,
+                    'src' => "products/{$product->getKey()}/images/cover.jpg",
+                ],
+            ], JSON_UNESCAPED_SLASHES),
+        ]);
+
+    $migration = include __DIR__ . '/../../database/migrations/update_products_images_to_catalog_collection.php';
+    $migration->up();
+
+    $product->refresh();
+
+    $shared = collect($product->images)->firstWhere('id', 'shared-legacy');
+    $thumb = collect($product->images)->firstWhere('id', 'thumb-legacy');
+    $cover = collect($product->images)->firstWhere('id', 'cover-legacy');
+
+    expect(data_get($shared, 'type'))->toBeNull()
+        ->and(data_get($thumb, 'type'))->toBe('thumb')
+        ->and(data_get($cover, 'type'))->toBe('cover')
+        ->and($shared)->not->toHaveKeys(['active', 'thumbnail', 'shared_from_variant_option'])
+        ->and($thumb)->not->toHaveKeys(['active', 'thumbnail', 'shared_from_variant_option'])
+        ->and($cover)->not->toHaveKeys(['active', 'thumbnail', 'shared_from_variant_option']);
 });

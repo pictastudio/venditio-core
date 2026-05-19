@@ -31,20 +31,18 @@ class ProductFactory extends Factory
             'images' => [
                 [
                     'id' => (string) Str::ulid(),
+                    'type' => 'thumb',
                     'alt' => fake()->sentence(),
                     'mimetype' => 'image/jpeg',
                     'sort_order' => 0,
-                    'active' => true,
-                    'thumbnail' => true,
                     'src' => fake()->imageUrl(),
                 ],
                 [
                     'id' => (string) Str::ulid(),
+                    'type' => 'cover',
                     'alt' => fake()->sentence(),
                     'mimetype' => 'image/jpeg',
                     'sort_order' => 1,
-                    'active' => true,
-                    'thumbnail' => false,
                     'src' => fake()->imageUrl(),
                 ],
             ],

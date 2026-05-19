@@ -10,7 +10,7 @@ use PictaStudio\Venditio\Actions\Taxes\{ExtractTaxFromGrossPrice, ResolveTaxRate
 use PictaStudio\Venditio\Contracts\{DiscountCalculatorInterface, ProductPriceResolverInterface};
 use PictaStudio\Venditio\Discounts\DiscountContext;
 use PictaStudio\Venditio\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
-use PictaStudio\Venditio\Support\ProductMedia;
+use PictaStudio\Venditio\Support\CatalogImage;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
@@ -185,7 +185,7 @@ class ProductResource extends JsonResource
     protected function transformAttributes(): array
     {
         return [
-            'images' => fn (mixed $images) => $this->transformProductMediaCollection($images, true),
+            'images' => fn (mixed $images): array => $this->transformCatalogImageCollection($images),
             'files' => fn (mixed $files) => $this->transformProductMediaCollection($files, false),
         ];
     }
@@ -260,19 +260,15 @@ class ProductResource extends JsonResource
                     (string) $variantOption->getKey() === (string) $option->getKey()
                 ))
             )
-            ->flatMap(fn ($variant): array => ProductMedia::normalizeCollection(
-                $variant->getAttribute('images'),
-                isImage: true
-            ))
+            ->flatMap(fn ($variant): array => CatalogImage::normalizeCollection($variant->getAttribute('images')))
             ->filter(
-                fn (array $image): bool => (bool) Arr::get($image, 'shared_from_variant_option', false)
-                && str_contains((string) Arr::get($image, 'src'), $pathFragment)
+                fn (array $image): bool => str_contains((string) Arr::get($image, 'src'), $pathFragment)
             )
             ->unique(fn (array $image): string => (string) Arr::get($image, 'src'))
             ->values()
             ->all();
 
-        return $this->transformProductMediaCollection($images, true);
+        return $this->transformCatalogImageCollection($images);
     }
 
     protected function resolvePriceSource(array $resolved): array

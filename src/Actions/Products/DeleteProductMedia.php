@@ -14,26 +14,17 @@ class DeleteProductMedia
 {
     public function handle(Product $product, string $mediaId): Product
     {
-        $media = ProductMedia::normalizeProductMedia(
-            $product->getAttribute('images'),
-            $product->getAttribute('files')
-        );
+        $files = ProductMedia::normalizeCollection($product->getAttribute('files'), isImage: false);
 
         $deletedMedia = null;
-
-        [$media['images'], $deletedMedia] = $this->removeFromCollection($media['images'], $mediaId);
-
-        if ($deletedMedia === null) {
-            [$media['files'], $deletedMedia] = $this->removeFromCollection($media['files'], $mediaId);
-        }
+        [$files, $deletedMedia] = $this->removeFromCollection($files, $mediaId);
 
         if ($deletedMedia === null) {
             throw new NotFoundHttpException('Product media not found.');
         }
 
         $product->forceFill([
-            'images' => $media['images'],
-            'files' => $media['files'],
+            'files' => $files,
         ]);
         $product->save();
 
@@ -92,14 +83,9 @@ class DeleteProductMedia
 
         return $productModelClass::withoutGlobalScopes()
             ->whereKeyNot($deletedFromProduct->getKey())
-            ->get(['images', 'files'])
+            ->get(['files'])
             ->contains(function (Product $product) use ($path): bool {
-                $media = ProductMedia::normalizeProductMedia(
-                    $product->getAttribute('images'),
-                    $product->getAttribute('files')
-                );
-
-                return collect([...$media['images'], ...$media['files']])
+                return collect(ProductMedia::normalizeCollection($product->getAttribute('files'), isImage: false))
                     ->contains(fn (array $item): bool => Arr::get($item, 'src') === $path);
             });
     }

@@ -93,8 +93,7 @@ it('seeds random venditio data from command options with shipping snapshots and 
     expect(data_get($brand->images, '0.type'))->toBe('thumb')
         ->and(data_get($brand->images, '0.sort_order'))->toBe(10)
         ->and(data_get($category->images, '1.type'))->toBe('cover')
-        ->and(data_get($product->images, '0.thumbnail'))->toBeTrue()
-        ->and(data_get($product->images, '0.active'))->toBeTrue()
+        ->and(data_get($product->images, '0.type'))->toBe('thumb')
         ->and(data_get($product->images, '0.sort_order'))->toBe(10)
         ->and(data_get($product->files, '0.active'))->toBeTrue()
         ->and($product->inventory?->manage_stock)->toBeBool();

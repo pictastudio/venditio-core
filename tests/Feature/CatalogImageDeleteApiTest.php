@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use PictaStudio\Venditio\Models\{Brand, ProductCategory, ProductCollection, Tag};
+use PictaStudio\Venditio\Models\{Brand, Product, ProductCategory, ProductCollection, Tag};
 
 use function Pest\Laravel\deleteJson;
 
@@ -17,8 +17,7 @@ it('deletes catalog images by unique id for every catalog image owner', function
     $path = "{$uri}/1/images/delete-me.jpg";
     Storage::disk('public')->put($path, 'content');
 
-    /** @var Model $model */
-    $model = $modelClass::factory()->create([
+    $attributes = [
         'images' => [
             [
                 'id' => 'delete-image',
@@ -37,7 +36,19 @@ it('deletes catalog images by unique id for every catalog image owner', function
                 'src' => "{$uri}/1/images/keep-me.jpg",
             ],
         ],
-    ]);
+    ];
+
+    if ($modelClass === Product::class) {
+        $attributes = [
+            ...$attributes,
+            'active' => true,
+            'visible_from' => null,
+            'visible_until' => null,
+        ];
+    }
+
+    /** @var Model $model */
+    $model = $modelClass::factory()->create($attributes);
 
     deleteJson(config('venditio.routes.api.v1.prefix') . "/{$uri}/{$model->getKey()}/images/delete-image")
         ->assertNoContent();
@@ -50,6 +61,7 @@ it('deletes catalog images by unique id for every catalog image owner', function
     Storage::disk('public')->assertMissing($path);
 })->with([
     'brand' => [Brand::class, 'brands'],
+    'product' => [Product::class, 'products'],
     'product category' => [ProductCategory::class, 'product_categories'],
     'product collection' => [ProductCollection::class, 'product_collections'],
     'tag' => [Tag::class, 'tags'],

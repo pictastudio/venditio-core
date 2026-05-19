@@ -10,7 +10,7 @@ use PictaStudio\Translatable\Translatable;
 use PictaStudio\Venditio\Enums\Contracts\ProductStatus as ProductStatusContract;
 use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange, ProductStatusActive};
 use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug};
-use PictaStudio\Venditio\Support\ProductMedia;
+use PictaStudio\Venditio\Support\{CatalogImage, ProductMedia};
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
@@ -76,17 +76,15 @@ class Product extends Model implements TranslatableContract
         });
 
         static::saving(function (self $product): void {
-            $normalizedMedia = ProductMedia::normalizeProductMedia(
-                $product->getAttribute('images'),
-                $product->getAttribute('files')
-            );
-
             if ($product->getAttribute('images') !== null) {
-                $product->setAttribute('images', $normalizedMedia['images']);
+                $product->setAttribute('images', CatalogImage::normalizeCollection($product->getAttribute('images')));
             }
 
             if ($product->getAttribute('files') !== null) {
-                $product->setAttribute('files', $normalizedMedia['files']);
+                $product->setAttribute(
+                    'files',
+                    ProductMedia::normalizeCollection($product->getAttribute('files'), isImage: false)
+                );
             }
         });
     }

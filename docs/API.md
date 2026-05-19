@@ -110,6 +110,8 @@ Credit-note-specific notes:
 - `GET /products/{product}/related_products`
 - `GET /products/{product}/variants`
 - `POST /products/{product}/variants`
+- `DELETE /products/{product}/images/{image_id}`
+- `DELETE /products/{product}/media/{media_id}`
 
 ### Product Categories
 
@@ -134,7 +136,7 @@ Product categories and tags use branch-scoped `sort_order` values for tree order
 
 Products accept `related_product_ids` in write payloads to sync directional, manually curated related products. Products, product categories, product collections, brands, and tags accept `tag_ids` in write payloads where supported; the IDs are synced to the resource through the `taggables` polymorphic association.
 
-Catalog image owners (`product_categories`, `brands`, `product_collections`, and `tags`) expose an `images` array. Each image item contains `id`, `type`, `src`, `alt`, `name`, `mimetype`, and `sort_order`. `type` accepts `thumb`, `cover`, or `null`; only one `thumb` and one `cover` are allowed per resource, while multiple `null` images are allowed and are stored as generic images.
+Catalog image owners (`products`, `product_categories`, `brands`, `product_collections`, and `tags`) expose an `images` array. Each image item contains `id`, `type`, `src`, `alt`, `name`, `mimetype`, and `sort_order`. `type` accepts `thumb`, `cover`, or `null`; only one `thumb` and one `cover` are allowed per resource, while multiple `null` images are allowed and are stored as generic images. Product `files` remain separate product media entries and keep file-specific metadata such as `active`.
 
 ### Product Types
 

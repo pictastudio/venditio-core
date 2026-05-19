@@ -93,6 +93,14 @@ docs {
   - visible_until
   - description
   - description_short
+  - images (array|nullable)
+  - images.*.id
+  - images.*.file (file|image)
+  - images.*.alt
+  - images.*.name
+  - images.*.mimetype
+  - images.*.sort_order
+  - images.*.type (nullable, thumb|cover)
   - measuring_unit (defaults to configured product.default_measuring_unit, `pz` by default)
   - qty_for_unit
   - length
@@ -124,5 +132,8 @@ docs {
   - {locale}.slug / slug:{locale}
   - {locale}.description / description:{locale}
   - {locale}.description_short / description_short:{locale}
-  - Note: images/files are not accepted in create; use update for media uploads.
+  - Note: for image upload use multipart/form-data with fields like `images[0][file]` and `images[0][type]=thumb`.
+  - Note: uploaded product images are stored under date subfolders (`YYYY/MM/DD`) inside their image type folder.
+  - Note: only one `thumb` and one `cover` are allowed. `type=null` can be repeated for generic images.
+  - Note: files are not accepted in create; use update for file uploads.
 }

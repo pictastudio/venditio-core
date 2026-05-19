@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use PictaStudio\Venditio\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 use PictaStudio\Venditio\Models\Product;
-use PictaStudio\Venditio\Support\ProductMedia;
+use PictaStudio\Venditio\Support\CatalogImage;
 
 class ProductVariantOptionResource extends JsonResource
 {
@@ -52,17 +52,16 @@ class ProductVariantOptionResource extends JsonResource
 
         $sharedImages = $variantProducts
             ->flatMap(function (Product $product): array {
-                return ProductMedia::normalizeCollection($product->getAttribute('images'), isImage: true);
+                return CatalogImage::normalizeCollection($product->getAttribute('images'));
             })
             ->filter(function (array $image): bool {
-                return (bool) Arr::get($image, 'shared_from_variant_option', false)
-                    && str_contains((string) Arr::get($image, 'src'), $this->sharedImagePathFragment());
+                return str_contains((string) Arr::get($image, 'src'), $this->sharedImagePathFragment());
             })
             ->unique(fn (array $image): string => (string) Arr::get($image, 'src'))
             ->values()
             ->all();
 
-        return $this->transformProductMediaCollection($sharedImages, true);
+        return $this->transformCatalogImageCollection($sharedImages);
     }
 
     protected function sharedImagePathFragment(): string

@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use PictaStudio\Venditio\Contracts\ProductSkuGeneratorInterface;
 use PictaStudio\Venditio\Models\Product;
 use PictaStudio\Venditio\Models\Scopes\Active;
+use PictaStudio\Venditio\Support\CatalogImage;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
@@ -23,6 +24,8 @@ class CreateProduct
         $tagIds = Arr::pull($payload, 'tag_ids', []);
         $relatedProductIds = Arr::pull($payload, 'related_product_ids', []);
         $inventoryPayload = Arr::pull($payload, 'inventory');
+        $imagesProvided = array_key_exists('images', $payload);
+        $images = Arr::pull($payload, 'images');
 
         if (blank($payload['sku'] ?? null)) {
             $payload['sku'] = $this->productSkuGenerator->forProductPayload($payload);
@@ -56,8 +59,17 @@ class CreateProduct
 
         $this->validateTagProductTypeCompatibility($tagIds, $payload['product_type_id'] ?? null);
 
+        if ($imagesProvided) {
+            CatalogImage::validatePayload($images, []);
+        }
+
         /** @var Product $product */
         $product = resolve_model('product')::create($payload);
+
+        if ($imagesProvided) {
+            $product->images = CatalogImage::mergeCollection($product, [], $images, 'products');
+            $product->save();
+        }
 
         if (!empty($categoryIds)) {
             $product->categories()->sync($categoryIds);

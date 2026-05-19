@@ -15,8 +15,6 @@ class ProductVariantOptionMediaUploadValidation implements ProductVariantOptionM
             'images.*.name' => ['nullable', 'string', 'max:255'],
             'images.*.mimetype' => ['nullable', 'string', 'max:255'],
             'images.*.sort_order' => ['nullable', 'integer', 'min:0'],
-            'images.*.active' => ['nullable', 'boolean'],
-            'images.*.thumbnail' => ['nullable', 'boolean'],
             'files' => ['sometimes', 'nullable', 'array'],
             'files.*.file' => ['required', 'file'],
             'files.*.alt' => ['nullable', 'string', 'max:255'],

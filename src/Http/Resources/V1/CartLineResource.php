@@ -41,7 +41,7 @@ class CartLineResource extends JsonResource
     protected function transformAttributes(): array
     {
         return [
-            'product_data.images' => fn (mixed $images) => $this->transformProductMediaCollection($images, true),
+            'product_data.images' => fn (mixed $images): array => $this->transformCatalogImageCollection($images),
             'product_data.files' => fn (mixed $files) => $this->transformProductMediaCollection($files, false),
         ];
     }

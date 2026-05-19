@@ -7,11 +7,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use PictaStudio\Venditio\Actions\CatalogImages\DeleteCatalogImage;
 use PictaStudio\Venditio\Actions\Products\{CreateProduct, CreateProductVariants, DeleteProductMedia, UpdateProduct, UploadProductVariantOptionMedia};
 use PictaStudio\Venditio\Http\Controllers\Api\Controller;
 use PictaStudio\Venditio\Http\Requests\V1\Product\{GenerateProductVariantsRequest, StoreProductRequest, UpdateProductRequest, UploadProductVariantOptionMediaRequest};
 use PictaStudio\Venditio\Http\Resources\V1\ProductResource;
 use PictaStudio\Venditio\Models\{Product, ProductVariantOption};
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_model};
 
@@ -172,9 +174,30 @@ class ProductController extends Controller
         return response()->noContent();
     }
 
-    public function destroyMedia(Product $product, string $mediaId, DeleteProductMedia $action)
+    public function destroyImage(Product $product, string $imageId, DeleteCatalogImage $action)
     {
         $this->authorizeIfConfigured('update', $product);
+
+        $action->handle($product, $imageId);
+
+        return response()->noContent();
+    }
+
+    public function destroyMedia(
+        Product $product,
+        string $mediaId,
+        DeleteProductMedia $action,
+        DeleteCatalogImage $deleteCatalogImage
+    ) {
+        $this->authorizeIfConfigured('update', $product);
+
+        try {
+            $deleteCatalogImage->handle($product, $mediaId);
+
+            return response()->noContent();
+        } catch (NotFoundHttpException) {
+            // Keep the legacy media endpoint useful for product files.
+        }
 
         $action->handle($product, $mediaId);
 

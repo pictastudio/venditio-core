@@ -66,7 +66,7 @@ class DeleteCatalogImage
 
     private function isReferencedByAnotherCatalogResource(string $path, Model $deletedFromModel): bool
     {
-        foreach (['brand', 'product_category', 'product_collection', 'tag'] as $modelAlias) {
+        foreach (['brand', 'product', 'product_category', 'product_collection', 'tag'] as $modelAlias) {
             $modelClass = resolve_model($modelAlias);
             $query = $modelClass::withoutGlobalScopes();
 

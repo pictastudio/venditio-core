@@ -4,6 +4,7 @@ namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
+use PictaStudio\Venditio\Support\CatalogImage;
 use PictaStudio\Venditio\Validations\Concerns\{InteractsWithTranslatableRules, ValidatesSeoMetadata};
 use PictaStudio\Venditio\Validations\Contracts\ProductValidationRules;
 
@@ -58,7 +59,7 @@ class ProductValidation implements ProductValidationRules
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             'description' => ['nullable', 'string'],
             'description_short' => ['nullable', 'string'],
-            'images' => ['prohibited'],
+            ...$this->imageValidationRules(),
             'files' => ['prohibited'],
             'measuring_unit' => [
                 'nullable',
@@ -159,15 +160,7 @@ class ProductValidation implements ProductValidationRules
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             'description' => ['nullable', 'string'],
             'description_short' => ['nullable', 'string'],
-            'images' => ['sometimes', 'nullable', 'array'],
-            'images.*.id' => ['nullable', 'string', 'max:255'],
-            'images.*.file' => ['sometimes', 'file', 'image'],
-            'images.*.alt' => ['nullable', 'string', 'max:255'],
-            'images.*.name' => ['nullable', 'string', 'max:255'],
-            'images.*.mimetype' => ['nullable', 'string', 'max:255'],
-            'images.*.sort_order' => ['nullable', 'integer', 'min:0'],
-            'images.*.active' => ['nullable', 'boolean'],
-            'images.*.thumbnail' => ['nullable', 'boolean'],
+            ...$this->imageValidationRules(),
             'files' => ['sometimes', 'nullable', 'array'],
             'files.*.id' => ['nullable', 'string', 'max:255'],
             'files.*.file' => ['sometimes', 'file'],
@@ -225,6 +218,20 @@ class ProductValidation implements ProductValidationRules
                 'description' => ['sometimes', 'nullable', 'string'],
                 'description_short' => ['sometimes', 'nullable', 'string'],
             ]),
+        ];
+    }
+
+    private function imageValidationRules(): array
+    {
+        return [
+            'images' => ['sometimes', 'nullable', 'array'],
+            'images.*.id' => ['nullable', 'string', 'max:255'],
+            'images.*.file' => ['sometimes', 'file', 'image'],
+            'images.*.alt' => ['nullable', 'string', 'max:255'],
+            'images.*.name' => ['nullable', 'string', 'max:255'],
+            'images.*.mimetype' => ['nullable', 'string', 'max:255'],
+            'images.*.sort_order' => ['nullable', 'integer', 'min:0'],
+            'images.*.type' => ['nullable', 'string', Rule::in(CatalogImage::TYPES)],
         ];
     }
 

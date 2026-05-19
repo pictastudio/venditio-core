@@ -59,11 +59,10 @@ body:json {
     "images": [
       {
         "id": "existing-image-id",
+        "type": "thumb",
         "name": "T-shirt front",
         "alt": "Front view of the T-shirt",
-        "sort_order": 1,
-        "thumbnail": true,
-        "active": true
+        "sort_order": 1
       }
     ]
   }
@@ -109,8 +108,7 @@ docs {
   - images.*.name
   - images.*.mimetype
   - images.*.sort_order
-  - images.*.active
-  - images.*.thumbnail
+  - images.*.type (nullable, thumb|cover)
   - files (array)
   - files.*.id
   - files.*.file
@@ -152,6 +150,8 @@ docs {
   - {locale}.description_short / description_short:{locale}
   - Note: file uploads require multipart/form-data.
   - Note: if `mimetype` is omitted, the backend fills it from the uploaded file.
-  - Note: if `id` is provided, the item updates an existing media entry and `file` must be omitted.
-  - Note: metadata updates for shared variant-option media are propagated to matching media copies with the same source.
+  - Note: product images follow the catalog image shape used by brands, categories, and collections.
+  - Note: only one `thumb` and one `cover` are allowed. `type=null` can be repeated for generic images.
+  - Note: image metadata updates for variant-option images are propagated to matching image copies with the same source path.
+  - Note: if `id` is provided for files, the item updates an existing media entry and `file` must be omitted.
 }

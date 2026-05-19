@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use PictaStudio\Venditio\Models\Product;
-use PictaStudio\Venditio\Support\ProductMedia;
+use PictaStudio\Venditio\Support\{CatalogImage, ProductMedia};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
@@ -122,29 +122,29 @@ class UpdateProduct
         bool $filesProvided,
         array &$sharedMediaUpdates
     ): array {
-        $currentMedia = ProductMedia::normalizeProductMedia(
-            $product->getAttribute('images'),
-            $product->getAttribute('files')
-        );
-        $usedMediaIds = ProductMedia::collectUsedIds($currentMedia['images'], $currentMedia['files']);
+        $currentImages = CatalogImage::normalizeCollection($product->getAttribute('images'));
+        $currentFiles = ProductMedia::normalizeCollection($product->getAttribute('files'), isImage: false);
         $validationErrors = [];
 
         if ($imagesProvided) {
-            $validationErrors += $this->collectMediaItemPayloadErrors(
-                Arr::get($payload, 'images'),
-                'images',
-                array_keys(collect($currentMedia['images'])->keyBy('id')->all()),
-                true
-            );
+            try {
+                CatalogImage::validatePayload(
+                    Arr::get($payload, 'images'),
+                    CatalogImage::collectUsedIds($currentImages),
+                    'images',
+                    $currentImages
+                );
+            } catch (ValidationException $exception) {
+                $validationErrors = array_replace_recursive($validationErrors, $exception->errors());
+            }
         }
 
         if ($filesProvided) {
-            $validationErrors += $this->collectMediaItemPayloadErrors(
+            $validationErrors = array_replace_recursive($validationErrors, $this->collectFileItemPayloadErrors(
                 Arr::get($payload, 'files'),
                 'files',
-                array_keys(collect($currentMedia['files'])->keyBy('id')->all()),
-                false
-            );
+                ProductMedia::collectUsedIds($currentFiles)
+            ));
         }
 
         if ($validationErrors !== []) {
@@ -152,25 +152,25 @@ class UpdateProduct
         }
 
         if ($imagesProvided) {
-            $payload['images'] = $this->mergeMediaCollection(
+            $updatedImages = CatalogImage::mergeCollection(
                 $product,
+                $currentImages,
                 Arr::get($payload, 'images'),
-                'images',
-                $currentMedia['images'],
-                true,
-                $usedMediaIds,
-                $sharedMediaUpdates
+                'products'
             );
+
+            $this->trackSharedVariantOptionImageUpdates($currentImages, $updatedImages ?? [], $sharedMediaUpdates);
+
+            $payload['images'] = $updatedImages;
         }
 
         if ($filesProvided) {
-            $payload['files'] = $this->mergeMediaCollection(
+            $usedFileIds = ProductMedia::collectUsedIds($currentFiles);
+            $payload['files'] = $this->mergeFileCollection(
                 $product,
                 Arr::get($payload, 'files'),
-                'files',
-                $currentMedia['files'],
-                false,
-                $usedMediaIds,
+                $currentFiles,
+                $usedFileIds,
                 $sharedMediaUpdates
             );
         }
@@ -178,13 +178,11 @@ class UpdateProduct
         return $payload;
     }
 
-    private function mergeMediaCollection(
+    private function mergeFileCollection(
         Product $product,
         mixed $items,
-        string $folder,
-        array $currentItems,
-        bool $isImage,
-        array &$usedMediaIds,
+        array $currentFiles,
+        array &$usedFileIds,
         array &$sharedMediaUpdates
     ): ?array {
         if ($items === null) {
@@ -192,22 +190,20 @@ class UpdateProduct
         }
 
         $items = is_array($items) ? $items : [];
-        $currentItemsById = collect($currentItems)
+        $currentFilesById = collect($currentFiles)
             ->keyBy(fn (array $item) => (string) Arr::get($item, 'id'))
             ->all();
 
-        foreach ($items as $index => $item) {
+        foreach ($items as $item) {
             $mediaId = Arr::get($item, 'id');
 
             if (is_string($mediaId) && $mediaId !== '') {
                 /** @var array<string, mixed> $existingItem */
-                $existingItem = $currentItemsById[$mediaId];
-                $currentItemsById[$mediaId] = ProductMedia::mergeItem($existingItem, $item, $isImage);
-                $this->trackSharedVariantOptionMediaUpdate(
+                $existingItem = $currentFilesById[$mediaId];
+                $currentFilesById[$mediaId] = ProductMedia::mergeItem($existingItem, $item, false);
+                $this->trackSharedVariantOptionFileUpdate(
                     $existingItem,
-                    $currentItemsById[$mediaId],
-                    $folder,
-                    $isImage,
+                    $currentFilesById[$mediaId],
                     $sharedMediaUpdates
                 );
 
@@ -216,33 +212,68 @@ class UpdateProduct
 
             /** @var UploadedFile $file */
             $file = $item['file'];
-            $generatedId = ProductMedia::generateUniqueId($usedMediaIds);
-            $currentItemsById[$generatedId] = [
+            $generatedId = ProductMedia::generateUniqueId($usedFileIds);
+            $currentFilesById[$generatedId] = [
                 'id' => $generatedId,
-                'src' => $file->store("products/{$product->getKey()}/{$folder}", 'public'),
+                'src' => $file->store("products/{$product->getKey()}/files", 'public'),
                 'alt' => Arr::get($item, 'alt'),
                 'name' => Arr::get($item, 'name'),
                 'mimetype' => Arr::get($item, 'mimetype', $file->getMimeType()),
                 'sort_order' => ProductMedia::resolveSortOrder(
                     Arr::get($item, 'sort_order'),
-                    count($currentItemsById)
+                    count($currentFilesById)
                 ),
                 'active' => ProductMedia::resolveBoolean(Arr::get($item, 'active'), true),
                 'shared_from_variant_option' => false,
-                ...($isImage ? [
-                    'thumbnail' => ProductMedia::resolveBoolean(Arr::get($item, 'thumbnail'), false),
-                ] : []),
             ];
         }
 
-        return array_values($currentItemsById);
+        return array_values($currentFilesById);
     }
 
-    private function trackSharedVariantOptionMediaUpdate(
+    private function trackSharedVariantOptionImageUpdates(array $currentImages, array $updatedImages, array &$sharedMediaUpdates): void
+    {
+        $currentImagesById = collect($currentImages)
+            ->keyBy(fn (array $image) => (string) Arr::get($image, 'id'))
+            ->all();
+
+        foreach ($updatedImages as $updatedImage) {
+            $imageId = Arr::get($updatedImage, 'id');
+            $existingImage = is_scalar($imageId) ? ($currentImagesById[(string) $imageId] ?? null) : null;
+
+            if (!is_array($existingImage)) {
+                continue;
+            }
+
+            $src = Arr::get($existingImage, 'src');
+
+            if (!$this->isSharedVariantOptionImage($src) || Arr::get($updatedImage, 'src') !== $src) {
+                continue;
+            }
+
+            $metadata = Arr::only($updatedImage, [
+                'type',
+                'name',
+                'alt',
+                'mimetype',
+                'sort_order',
+            ]);
+
+            if ($metadata === Arr::only($existingImage, array_keys($metadata))) {
+                continue;
+            }
+
+            $sharedMediaUpdates[] = [
+                'collection' => 'images',
+                'src' => $src,
+                'metadata' => $metadata,
+            ];
+        }
+    }
+
+    private function trackSharedVariantOptionFileUpdate(
         array $existingItem,
         array $updatedItem,
-        string $folder,
-        bool $isImage,
         array &$sharedMediaUpdates
     ): void {
         if (!(bool) Arr::get($existingItem, 'shared_from_variant_option', false)) {
@@ -261,12 +292,10 @@ class UpdateProduct
             'mimetype',
             'sort_order',
             'active',
-            ...($isImage ? ['thumbnail'] : []),
         ]);
 
         $sharedMediaUpdates[] = [
-            'folder' => $folder,
-            'is_image' => $isImage,
+            'collection' => 'files',
             'src' => $src,
             'metadata' => $metadata,
         ];
@@ -284,24 +313,45 @@ class UpdateProduct
             ->whereKeyNot($updatedProduct->getKey())
             ->get(['id', 'images', 'files'])
             ->each(function (Product $product) use ($updates): void {
-                $media = ProductMedia::normalizeProductMedia(
-                    $product->getAttribute('images'),
-                    $product->getAttribute('files')
-                );
+                $images = CatalogImage::normalizeCollection($product->getAttribute('images'));
+                $files = ProductMedia::normalizeCollection($product->getAttribute('files'), isImage: false);
                 $changed = false;
 
                 foreach ($updates as $update) {
-                    $folder = (string) Arr::get($update, 'folder');
-                    $isImage = (bool) Arr::get($update, 'is_image');
+                    $collection = (string) Arr::get($update, 'collection');
                     $src = Arr::get($update, 'src');
                     $metadata = Arr::get($update, 'metadata', []);
 
-                    if (!is_string($src) || !is_array($metadata) || !array_key_exists($folder, $media)) {
+                    if (!is_string($src) || !is_array($metadata)) {
                         continue;
                     }
 
-                    $media[$folder] = collect($media[$folder])
-                        ->map(function (array $item) use ($src, $metadata, $isImage, &$changed): array {
+                    if ($collection === 'images') {
+                        $images = collect($images)
+                            ->map(function (array $item) use ($src, $metadata, &$changed): array {
+                                if (
+                                    Arr::get($item, 'src') !== $src
+                                    || !$this->isSharedVariantOptionImage(Arr::get($item, 'src'))
+                                ) {
+                                    return $item;
+                                }
+
+                                $changed = true;
+
+                                return CatalogImage::mergeItem($item, $metadata);
+                            })
+                            ->values()
+                            ->all();
+
+                        continue;
+                    }
+
+                    if ($collection !== 'files') {
+                        continue;
+                    }
+
+                    $files = collect($files)
+                        ->map(function (array $item) use ($src, $metadata, &$changed): array {
                             if (
                                 Arr::get($item, 'src') !== $src
                                 || !(bool) Arr::get($item, 'shared_from_variant_option', false)
@@ -311,7 +361,7 @@ class UpdateProduct
 
                             $changed = true;
 
-                            return ProductMedia::mergeItem($item, $metadata, $isImage);
+                            return ProductMedia::mergeItem($item, $metadata, false);
                         })
                         ->values()
                         ->all();
@@ -322,8 +372,8 @@ class UpdateProduct
                 }
 
                 $product->forceFill([
-                    'images' => $media['images'],
-                    'files' => $media['files'],
+                    'images' => $images,
+                    'files' => $files,
                 ]);
                 $product->save();
             });
@@ -333,11 +383,10 @@ class UpdateProduct
      * @param  array<int, string>  $existingIds
      * @return array<string, array<int, string>>
      */
-    private function collectMediaItemPayloadErrors(
+    private function collectFileItemPayloadErrors(
         mixed $items,
         string $attribute,
-        array $existingIds,
-        bool $isImage
+        array $existingIds
     ): array {
         if ($items === null) {
             return [];
@@ -351,8 +400,7 @@ class UpdateProduct
                 is_array($item) ? $item : [],
                 $attribute,
                 $index,
-                $existingIds,
-                $isImage
+                $existingIds
             );
         }
 
@@ -367,8 +415,7 @@ class UpdateProduct
         array $item,
         string $attribute,
         int $index,
-        array $existingIds,
-        bool $isImage
+        array $existingIds
     ): array {
         $hasId = is_string(Arr::get($item, 'id')) && Arr::get($item, 'id') !== '';
         $hasFile = Arr::get($item, 'file') instanceof UploadedFile;
@@ -386,10 +433,17 @@ class UpdateProduct
             $errors["{$attribute}.{$index}.file"] = ['Omit the file when updating an existing media item.'];
         }
 
-        if (!$isImage && array_key_exists('thumbnail', $item)) {
+        if (array_key_exists('thumbnail', $item)) {
             $errors["{$attribute}.{$index}.thumbnail"] = ['The thumbnail field is only supported for images.'];
         }
 
         return $errors;
+    }
+
+    private function isSharedVariantOptionImage(mixed $src): bool
+    {
+        return is_string($src)
+            && str_contains($src, '/variant_options/')
+            && str_contains($src, '/images/');
     }
 }

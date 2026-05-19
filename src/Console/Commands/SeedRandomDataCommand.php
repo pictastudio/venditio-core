@@ -1329,28 +1329,26 @@ class SeedRandomDataCommand extends Command
 
     private function buildProductMedia(string $name): array
     {
-        return ProductMedia::normalizeProductMedia(
-            [
+        return [
+            'images' => CatalogImage::normalizeCollection([
                 [
+                    'type' => 'thumb',
                     'name' => Str::slug($name) . '-hero.jpg',
                     'alt' => $name . ' hero',
                     'mimetype' => 'image/jpeg',
                     'src' => fake()->imageUrl(),
                     'sort_order' => 10,
-                    'active' => true,
-                    'thumbnail' => true,
                 ],
                 [
+                    'type' => 'cover',
                     'name' => Str::slug($name) . '-detail.jpg',
                     'alt' => $name . ' detail',
                     'mimetype' => 'image/jpeg',
                     'src' => fake()->imageUrl(),
                     'sort_order' => 20,
-                    'active' => true,
-                    'thumbnail' => false,
                 ],
-            ],
-            [
+            ]),
+            'files' => ProductMedia::normalizeCollection([
                 [
                     'name' => Str::slug($name) . '-spec-sheet.pdf',
                     'alt' => $name . ' spec sheet',
@@ -1359,8 +1357,8 @@ class SeedRandomDataCommand extends Command
                     'sort_order' => 10,
                     'active' => true,
                 ],
-            ]
-        );
+            ], isImage: false),
+        ];
     }
 
     private function buildCustomerSnapshot(?array $user): array

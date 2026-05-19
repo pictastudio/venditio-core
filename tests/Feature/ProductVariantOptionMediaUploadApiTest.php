@@ -79,12 +79,10 @@ it('uploads shared media for a variant option and appends it to matching variant
         $variant->forceFill([
             'images' => [[
                 'id' => "specific-image-{$variant->getKey()}",
+                'type' => 'thumb',
                 'alt' => 'Specific image',
                 'mimetype' => 'image/jpeg',
                 'sort_order' => 0,
-                'active' => true,
-                'thumbnail' => false,
-                'shared_from_variant_option' => false,
                 'src' => "products/{$variant->getKey()}/specific-image.jpg",
             ]],
             'files' => [[
@@ -107,7 +105,6 @@ it('uploads shared media for a variant option and appends it to matching variant
                 [
                     'file' => UploadedFile::fake()->image('red-front.jpg'),
                     'alt' => 'Red front',
-                    'thumbnail' => true,
                 ],
             ],
             'files' => [
@@ -120,8 +117,9 @@ it('uploads shared media for a variant option and appends it to matching variant
         ['Accept' => 'application/json']
     )->assertOk()
         ->assertJsonPath('meta.updated', $redVariants->count())
-        ->assertJsonPath('data.0.images.0.shared_from_variant_option', false)
-        ->assertJsonPath('data.0.images.1.shared_from_variant_option', true)
+        ->assertJsonPath('data.0.images.0.type', 'thumb')
+        ->assertJsonPath('data.0.images.1.type', null)
+        ->assertJsonMissingPath('data.0.images.1.shared_from_variant_option')
         ->assertJsonPath('data.0.files.0.shared_from_variant_option', false)
         ->assertJsonPath('data.0.files.1.shared_from_variant_option', true);
 
@@ -129,9 +127,10 @@ it('uploads shared media for a variant option and appends it to matching variant
         $variant->refresh();
 
         expect($variant->images)->toHaveCount(2)
-            ->and(data_get($variant->images, '0.shared_from_variant_option'))->toBeFalse()
-            ->and(data_get($variant->images, '1.shared_from_variant_option'))->toBeTrue()
-            ->and(data_get($variant->images, '1.thumbnail'))->toBeTrue()
+            ->and(data_get($variant->images, '0.type'))->toBe('thumb')
+            ->and(data_get($variant->images, '1.type'))->toBeNull()
+            ->and(data_get($variant->images, '1.shared_from_variant_option'))->toBeNull()
+            ->and(data_get($variant->images, '1.thumbnail'))->toBeNull()
             ->and((string) data_get($variant->images, '1.src'))->toStartWith("products/{$product->getKey()}/variant_options/{$red->getKey()}/images/")
             ->and($variant->files)->toHaveCount(2)
             ->and(data_get($variant->files, '0.shared_from_variant_option'))->toBeFalse()
@@ -154,7 +153,8 @@ it('uploads shared media for a variant option and appends it to matching variant
         ->assertJsonMissingPath('image')
         ->assertJsonCount(1, 'images')
         ->assertJsonPath('images.0.alt', 'Red front')
-        ->assertJsonPath('images.0.shared_from_variant_option', true);
+        ->assertJsonPath('images.0.type', null)
+        ->assertJsonMissingPath('images.0.shared_from_variant_option');
 
     expect((string) data_get($optionResponse->json(), 'images.0.src'))
         ->toContain("/storage/products/{$product->getKey()}/variant_options/{$red->getKey()}/images/");
@@ -248,9 +248,7 @@ it('propagates shared variant option image metadata updates to matching media co
             'alt' => 'Old alt',
             'mimetype' => 'image/jpeg',
             'sort_order' => 5,
-            'active' => true,
-            'thumbnail' => false,
-            'shared_from_variant_option' => true,
+            'type' => null,
             'src' => $sharedSrc,
         ]],
     ])->save();
@@ -272,9 +270,7 @@ it('propagates shared variant option image metadata updates to matching media co
             'alt' => 'Old alt',
             'mimetype' => 'image/jpeg',
             'sort_order' => 5,
-            'active' => true,
-            'thumbnail' => false,
-            'shared_from_variant_option' => true,
+            'type' => null,
             'src' => $sharedSrc,
         ]],
     ])->save();
@@ -285,7 +281,6 @@ it('propagates shared variant option image metadata updates to matching media co
             'name' => 'Red front',
             'alt' => 'Updated red front',
             'sort_order' => 1,
-            'thumbnail' => true,
         ]],
     ])->assertOk()
         ->assertJsonPath('images.0.name', 'Red front')
@@ -298,11 +293,13 @@ it('propagates shared variant option image metadata updates to matching media co
     expect(data_get($firstVariant->images, '0.name'))->toBe('Red front')
         ->and(data_get($firstVariant->images, '0.alt'))->toBe('Updated red front')
         ->and(data_get($firstVariant->images, '0.sort_order'))->toBe(1)
-        ->and(data_get($firstVariant->images, '0.thumbnail'))->toBeTrue()
+        ->and(data_get($firstVariant->images, '0.type'))->toBeNull()
+        ->and(data_get($firstVariant->images, '0.thumbnail'))->toBeNull()
         ->and(data_get($secondVariant->images, '0.name'))->toBe('Red front')
         ->and(data_get($secondVariant->images, '0.alt'))->toBe('Updated red front')
         ->and(data_get($secondVariant->images, '0.sort_order'))->toBe(1)
-        ->and(data_get($secondVariant->images, '0.thumbnail'))->toBeTrue();
+        ->and(data_get($secondVariant->images, '0.type'))->toBeNull()
+        ->and(data_get($secondVariant->images, '0.thumbnail'))->toBeNull();
 
     getJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}?include=variants,variants_options_table")
         ->assertOk()

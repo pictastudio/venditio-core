@@ -1,5 +1,5 @@
 meta {
-  name: Delete product media
+  name: Delete product file media
   type: http
   seq: 8
 }
@@ -22,7 +22,7 @@ headers {
 
 docs {
   summary:
-  - Delete a product image or file by its unique backend-generated media id.
+  - Delete a product file by its unique backend-generated media id.
 
   endpoint:
   - method: DELETE
@@ -30,10 +30,11 @@ docs {
 
   path params:
   - id-or-slug: Replace with target product identifier.
-  - media-id: Unique media id returned in the product `images` or `files` array.
+  - media-id: Unique media id returned in the product `files` array.
 
   behavior:
-  - Removes the matching entry from the product `images` or `files` collection.
+  - Removes the matching entry from the product `files` collection.
+  - Product images should use `DELETE /products/:id-or-slug/images/:image-id`; this legacy endpoint still accepts image ids for compatibility.
   - Returns `204 No Content` on success.
-  - Filesystem deletion is controlled by `VENDITIO_PRODUCT_MEDIA_DELETE_FILES_FROM_FILESYSTEM`.
+  - File filesystem deletion is controlled by `VENDITIO_PRODUCT_MEDIA_DELETE_FILES_FROM_FILESYSTEM`.
 }

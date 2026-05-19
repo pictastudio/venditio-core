@@ -7,7 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use PictaStudio\Venditio\Models\{Product, ProductVariantOption};
-use PictaStudio\Venditio\Support\ProductMedia;
+use PictaStudio\Venditio\Support\{CatalogImage, ProductMedia};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
@@ -24,19 +24,15 @@ class UploadProductVariantOptionMedia
         }
 
         $storedMedia = [
-            'images' => $this->storeSharedMediaCollection(
+            'images' => $this->storeSharedImageCollection(
                 Arr::get($payload, 'images'),
                 $product,
-                $productVariantOption,
-                'images',
-                true
+                $productVariantOption
             ),
-            'files' => $this->storeSharedMediaCollection(
+            'files' => $this->storeSharedFileCollection(
                 Arr::get($payload, 'files'),
                 $product,
-                $productVariantOption,
-                'files',
-                false
+                $productVariantOption
             ),
         ];
 
@@ -48,20 +44,21 @@ class UploadProductVariantOptionMedia
         }
 
         $matchingProducts->each(function (Product $matchingProduct) use ($storedMedia): void {
-            $normalizedMedia = ProductMedia::normalizeProductMedia(
-                $matchingProduct->getAttribute('images'),
-                $matchingProduct->getAttribute('files')
-            );
-            $usedIds = ProductMedia::collectUsedIds($normalizedMedia['images'], $normalizedMedia['files']);
+            $images = CatalogImage::normalizeCollection($matchingProduct->getAttribute('images'));
+            $files = ProductMedia::normalizeCollection($matchingProduct->getAttribute('files'), isImage: false);
+            $usedIds = array_values(array_unique([
+                ...CatalogImage::collectUsedIds($images),
+                ...ProductMedia::collectUsedIds($files),
+            ]));
 
             $matchingProduct->forceFill([
                 'images' => [
-                    ...$normalizedMedia['images'],
-                    ...$this->cloneMediaItems($storedMedia['images'], $normalizedMedia['images'], true, $usedIds),
+                    ...$images,
+                    ...$this->cloneImageItems($storedMedia['images'], $images, $usedIds),
                 ],
                 'files' => [
-                    ...$normalizedMedia['files'],
-                    ...$this->cloneMediaItems($storedMedia['files'], $normalizedMedia['files'], false, $usedIds),
+                    ...$files,
+                    ...$this->cloneFileItems($storedMedia['files'], $files, $usedIds),
                 ],
             ]);
             $matchingProduct->save();
@@ -89,23 +86,49 @@ class UploadProductVariantOptionMedia
             ->get();
     }
 
-    private function storeSharedMediaCollection(
+    private function storeSharedImageCollection(
         mixed $items,
         Product $product,
-        ProductVariantOption $productVariantOption,
-        string $folder,
-        bool $isImage
+        ProductVariantOption $productVariantOption
     ): array {
         $items = is_array($items) ? $items : [];
 
         return collect($items)
-            ->map(function (array $item, int $index) use ($product, $productVariantOption, $folder, $isImage): array {
+            ->map(function (array $item, int $index) use ($product, $productVariantOption): array {
                 /** @var UploadedFile $file */
                 $file = $item['file'];
 
                 return [
                     'src' => $file->store(
-                        "products/{$product->getKey()}/variant_options/{$productVariantOption->getKey()}/{$folder}",
+                        "products/{$product->getKey()}/variant_options/{$productVariantOption->getKey()}/images",
+                        'public'
+                    ),
+                    'type' => null,
+                    'alt' => Arr::get($item, 'alt'),
+                    'name' => Arr::get($item, 'name'),
+                    'mimetype' => Arr::get($item, 'mimetype', $file->getMimeType()),
+                    'sort_order' => CatalogImage::resolveSortOrder(Arr::get($item, 'sort_order'), $index),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function storeSharedFileCollection(
+        mixed $items,
+        Product $product,
+        ProductVariantOption $productVariantOption
+    ): array {
+        $items = is_array($items) ? $items : [];
+
+        return collect($items)
+            ->map(function (array $item, int $index) use ($product, $productVariantOption): array {
+                /** @var UploadedFile $file */
+                $file = $item['file'];
+
+                return [
+                    'src' => $file->store(
+                        "products/{$product->getKey()}/variant_options/{$productVariantOption->getKey()}/files",
                         'public'
                     ),
                     'alt' => Arr::get($item, 'alt'),
@@ -114,9 +137,6 @@ class UploadProductVariantOptionMedia
                     'sort_order' => ProductMedia::resolveSortOrder(Arr::get($item, 'sort_order'), $index),
                     'active' => ProductMedia::resolveBoolean(Arr::get($item, 'active'), true),
                     'shared_from_variant_option' => true,
-                    ...($isImage ? [
-                        'thumbnail' => ProductMedia::resolveBoolean(Arr::get($item, 'thumbnail'), false),
-                    ] : []),
                 ];
             })
             ->values()
@@ -129,7 +149,44 @@ class UploadProductVariantOptionMedia
      * @param  array<int, string>  $usedIds
      * @return array<int, array<string, mixed>>
      */
-    private function cloneMediaItems(array $items, array $currentItems, bool $isImage, array &$usedIds): array
+    private function cloneImageItems(array $items, array $currentItems, array &$usedIds): array
+    {
+        if ($items === []) {
+            return [];
+        }
+
+        $sharedSortOffset = collect($currentItems)
+            ->filter(fn (array $item): bool => $this->isSharedVariantOptionImage(Arr::get($item, 'src')))
+            ->max('sort_order');
+
+        $nextSortOrder = is_numeric($sharedSortOffset) ? ((int) $sharedSortOffset + 1) : 0;
+
+        return collect($items)
+            ->map(function (array $item) use (&$usedIds, &$nextSortOrder): array {
+                $sortOrder = CatalogImage::resolveSortOrder(Arr::get($item, 'sort_order'), $nextSortOrder);
+                $nextSortOrder++;
+
+                return [
+                    'id' => CatalogImage::generateUniqueId($usedIds),
+                    'type' => null,
+                    'src' => Arr::get($item, 'src'),
+                    'alt' => Arr::get($item, 'alt'),
+                    'name' => Arr::get($item, 'name'),
+                    'mimetype' => Arr::get($item, 'mimetype'),
+                    'sort_order' => $sortOrder,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $items
+     * @param  array<int, array<string, mixed>>  $currentItems
+     * @param  array<int, string>  $usedIds
+     * @return array<int, array<string, mixed>>
+     */
+    private function cloneFileItems(array $items, array $currentItems, array &$usedIds): array
     {
         if ($items === []) {
             return [];
@@ -142,7 +199,7 @@ class UploadProductVariantOptionMedia
         $nextSortOrder = is_numeric($sharedSortOffset) ? ((int) $sharedSortOffset + 1) : 0;
 
         return collect($items)
-            ->map(function (array $item) use (&$usedIds, &$nextSortOrder, $isImage): array {
+            ->map(function (array $item) use (&$usedIds, &$nextSortOrder): array {
                 $sortOrder = ProductMedia::resolveSortOrder(Arr::get($item, 'sort_order'), $nextSortOrder);
                 $nextSortOrder++;
 
@@ -155,12 +212,16 @@ class UploadProductVariantOptionMedia
                     'sort_order' => $sortOrder,
                     'active' => ProductMedia::resolveBoolean(Arr::get($item, 'active'), true),
                     'shared_from_variant_option' => true,
-                    ...($isImage ? [
-                        'thumbnail' => ProductMedia::resolveBoolean(Arr::get($item, 'thumbnail'), false),
-                    ] : []),
                 ];
             })
             ->values()
             ->all();
+    }
+
+    private function isSharedVariantOptionImage(mixed $src): bool
+    {
+        return is_string($src)
+            && str_contains($src, '/variant_options/')
+            && str_contains($src, '/images/');
     }
 }

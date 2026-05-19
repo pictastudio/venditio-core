@@ -18,6 +18,7 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show',
 Route::get('products/{product}/related_products', [ProductController::class, 'relatedProducts'])->name('products.relatedProducts');
 Route::get('products/{product}/variants', [ProductController::class, 'variants'])->name('products.variants');
 Route::post('products/{product}/variants', [ProductController::class, 'createVariants'])->name('products.createVariants');
+Route::delete('products/{product}/images/{imageId}', [ProductController::class, 'destroyImage'])->name('products.images.destroy');
 Route::delete('products/{product}/media/{mediaId}', [ProductController::class, 'destroyMedia'])->name('products.media.destroy');
 Route::post('product/{product}/{productVariantOption}/upload', [ProductController::class, 'uploadVariantOptionMedia'])->name('product.variantOptionMedia.upload');
 

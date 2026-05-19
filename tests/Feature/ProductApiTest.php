@@ -1081,9 +1081,7 @@ it('includes variants and variants options table when requested', function () {
             'alt' => 'Shared red image',
             'mimetype' => 'image/jpeg',
             'sort_order' => 0,
-            'active' => true,
-            'thumbnail' => true,
-            'shared_from_variant_option' => true,
+            'type' => null,
             'src' => "products/{$product->getKey()}/variant_options/{$red->getKey()}/images/red-shared.jpg",
         ]],
     ])->save();
@@ -1164,9 +1162,7 @@ it('scopes shared variant option images to the requested product variants option
             'alt' => 'First product porpora',
             'mimetype' => 'image/jpeg',
             'sort_order' => 0,
-            'active' => true,
-            'thumbnail' => true,
-            'shared_from_variant_option' => true,
+            'type' => null,
             'src' => "products/{$firstProduct->getKey()}/variant_options/{$porpora->getKey()}/images/porpora.jpg",
         ]],
     ])->save();

@@ -26,7 +26,6 @@ body:multipart-form {
   images[0][name]: Red front
   images[0][alt]: Red front
   images[0][sort_order]: 0
-  images[0][thumbnail]: true
   files[0][file]: @file(/absolute/path/to/manual.pdf)
   files[0][name]: Red manual
   files[0][alt]: Red manual
@@ -53,8 +52,6 @@ docs {
   - images.*.name
   - images.*.mimetype
   - images.*.sort_order
-  - images.*.active
-  - images.*.thumbnail
   - files (array)
   - files.*.file
   - files.*.alt
@@ -66,7 +63,7 @@ docs {
   behavior:
   - Files are stored under `products/{product_id}/variant_options/{variant_option_id}/...`.
   - Media is appended to all products matching the variant option.
-  - Uploaded media is automatically marked as `shared_from_variant_option=true`.
-  - In API responses, variant-specific media stays before shared variant-option media.
+  - Uploaded images are stored as generic product catalog images with `type=null`.
+  - Uploaded files keep product file media metadata and are marked as shared variant-option files internally.
   - In product `variants_options_table` responses, option images are scoped to the requested product.
 }
