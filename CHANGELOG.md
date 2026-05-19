@@ -2,6 +2,37 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.9.0 - 2026-05-19
+
+### What's Changed
+
+This minor release adds Laravel 13 compatibility, aligns product media storage with catalog images, and expands discount behavior with highlighted catalog flags, standalone discounts, and fixed-price discounts.
+
+### Features
+
+- **Catalog image backed product media** - Product image uploads now normalize into catalog image collections, including the legacy product media delete path and shared variant option media copies.
+- **Highlighted catalog fields** - Renamed the catalog `in_evidence` flag to `highlighted` across products, brands, categories, and tags, including migrations, API payloads, docs, DBML, factories, tests, and Bruno requests.
+- **Standalone discounts** - Replaced the previous stop-after-propagation behavior with `standalone` discounts that can be evaluated against cumulative discount stacks.
+- **Fixed-price discounts** - Added `fixed_price` discount support for product-scoped discounts, including validation, resources, pipelines, factories, and request examples.
+
+### Fixes
+
+- Preserved Venditio’s default-locale base column sync when using the newer translatable package, keeping translated slug update responses stable.
+- Avoided Laravel 13 model boot recursion in ordered tree models by assigning tree paths after inserts.
+- Re-merged nested package config after Laravel 13/Testbench boot-time config overrides so partial host config continues to inherit defaults.
+
+### Tooling
+
+- Added Laravel 13 support to the Illuminate constraint and updated the dev stack for Orchestra Testbench 11, Pest Laravel 4.1, Collision 8.9.4, and Laravel 13-compatible Larastan.
+- Updated Bruno requests for product media, highlighted catalog fields, and discount payload examples.
+
+### Tests
+
+- Added/updated coverage for catalog-image product media, highlighted fields, standalone and fixed-price discounts, and Laravel 13 compatibility behavior.
+- Verified the package test suite against Laravel 13 with `composer test -- --colors=never`.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.8.5...v2.9.0
+
 ## v2.8.5 - 2026-05-14
 
 ### What's Changed
