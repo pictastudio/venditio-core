@@ -27,4 +27,9 @@ trait HasOrderedTreeStructure
             ->orderBy($this->qualifyColumn('sort_order'))
             ->orderBy($this->getQualifiedKeyName());
     }
+
+    protected static function shouldAssignPathDuringInsert(): bool
+    {
+        return false;
+    }
 }

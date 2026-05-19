@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
-use PictaStudio\Translatable\Translatable;
 use PictaStudio\Venditio\Models\Scopes\Ordered;
-use PictaStudio\Venditio\Models\Traits\HasHelperMethods;
+use PictaStudio\Venditio\Models\Traits\{HasHelperMethods, VenditioTranslatable};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
@@ -17,7 +16,7 @@ class ProductVariant extends Model implements TranslatableContract
     use HasFactory;
     use HasHelperMethods;
     use SoftDeletes;
-    use Translatable;
+    use VenditioTranslatable;
 
     public array $translatedAttributes = ['name'];
 

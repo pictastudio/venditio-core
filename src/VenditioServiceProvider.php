@@ -133,10 +133,14 @@ class VenditioServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->mergeVenditioConfig();
+        $this->app->booted(function (): void {
+            $this->mergeVenditioConfig();
+        });
     }
 
     public function packageBooted(): void
     {
+        $this->mergeVenditioConfig();
         $this->registerExcelProvider();
         $this->registerDomPdfProvider();
         $this->registerPublishableAssets();

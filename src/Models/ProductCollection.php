@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsToMany, MorphToMany};
 use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
-use PictaStudio\Translatable\Translatable;
 use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange};
-use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug};
+use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug, VenditioTranslatable};
 use PictaStudio\Venditio\Support\CatalogImage;
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
@@ -23,7 +22,7 @@ class ProductCollection extends Model implements TranslatableContract
     use LogsActivity;
     use ResolvesRouteBindingByIdOrSlug;
     use SoftDeletes;
-    use Translatable;
+    use VenditioTranslatable;
 
     public array $translatedAttributes = ['name', 'slug', 'description'];
 
