@@ -2,6 +2,26 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.9.2 - 2026-05-29
+
+### What's Changed
+
+This patch release makes product-side collection syncing respect collection ordering by appending newly attached products to each collection's current ordered list instead of defaulting new pivot rows to zero.
+
+### Fixes
+
+- **Product collection sync ordering** - Updating a product with `collection_ids` now preserves existing collection-product sort values and assigns newly attached collections the current max `sort_order` plus one.
+
+### Tooling
+
+- Updated the API reference and Bruno product update request to document how product-side `collection_ids` assigns collection product ordering.
+
+### Tests
+
+- Added product API coverage for assigning max-plus-one sort values to newly attached collections and preserving existing pivot sort values during sync.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.9.1...v2.9.2
+
 ## v2.9.1 - 2026-05-29
 
 ### What's Changed
