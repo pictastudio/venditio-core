@@ -4,6 +4,7 @@ namespace PictaStudio\Venditio\Actions\Products;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use PictaStudio\Venditio\Models\Product;
 use PictaStudio\Venditio\Support\{CatalogImage, ProductMedia};
@@ -47,7 +48,7 @@ class UpdateProduct
         }
 
         if ($collectionIdsProvided) {
-            $product->collections()->sync($collectionIds ?? []);
+            $this->syncCollections($product, $collectionIds ?? []);
         }
 
         if ($tagIdsProvided) {
@@ -82,6 +83,60 @@ class UpdateProduct
             ->all();
 
         $product->relatedProducts()->sync($syncPayload);
+    }
+
+    private function syncCollections(Product $product, array $collectionIds): void
+    {
+        $collectionIds = collect($collectionIds)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($collectionIds->isEmpty()) {
+            $product->collections()->sync([]);
+
+            return;
+        }
+
+        $relation = $product->collections();
+        $pivotTable = $relation->getTable();
+        $productPivotKey = $relation->getForeignPivotKeyName();
+        $collectionPivotKey = $relation->getRelatedPivotKeyName();
+
+        $existingSortOrders = DB::table($pivotTable)
+            ->where($productPivotKey, $product->getKey())
+            ->whereIn($collectionPivotKey, $collectionIds->all())
+            ->pluck('sort_order', $collectionPivotKey);
+
+        $newCollectionIds = $collectionIds
+            ->reject(fn (int $collectionId): bool => $existingSortOrders->has($collectionId))
+            ->values();
+
+        $maxSortOrders = $newCollectionIds->isEmpty()
+            ? collect()
+            : DB::table($pivotTable)
+                ->whereIn($collectionPivotKey, $newCollectionIds->all())
+                ->select($collectionPivotKey, DB::raw('MAX(sort_order) as max_sort_order'))
+                ->groupBy($collectionPivotKey)
+                ->pluck('max_sort_order', $collectionPivotKey);
+
+        $syncPayload = $collectionIds
+            ->mapWithKeys(function (int $collectionId) use ($existingSortOrders, $maxSortOrders): array {
+                if ($existingSortOrders->has($collectionId)) {
+                    return [
+                        $collectionId => ['sort_order' => (int) $existingSortOrders->get($collectionId)],
+                    ];
+                }
+
+                $maxSortOrder = $maxSortOrders->get($collectionId);
+
+                return [
+                    $collectionId => ['sort_order' => $maxSortOrder === null ? 0 : (int) $maxSortOrder + 1],
+                ];
+            })
+            ->all();
+
+        $product->collections()->sync($syncPayload);
     }
 
     private function validateTagProductTypeCompatibility(array $tagIds, mixed $productTypeId): void

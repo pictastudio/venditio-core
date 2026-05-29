@@ -328,8 +328,18 @@ it('updates product collections when provided', function () {
         'visible_from' => null,
         'visible_until' => null,
     ]);
+    $otherProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
 
-    $product->collections()->sync([$collection->getKey()]);
+    $product->collections()->sync([
+        $collection->getKey() => ['sort_order' => 7],
+    ]);
+    $otherCollection->products()->sync([
+        $otherProduct->getKey() => ['sort_order' => 11],
+    ]);
 
     patchJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
         'collection_ids' => [$otherCollection->getKey()],
@@ -342,6 +352,44 @@ it('updates product collections when provided', function () {
     assertDatabaseHas('product_collection_product', [
         'product_id' => $product->getKey(),
         'product_collection_id' => $otherCollection->getKey(),
+        'sort_order' => 12,
+    ]);
+});
+
+it('preserves existing product collection sort_order when syncing collection ids', function () {
+    $product = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $existingCollection = ProductCollection::factory()->create();
+    $newCollection = ProductCollection::factory()->create();
+    $otherProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $product->collections()->sync([
+        $existingCollection->getKey() => ['sort_order' => 4],
+    ]);
+    $newCollection->products()->sync([
+        $otherProduct->getKey() => ['sort_order' => 2],
+    ]);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . "/products/{$product->getKey()}", [
+        'collection_ids' => [$existingCollection->getKey(), $newCollection->getKey()],
+    ])->assertOk();
+
+    assertDatabaseHas('product_collection_product', [
+        'product_id' => $product->getKey(),
+        'product_collection_id' => $existingCollection->getKey(),
+        'sort_order' => 4,
+    ]);
+    assertDatabaseHas('product_collection_product', [
+        'product_id' => $product->getKey(),
+        'product_collection_id' => $newCollection->getKey(),
+        'sort_order' => 3,
     ]);
 });
 

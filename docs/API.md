@@ -134,7 +134,7 @@ Product categories and product collections accept a nullable `metadata` object f
 
 Product categories and tags use branch-scoped `sort_order` values for tree ordering. API write payloads require `sort_order >= 1`; duplicate values are allowed and are returned deterministically by primary key as a tie-breaker.
 
-Products accept `related_product_ids` in write payloads to sync directional, manually curated related products. Products, product categories, product collections, brands, and tags accept `tag_ids` in write payloads where supported; the IDs are synced to the resource through the `taggables` polymorphic association.
+Products accept `related_product_ids` in write payloads to sync directional, manually curated related products. Product update payloads accept `collection_ids`; newly attached collection products receive the collection's current max `sort_order` plus one, while existing collection-product sort values are preserved. Products, product categories, product collections, brands, and tags accept `tag_ids` in write payloads where supported; the IDs are synced to the resource through the `taggables` polymorphic association.
 
 Product collection update payloads accept `products` as an ordered array of `{id, sort_order}` objects. When present it syncs the collection products; omitting `products` leaves current associations unchanged, while `products: []` clears them. `include=products` returns products ordered by collection `sort_order` and exposes that value on each included product.
 
