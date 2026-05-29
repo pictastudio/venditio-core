@@ -62,8 +62,14 @@ class ProductCollection extends Model implements TranslatableContract
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(resolve_model('product'), 'product_collection_product')
-            ->withTimestamps();
+        $productModel = resolve_model('product');
+        $product = new $productModel;
+
+        return $this->belongsToMany($productModel, 'product_collection_product')
+            ->withPivot('sort_order')
+            ->withTimestamps()
+            ->orderByPivot('sort_order')
+            ->orderBy($product->qualifyColumn($product->getKeyName()));
     }
 
     public function tags(): MorphToMany

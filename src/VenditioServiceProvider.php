@@ -86,6 +86,7 @@ class VenditioServiceProvider extends PackageServiceProvider
                 'update_tags_images_to_collection',
                 'create_product_category_product_table',
                 'create_product_collection_product_table',
+                'update_product_collection_product_add_sort_order',
                 'create_taggables_table',
                 'create_product_variants_table',
                 'update_product_variants_add_accept_hex_color',

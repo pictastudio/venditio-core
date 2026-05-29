@@ -221,6 +221,142 @@ it('includes products and discounts on product collections api when requested', 
         ->assertJsonPath('discounts.0.code', 'COL10');
 });
 
+it('syncs ordered products when updating a product collection', function () {
+    $collection = ProductCollection::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    [$firstProduct, $secondProduct, $thirdProduct] = Product::factory()
+        ->count(3)
+        ->create([
+            'status' => ProductStatus::Published,
+            'active' => true,
+            'visible_from' => null,
+            'visible_until' => null,
+        ])
+        ->all();
+
+    patchJson(config('venditio.routes.api.v1.prefix') . "/product_collections/{$collection->getKey()}?include=products", [
+        'products' => [
+            ['id' => $thirdProduct->getKey(), 'sort_order' => 20],
+            ['id' => $secondProduct->getKey(), 'sort_order' => 10],
+            ['id' => $firstProduct->getKey(), 'sort_order' => 10],
+        ],
+    ])->assertOk()
+        ->assertJsonPath('products.0.id', $firstProduct->getKey())
+        ->assertJsonPath('products.0.sort_order', 10)
+        ->assertJsonPath('products.1.id', $secondProduct->getKey())
+        ->assertJsonPath('products.1.sort_order', 10)
+        ->assertJsonPath('products.2.id', $thirdProduct->getKey())
+        ->assertJsonPath('products.2.sort_order', 20);
+
+    assertDatabaseHas('product_collection_product', [
+        'product_collection_id' => $collection->getKey(),
+        'product_id' => $firstProduct->getKey(),
+        'sort_order' => 10,
+    ]);
+    assertDatabaseHas('product_collection_product', [
+        'product_collection_id' => $collection->getKey(),
+        'product_id' => $secondProduct->getKey(),
+        'sort_order' => 10,
+    ]);
+    assertDatabaseHas('product_collection_product', [
+        'product_collection_id' => $collection->getKey(),
+        'product_id' => $thirdProduct->getKey(),
+        'sort_order' => 20,
+    ]);
+});
+
+it('preserves and clears product collection products based on update payload presence', function () {
+    $collection = ProductCollection::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $product = Product::factory()->create([
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $collection->products()->sync([
+        $product->getKey() => ['sort_order' => 7],
+    ]);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . "/product_collections/{$collection->getKey()}", [
+        'name' => 'Renamed collection',
+    ])->assertOk();
+
+    assertDatabaseHas('product_collection_product', [
+        'product_collection_id' => $collection->getKey(),
+        'product_id' => $product->getKey(),
+        'sort_order' => 7,
+    ]);
+
+    patchJson(config('venditio.routes.api.v1.prefix') . "/product_collections/{$collection->getKey()}?include=products", [
+        'products' => [],
+    ])->assertOk()
+        ->assertJsonPath('products', []);
+
+    assertDatabaseMissing('product_collection_product', [
+        'product_collection_id' => $collection->getKey(),
+        'product_id' => $product->getKey(),
+    ]);
+});
+
+it('validates ordered product collection products on update', function () {
+    $collection = ProductCollection::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $product = Product::factory()->create([
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $endpoint = config('venditio.routes.api.v1.prefix') . "/product_collections/{$collection->getKey()}";
+
+    patchJson($endpoint, [
+        'products' => [
+            ['sort_order' => 0],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['products.0.id']);
+
+    patchJson($endpoint, [
+        'products' => [
+            ['id' => 999_999, 'sort_order' => 0],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['products.0.id']);
+
+    patchJson($endpoint, [
+        'products' => [
+            ['id' => $product->getKey(), 'sort_order' => 0],
+            ['id' => $product->getKey(), 'sort_order' => 1],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['products.0.id']);
+
+    patchJson($endpoint, [
+        'products' => [
+            ['id' => $product->getKey()],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['products.0.sort_order']);
+
+    patchJson($endpoint, [
+        'products' => [
+            ['id' => $product->getKey(), 'sort_order' => -1],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['products.0.sort_order']);
+});
+
 it('uploads product collection images as a typed images collection on update', function () {
     Storage::fake('public');
 

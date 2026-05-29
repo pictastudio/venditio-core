@@ -122,6 +122,7 @@ class Product extends Model implements TranslatableContract
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(resolve_model('product_collection'), 'product_collection_product')
+            ->withPivot('sort_order')
             ->withTimestamps();
     }
 

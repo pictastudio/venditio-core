@@ -12,8 +12,10 @@ class UpdateProductCollection
     {
         $imagesProvided = array_key_exists('images', $payload);
         $tagIdsProvided = array_key_exists('tag_ids', $payload);
+        $productsProvided = array_key_exists('products', $payload);
         $images = Arr::pull($payload, 'images');
         $tagIds = Arr::pull($payload, 'tag_ids', []);
+        $products = Arr::pull($payload, 'products', []);
 
         if ($imagesProvided) {
             $currentImages = CatalogImage::normalizeCollection($collection->getAttribute('images'));
@@ -29,6 +31,21 @@ class UpdateProductCollection
             $collection->tags()->sync($tagIds ?? []);
         }
 
+        if ($productsProvided) {
+            $this->syncProducts($collection, $products ?? []);
+        }
+
         return $collection->refresh()->load('tags');
+    }
+
+    private function syncProducts(ProductCollection $collection, array $products): void
+    {
+        $syncPayload = collect($products)
+            ->mapWithKeys(fn (array $product): array => [
+                (int) $product['id'] => ['sort_order' => (int) $product['sort_order']],
+            ])
+            ->all();
+
+        $collection->products()->sync($syncPayload);
     }
 }

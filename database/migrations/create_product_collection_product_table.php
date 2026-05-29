@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(ProductCollection::class);
             $table->foreignIdFor(Product::class);
+            $table->unsignedInteger('sort_order')->default(0);
             $table->datetimes();
         });
     }
