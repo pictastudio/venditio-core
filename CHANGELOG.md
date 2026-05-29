@@ -2,6 +2,26 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.9.1 - 2026-05-29
+
+### What's Changed
+
+This patch release adds ordered product associations to product collections, allowing collection edit payloads to sync products with explicit sort numbers while keeping existing product-side collection behavior compatible.
+
+### Features
+
+- **Ordered collection products** - Product collection updates now accept `products` items with `id` and `sort_order`, persist that value on the collection-product pivot, and return included products in collection order with the ordering value exposed.
+
+### Tooling
+
+- Updated the API reference, DBML schema, and Bruno product collection update request to document the ordered products payload.
+
+### Tests
+
+- Added product collection API coverage for ordered product syncing, omitted-versus-empty product payload semantics, response ordering, and validation errors.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.9.0...v2.9.1
+
 ## v2.9.0 - 2026-05-19
 
 ### What's Changed
