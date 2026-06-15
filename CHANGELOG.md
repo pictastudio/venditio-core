@@ -2,6 +2,30 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.9.3 - 2026-06-15
+
+### What's Changed
+
+This patch release makes the orders index lean by default by removing automatic relationship eager loads from list responses while keeping detail and write responses rich, with explicit includes available when callers need the heavier payload.
+
+### Features
+
+- **Order relation includes** - `GET /orders` now supports `include=lines,shipping_method,shipping_status,shipping_zone,user` so callers can opt into relationship payloads intentionally.
+
+### Fixes
+
+- **Lean orders index** - `GET /orders` no longer loads order lines, shipping methods, or shipping zones by default, reducing unnecessary relationship queries for common list requests.
+
+### Tooling
+
+- Updated the API reference and Bruno order list/show requests to document the lean orders index behavior and supported order includes.
+
+### Tests
+
+- Added order API coverage proving the default index omits heavy relationships and avoids querying relation tables, while explicit includes restore those payloads.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.9.2...v2.9.3
+
 ## v2.9.2 - 2026-05-29
 
 ### What's Changed
