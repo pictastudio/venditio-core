@@ -35,7 +35,7 @@ class OrderController extends Controller
 
         return OrderResource::collection(
             $this->applyBaseFilters(
-                query('order')->with($this->orderRelationsForIncludes($includes)),
+                query('order')->with($this->orderIndexRelationsForIncludes($includes)),
                 $filters,
                 'order'
             )
@@ -90,16 +90,47 @@ class OrderController extends Controller
 
     protected function resolveOrderIncludes(): array
     {
-        return $this->resolveIncludes($this->allowedIncludesWithDiscounts());
+        return $this->resolveIncludes($this->allowedIncludesWithDiscounts([
+            'lines',
+            'shipping_method',
+            'shipping_status',
+            'shipping_zone',
+            'user',
+        ]));
+    }
+
+    protected function orderIndexRelationsForIncludes(array $includes): array
+    {
+        return $this->includedOrderRelations($includes);
     }
 
     protected function orderRelationsForIncludes(array $includes): array
     {
-        return [
+        return collect([
             'lines',
             'shippingMethod',
             'shippingZone',
-            ...$this->discountRelationsForIncludes($includes),
-        ];
+        ])
+            ->merge($this->includedOrderRelations($includes))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    protected function includedOrderRelations(array $includes): array
+    {
+        return collect([
+            'lines' => 'lines',
+            'shipping_method' => 'shippingMethod',
+            'shipping_status' => 'shippingStatus',
+            'shipping_zone' => 'shippingZone',
+            'user' => 'user',
+        ])
+            ->filter(fn (string $relation, string $include): bool => in_array($include, $includes, true))
+            ->values()
+            ->merge($this->discountRelationsForIncludes($includes))
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -66,7 +66,10 @@ Include parameters:
 - `/product_collections`: `include=products,products_count,tags,discounts,valid_discounts,expired_discounts`
 - `/price_list_prices`: `include=product`
 - `/wishlists`: `include=user,items,items.product,products,products_count`
-- `/brands`, `/product_categories`, `/product_types`, `/tags`, `/carts`, `/cart_lines`, `/orders`, `/order_lines`: `include=discounts,valid_discounts,expired_discounts`
+- `/brands`, `/product_categories`, `/product_types`, `/tags`, `/carts`, `/cart_lines`, `/order_lines`: `include=discounts,valid_discounts,expired_discounts`
+- `/orders`: `include=lines,shipping_method,shipping_status,shipping_zone,user,discounts,valid_discounts,expired_discounts`
+  - `GET /orders` is lean by default and only returns relationship payloads when requested through `include`
+  - `GET /orders/{order}`, `POST /orders`, and `PATCH /orders/{order}` keep returning `lines`, `shipping_method`, and `shipping_zone` by default
   - `discounts` returns all non-deleted discounts scoped to that resource, including inactive, future, currently valid, and expired rows
   - `valid_discounts` returns date-valid active discounts only (`active=true`, `starts_at <= now`, and `ends_at` is null or in the future)
   - `expired_discounts` returns discounts with `ends_at < now`
