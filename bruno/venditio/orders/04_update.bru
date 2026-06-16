@@ -26,6 +26,7 @@ headers {
 body:json {
   {
     "shipping_status_id": 1,
+    "payment_method_id": 1,
     "shipping_method_id": 1,
     "shipping_zone_id": 1,
     "status": "completed",
@@ -53,7 +54,7 @@ docs {
   - path: /orders/:id
 
   query params:
-  - include (string|array): Optional includes: discounts, valid_discounts, expired_discounts.
+  - include (string|array): Optional includes: payment_method, discounts, valid_discounts, expired_discounts.
 
   path params:
   - id: Replace with target resource identifier.
@@ -63,6 +64,7 @@ docs {
   - Available fields:
   - user_id
   - shipping_status_id
+  - payment_method_id
   - shipping_method_id
   - shipping_zone_id
   - status

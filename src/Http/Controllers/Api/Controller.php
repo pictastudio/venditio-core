@@ -674,6 +674,7 @@ class Controller extends BaseController
             'order' => [
                 'user_id' => 'integer',
                 'shipping_status_id' => 'integer',
+                'payment_method_id' => 'integer',
                 'shipping_method_id' => 'integer',
                 'shipping_zone_id' => 'integer',
                 'identifier' => 'string',
@@ -904,6 +905,16 @@ class Controller extends BaseController
             'shipping_status' => [
                 'external_code' => 'string',
                 'name' => 'string',
+                'created_at' => 'date',
+                'updated_at' => 'date',
+                'deleted_at' => 'date',
+            ],
+            'payment_method' => [
+                'code' => 'string',
+                'name' => 'string',
+                'active' => 'boolean',
+                'flat_fee' => 'numeric',
+                'description' => 'string',
                 'created_at' => 'date',
                 'updated_at' => 'date',
                 'deleted_at' => 'date',

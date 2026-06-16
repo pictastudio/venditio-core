@@ -92,6 +92,7 @@ class OrderController extends Controller
     {
         return $this->resolveIncludes($this->allowedIncludesWithDiscounts([
             'lines',
+            'payment_method',
             'shipping_method',
             'shipping_status',
             'shipping_zone',
@@ -108,6 +109,7 @@ class OrderController extends Controller
     {
         return collect([
             'lines',
+            'paymentMethod',
             'shippingMethod',
             'shippingZone',
         ])
@@ -121,6 +123,7 @@ class OrderController extends Controller
     {
         return collect([
             'lines' => 'lines',
+            'payment_method' => 'paymentMethod',
             'shipping_method' => 'shippingMethod',
             'shipping_status' => 'shippingStatus',
             'shipping_zone' => 'shippingZone',

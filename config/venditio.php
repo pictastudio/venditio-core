@@ -61,6 +61,7 @@ return [
         'municipality' => Models\Municipality::class,
         'order' => Models\Order::class,
         'order_line' => Models\OrderLine::class,
+        'payment_method' => Models\PaymentMethod::class,
         'province' => Models\Province::class,
         'product' => Models\Product::class,
         'product_category' => Models\ProductCategory::class,

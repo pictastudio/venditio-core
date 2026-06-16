@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use PictaStudio\Venditio\Http\Resources\Traits\{CanTransformAttributes, HasAttributesToExclude};
 
-class OrderResource extends JsonResource
+class PaymentMethodResource extends JsonResource
 {
     use CanTransformAttributes;
     use HasAttributesToExclude;
@@ -27,15 +27,7 @@ class OrderResource extends JsonResource
     protected function getRelationshipsToInclude(): array
     {
         return [
-            'user' => UserResource::make($this->whenLoaded('user')),
-            'payment_method' => PaymentMethodResource::make($this->whenLoaded('paymentMethod')),
-            'shipping_method' => ShippingMethodResource::make($this->whenLoaded('shippingMethod')),
-            'shipping_status' => ShippingStatusResource::make($this->whenLoaded('shippingStatus')),
-            'shipping_zone' => ShippingZoneResource::make($this->whenLoaded('shippingZone')),
-            'lines' => OrderLineResource::collection($this->whenLoaded('lines')),
-            'discounts' => DiscountResource::collection($this->whenLoaded('discounts')),
-            'valid_discounts' => DiscountResource::collection($this->whenLoaded('validDiscounts')),
-            'expired_discounts' => DiscountResource::collection($this->whenLoaded('expiredDiscounts')),
+            'orders' => OrderResource::collection($this->whenLoaded('orders')),
         ];
     }
 

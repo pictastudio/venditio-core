@@ -4,7 +4,7 @@ namespace PictaStudio\Venditio\Http\Resources\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
-use PictaStudio\Venditio\Http\Resources\V1\{AddressResource, BrandResource, CartLineResource, CartResource, CountryResource, CountryTaxClassResource, CreditNoteResource, CurrencyResource, DiscountApplicationResource, DiscountResource, FreeGiftResource, InventoryResource, InvoiceResource, MunicipalityResource, OrderLineResource, OrderResource, PriceListPriceResource, PriceListResource, ProductCategoryResource, ProductCollectionResource, ProductCustomFieldResource, ProductResource, ProductTypeResource, ProductVariantOptionResource, ProductVariantResource, ProvinceResource, RegionResource, ReturnReasonResource, ReturnRequestResource, ShippingMethodResource, ShippingMethodZoneResource, ShippingStatusResource, ShippingZoneResource, TaxClassResource, UserResource};
+use PictaStudio\Venditio\Http\Resources\V1\{AddressResource, BrandResource, CartLineResource, CartResource, CountryResource, CountryTaxClassResource, CreditNoteResource, CurrencyResource, DiscountApplicationResource, DiscountResource, FreeGiftResource, InventoryResource, InvoiceResource, MunicipalityResource, OrderLineResource, OrderResource, PaymentMethodResource, PriceListPriceResource, PriceListResource, ProductCategoryResource, ProductCollectionResource, ProductCustomFieldResource, ProductResource, ProductTypeResource, ProductVariantOptionResource, ProductVariantResource, ProvinceResource, RegionResource, ReturnReasonResource, ReturnRequestResource, ShippingMethodResource, ShippingMethodZoneResource, ShippingStatusResource, ShippingZoneResource, TaxClassResource, UserResource};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
@@ -42,6 +42,7 @@ trait ResolvesModelResource
             'municipality' => MunicipalityResource::class,
             'order' => OrderResource::class,
             'order_line' => OrderLineResource::class,
+            'payment_method' => PaymentMethodResource::class,
             'price_list' => PriceListResource::class,
             'price_list_price' => PriceListPriceResource::class,
             'product' => ProductResource::class,

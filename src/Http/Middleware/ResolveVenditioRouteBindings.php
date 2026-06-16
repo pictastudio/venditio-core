@@ -66,6 +66,7 @@ class ResolveVenditioRouteBindings
             'municipality' => 'municipality',
             'order' => 'order',
             'order_line' => 'order_line',
+            'payment_method' => 'payment_method',
             'price_list' => 'price_list',
             'price_list_price' => 'price_list_price',
             'product' => 'product',

@@ -58,6 +58,11 @@ class Order extends Model
         return $this->belongsTo(resolve_model('shipping_status'));
     }
 
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(resolve_model('payment_method'));
+    }
+
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(resolve_model('shipping_method'));

@@ -1,0 +1,28 @@
+meta {
+  name: Update payment_methods
+  type: http
+  seq: 121
+}
+
+patch {
+  url: {{baseUrl}}/payment_methods/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Credit Card Updated",
+    "flat_fee": 3.5,
+    "description": null
+  }
+}

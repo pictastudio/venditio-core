@@ -20,6 +20,7 @@ params:query {
   ~search: sample
   ~user_id: 1
   ~shipping_status_id: 1
+  ~payment_method_id: 1
   ~identifier: sample
   ~status: sample
   ~tracking_code: sample
@@ -55,7 +56,7 @@ params:query {
   ~deleted_at_end: 2026-12-31
   ~with_trashed: 0
   ~only_trashed: 0
-  ~include: lines,shipping_method,shipping_status,shipping_zone,user,discounts,valid_discounts,expired_discounts
+  ~include: lines,payment_method,shipping_method,shipping_status,shipping_zone,user,discounts,valid_discounts,expired_discounts
 }
 
 headers {
@@ -81,6 +82,7 @@ docs {
   - search (string): Case-insensitive partial search across identifier, user_first_name, user_last_name, and user_email.
   - user_id (integer): Exact-match filter for user_id.
   - shipping_status_id (integer): Exact-match filter for shipping_status_id.
+  - payment_method_id (integer): Exact-match filter for payment_method_id.
   - identifier (string): Exact-match filter for identifier.
   - status (string): Exact-match filter for status.
   - tracking_code (string): Exact-match filter for tracking_code.

@@ -287,6 +287,7 @@ Table orders {
   id bigint [pk, increment, not null]
   user_id bigint [ref: > users.id, note: 'nullable (guest checkout supported by host app)']
   shipping_status_id bigint [ref: > shipping_statuses.id]
+  payment_method_id bigint [ref: > payment_methods.id]
   identifier varchar(100) [not null, unique]
   status varchar(50) [not null]
   tracking_code varchar(150)
@@ -315,6 +316,18 @@ Table orders {
   Indexes {
     status
   }
+}
+
+Table payment_methods {
+  id bigint [pk, increment, not null]
+  code varchar(100) [not null, unique]
+  name varchar(255) [not null]
+  active boolean [not null, default: true]
+  flat_fee decimal(10,2) [not null, default: 0]
+  description text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted_at datetime
 }
 
 Table return_reasons {

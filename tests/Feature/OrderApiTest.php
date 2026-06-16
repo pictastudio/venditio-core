@@ -2,9 +2,9 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use PictaStudio\Venditio\Models\{Currency, Order, OrderLine, Product, ShippingMethod, ShippingStatus, ShippingZone, User};
+use PictaStudio\Venditio\Models\{Currency, Order, OrderLine, PaymentMethod, Product, ShippingMethod, ShippingStatus, ShippingZone, User};
 
-use function Pest\Laravel\getJson;
+use function Pest\Laravel\{deleteJson, getJson, patchJson};
 
 uses(RefreshDatabase::class);
 
@@ -24,6 +24,7 @@ it('keeps the orders index lean by default', function () {
         ->assertJsonPath('0.shipping_method_data.id', $order->shipping_method_id)
         ->assertJsonPath('0.shipping_zone_data.id', $order->shipping_zone_id)
         ->assertJsonMissingPath('0.lines')
+        ->assertJsonMissingPath('0.payment_method')
         ->assertJsonMissingPath('0.shipping_method')
         ->assertJsonMissingPath('0.shipping_status')
         ->assertJsonMissingPath('0.shipping_zone')
@@ -32,6 +33,7 @@ it('keeps the orders index lean by default', function () {
     $relationQueries = collect($queries)
         ->map(fn (string $sql): string => mb_strtolower($sql))
         ->filter(fn (string $sql): bool => str_contains($sql, 'order_lines')
+            || str_contains($sql, 'payment_methods')
             || str_contains($sql, 'shipping_methods')
             || str_contains($sql, 'shipping_zones'));
 
@@ -39,16 +41,54 @@ it('keeps the orders index lean by default', function () {
 });
 
 it('loads orders index relations when requested through includes', function () {
-    [$order, $orderLine, $shippingMethod, $shippingStatus, $shippingZone, $user] = createOrderIndexFixture();
+    [$order, $orderLine, $shippingMethod, $shippingStatus, $shippingZone, $user, $paymentMethod] = createOrderIndexFixture();
 
-    getJson(config('venditio.routes.api.v1.prefix') . '/orders?all=1&id[]=' . $order->getKey() . '&include=lines,shipping_method,shipping_status,shipping_zone,user')
+    getJson(config('venditio.routes.api.v1.prefix') . '/orders?all=1&id[]=' . $order->getKey() . '&include=lines,payment_method,shipping_method,shipping_status,shipping_zone,user')
         ->assertOk()
         ->assertJsonPath('0.id', $order->getKey())
         ->assertJsonPath('0.lines.0.id', $orderLine->getKey())
+        ->assertJsonPath('0.payment_method.id', $paymentMethod->getKey())
         ->assertJsonPath('0.shipping_method.id', $shippingMethod->getKey())
         ->assertJsonPath('0.shipping_status.id', $shippingStatus->getKey())
         ->assertJsonPath('0.shipping_zone.id', $shippingZone->getKey())
         ->assertJsonPath('0.user.id', $user->getKey());
+});
+
+it('updates and includes payment methods on orders', function () {
+    $prefix = config('venditio.routes.api.v1.prefix');
+    [$order] = createOrderIndexFixture();
+    $paymentMethod = PaymentMethod::factory()->create([
+        'code' => 'CARD',
+        'name' => 'Credit Card',
+    ]);
+
+    patchJson($prefix . '/orders/' . $order->getKey() . '?include=payment_method', [
+        'payment_method_id' => $paymentMethod->getKey(),
+    ])->assertOk()
+        ->assertJsonPath('payment_method_id', $paymentMethod->getKey())
+        ->assertJsonPath('payment_method.id', $paymentMethod->getKey())
+        ->assertJsonPath('payment_method.code', 'CARD');
+
+    patchJson($prefix . '/orders/' . $order->getKey(), [
+        'payment_method_id' => 999999,
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['payment_method_id']);
+});
+
+it('clears order payment method when payment method is deleted', function () {
+    $prefix = config('venditio.routes.api.v1.prefix');
+    $paymentMethod = PaymentMethod::factory()->create();
+    $order = Order::factory()->create([
+        'payment_method_id' => $paymentMethod->getKey(),
+        'addresses' => [
+            'billing' => [],
+            'shipping' => [],
+        ],
+    ]);
+
+    deleteJson($prefix . '/payment_methods/' . $paymentMethod->getKey())->assertNoContent();
+
+    expect($order->refresh()->payment_method_id)->toBeNull();
 });
 
 it('searches orders by identifier and user snapshot fields', function () {
@@ -111,6 +151,7 @@ function createOrderIndexFixture(): array
         'first_name' => 'Lean',
         'last_name' => 'Customer',
     ]);
+    $paymentMethod = PaymentMethod::factory()->create();
     $shippingMethod = ShippingMethod::factory()->create();
     $shippingStatus = ShippingStatus::factory()->create();
     $shippingZone = ShippingZone::factory()->create();
@@ -119,6 +160,7 @@ function createOrderIndexFixture(): array
 
     $order = Order::factory()->create([
         'user_id' => $user->getKey(),
+        'payment_method_id' => $paymentMethod->getKey(),
         'shipping_method_id' => $shippingMethod->getKey(),
         'shipping_status_id' => $shippingStatus->getKey(),
         'shipping_zone_id' => $shippingZone->getKey(),
@@ -155,5 +197,5 @@ function createOrderIndexFixture(): array
         'product_data' => [],
     ]);
 
-    return [$order, $orderLine, $shippingMethod, $shippingStatus, $shippingZone, $user];
+    return [$order, $orderLine, $shippingMethod, $shippingStatus, $shippingZone, $user, $paymentMethod];
 }

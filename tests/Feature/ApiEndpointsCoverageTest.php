@@ -32,6 +32,7 @@ it('registers index endpoints for all exposed models', function () {
         '/country_tax_classes',
         '/currencies',
         '/tax_classes',
+        '/payment_methods',
         '/shipping_methods',
         '/shipping_method_zones',
         '/shipping_statuses',

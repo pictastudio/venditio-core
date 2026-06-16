@@ -34,6 +34,11 @@ class OrderValidation implements OrderValidationRules
                 'integer',
                 Rule::exists($this->tableFor('shipping_status'), 'id'),
             ],
+            'payment_method_id' => [
+                'nullable',
+                'integer',
+                Rule::exists($this->tableFor('payment_method'), 'id'),
+            ],
             'shipping_method_id' => [
                 'nullable',
                 'integer',
