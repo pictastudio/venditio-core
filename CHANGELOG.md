@@ -2,6 +2,26 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.9.4 - 2026-06-16
+
+### What's Changed
+
+This patch release adds a lean order search query parameter so order lists can be filtered by order reference or customer snapshot details without loading related user records.
+
+### Features
+
+- **Order search** - `GET /orders` now accepts `search` for case-insensitive partial matching across `identifier`, `user_first_name`, `user_last_name`, and `user_email`.
+
+### Tooling
+
+- Updated the Bruno order list request to document and exercise the new `search` query parameter.
+
+### Tests
+
+- Added order API coverage proving `search` matches the order identifier and each supported customer snapshot field while excluding non-matching orders.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.9.3...v2.9.4
+
 ## v2.9.3 - 2026-06-15
 
 ### What's Changed
