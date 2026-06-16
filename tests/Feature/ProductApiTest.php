@@ -932,6 +932,71 @@ it('filters products index by multiple brands, categories, and collections', fun
         ->not->toContain($notMatchingBrand->getKey(), $notMatchingCategory->getKey(), $notMatchingCollection->getKey());
 });
 
+it('searches products index by exact id and partial name or sku while respecting scopes', function () {
+    $matchingId = Product::factory()->create([
+        'name' => 'Plain Product',
+        'sku' => 'PLAIN-SKU',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $matchingName = Product::factory()->create([
+        'name' => 'Needle Cotton Shirt',
+        'sku' => 'COTTON-SHIRT',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $matchingSku = Product::factory()->create([
+        'name' => 'Denim Jacket',
+        'sku' => 'SKU-NEEDLE-CODE',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $nonMatch = Product::factory()->create([
+        'name' => 'Ordinary Socks',
+        'sku' => 'SOCKS-PLAIN',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $scopedOut = Product::factory()->create([
+        'name' => 'Needle Hidden Product',
+        'sku' => 'HIDDEN-NEEDLE',
+        'active' => false,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $variant = Product::factory()->create([
+        'parent_id' => $matchingName->getKey(),
+        'name' => 'Needle Variant',
+        'sku' => 'VARIANT-NEEDLE',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $idResponse = getJson(config('venditio.routes.api.v1.prefix') . '/products?all=1&search=' . $matchingId->getKey())
+        ->assertOk();
+    $nameResponse = getJson(config('venditio.routes.api.v1.prefix') . '/products?all=1&search=' . urlencode('nEeDlE cOtToN'))
+        ->assertOk();
+    $skuResponse = getJson(config('venditio.routes.api.v1.prefix') . '/products?all=1&search=' . urlencode('needle-code'))
+        ->assertOk();
+
+    expect(collect($idResponse->json())->pluck('id')->all())
+        ->toContain($matchingId->getKey())
+        ->not->toContain($nonMatch->getKey());
+
+    expect(collect($nameResponse->json())->pluck('id')->all())
+        ->toContain($matchingName->getKey())
+        ->not->toContain($nonMatch->getKey(), $scopedOut->getKey(), $variant->getKey());
+
+    expect(collect($skuResponse->json())->pluck('id')->all())
+        ->toContain($matchingSku->getKey())
+        ->not->toContain($nonMatch->getKey(), $scopedOut->getKey(), $variant->getKey());
+});
+
 it('validates products index brand_ids, category_ids, and collection_ids filters', function () {
     getJson(
         config('venditio.routes.api.v1.prefix')

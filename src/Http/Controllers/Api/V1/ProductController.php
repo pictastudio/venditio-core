@@ -27,6 +27,7 @@ class ProductController extends Controller
         $filters = request()->except('include');
         $query = query('product')->with($this->productRelationsForIncludes($includes));
         $this->applyProductIndexRelationFilters($query, $filters);
+        $this->applyProductSearch($query, $filters['search'] ?? null);
 
         if ($this->shouldExcludeVariantsFromIndex()) {
             $query->whereNull('parent_id');
@@ -37,7 +38,13 @@ class ProductController extends Controller
                 $query,
                 $filters,
                 'product',
-                $this->productIndexValidationRules()
+                [
+                    ...$this->productIndexValidationRules(),
+                    'search' => [
+                        'sometimes',
+                        'string',
+                    ],
+                ]
             )
         );
     }
@@ -474,6 +481,27 @@ class ProductController extends Controller
                 Rule::in(['>', '<', '>=', '<=', '=']),
             ],
         ];
+    }
+
+    protected function applyProductSearch(Builder $query, mixed $search): void
+    {
+        if (!is_string($search) || blank($search)) {
+            return;
+        }
+
+        $search = mb_trim($search);
+        $stringSearch = $this->prepareStringFilterValue($search);
+        $model = $query->getModel();
+
+        $query->where(function (Builder $query) use ($model, $search, $stringSearch): void {
+            if (preg_match('/^\d+$/', $search) === 1) {
+                $query->orWhere($model->getQualifiedKeyName(), (int) $search);
+            }
+
+            foreach (['name', 'sku'] as $column) {
+                $query->orWhereLike($model->qualifyColumn($column), $stringSearch, caseSensitive: false);
+            }
+        });
     }
 
     protected function applyProductIndexRelationFilters(Builder $query, array &$filters): void

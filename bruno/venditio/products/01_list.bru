@@ -19,6 +19,7 @@ params:query {
   ~exclude_all_scopes: 0
   ~exclude_active_scope: 0
   ~exclude_date_range_scope: 0
+  ~search: sample
   ~id[]: 1
   ~not_ids[]: 2
   ~parent_id: 1
@@ -94,6 +95,7 @@ docs {
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - exclude_date_range_scope (boolean): Skip only the date range global scope when available.
+  - search (string): Case-insensitive partial search across name and sku; numeric values also match id exactly.
   - id[] (integer[]): Filter by one or more resource IDs.
   - not_ids[] (integer[]): Exclude products whose IDs are in this list.
   - parent_id (integer): Exact-match filter for parent_id.
