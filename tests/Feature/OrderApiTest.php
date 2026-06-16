@@ -51,6 +51,60 @@ it('loads orders index relations when requested through includes', function () {
         ->assertJsonPath('0.user.id', $user->getKey());
 });
 
+it('searches orders by identifier and user snapshot fields', function () {
+    $defaultAttributes = [
+        'addresses' => [
+            'billing' => [],
+            'shipping' => [],
+        ],
+    ];
+
+    $identifierMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-NEEDLE-001',
+        'user_first_name' => 'Alba',
+        'user_last_name' => 'Rossi',
+        'user_email' => 'alba@example.test',
+    ]));
+    $firstNameMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-PLAIN-002',
+        'user_first_name' => 'Needle',
+        'user_last_name' => 'Bianchi',
+        'user_email' => 'bianchi@example.test',
+    ]));
+    $lastNameMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-PLAIN-003',
+        'user_first_name' => 'Carlo',
+        'user_last_name' => 'Hayneedle',
+        'user_email' => 'carlo@example.test',
+    ]));
+    $emailMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-PLAIN-004',
+        'user_first_name' => 'Dora',
+        'user_last_name' => 'Verdi',
+        'user_email' => 'shopper.needle@example.test',
+    ]));
+    $nonMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-PLAIN-005',
+        'user_first_name' => 'Elena',
+        'user_last_name' => 'Neri',
+        'user_email' => 'elena@example.test',
+    ]));
+
+    $response = getJson(config('venditio.routes.api.v1.prefix') . '/orders?all=1&search=' . urlencode('nEeDlE'))
+        ->assertOk();
+
+    $ids = collect($response->json())
+        ->pluck('id')
+        ->all();
+
+    expect($ids)->toEqualCanonicalizing([
+        $identifierMatch->getKey(),
+        $firstNameMatch->getKey(),
+        $lastNameMatch->getKey(),
+        $emailMatch->getKey(),
+    ])->not->toContain($nonMatch->getKey());
+});
+
 function createOrderIndexFixture(): array
 {
     $user = User::factory()->create([

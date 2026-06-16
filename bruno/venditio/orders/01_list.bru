@@ -17,6 +17,7 @@ params:query {
   ~sort_by: id
   ~sort_dir: desc
   ~id[]: 1
+  ~search: sample
   ~user_id: 1
   ~shipping_status_id: 1
   ~identifier: sample
@@ -77,6 +78,7 @@ docs {
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
   - id[] (integer[]): Filter by one or more resource IDs.
+  - search (string): Case-insensitive partial search across identifier, user_first_name, user_last_name, and user_email.
   - user_id (integer): Exact-match filter for user_id.
   - shipping_status_id (integer): Exact-match filter for shipping_status_id.
   - identifier (string): Exact-match filter for identifier.
