@@ -2,6 +2,29 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.10.0 - 2026-06-16
+
+### What's Changed
+
+This minor release adds a first-class payment methods API with order linkage and expands product listing with a general search filter, while keeping request examples and public API coverage aligned with the new behavior.
+
+### Features
+
+- **Payment methods API** - Added `payment_methods` as a full CRUD API resource with model, migrations, factory, request validation, resources, route binding, filtering, and soft-delete behavior.
+- **Order payment method link** - Added nullable `orders.payment_method_id`, order update validation, `paymentMethod` relationship support, `include=payment_method`, and cleanup of order references when payment methods are deleted.
+- **Product index search** - Added `search` to `GET /products`, matching exact numeric product IDs and case-insensitive partial product names or SKUs while preserving existing scopes and variant exclusion.
+
+### Tooling
+
+- Updated DBML and Bruno requests for payment methods, order payment-method fields/includes, and product search examples.
+
+### Tests
+
+- Added payment method API coverage for CRUD, validation, filtering, soft deletes, and order unlinking.
+- Added order API coverage for payment-method updates/includes and product API coverage for `search` by ID, name, SKU, scopes, and default variant exclusion.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.9.4...v2.10.0
+
 ## v2.9.4 - 2026-06-16
 
 ### What's Changed
