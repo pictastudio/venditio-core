@@ -932,6 +932,68 @@ it('filters products index by multiple brands, categories, and collections', fun
         ->not->toContain($notMatchingBrand->getKey(), $notMatchingCategory->getKey(), $notMatchingCollection->getKey());
 });
 
+it('orders products filtered by a single collection by collection sort order', function () {
+    $collection = ProductCollection::factory()->create();
+    $firstProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $secondProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $thirdProduct = Product::factory()->create([
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+
+    $collection->products()->sync([
+        $firstProduct->getKey() => ['sort_order' => 20],
+        $secondProduct->getKey() => ['sort_order' => 10],
+        $thirdProduct->getKey() => ['sort_order' => 10],
+    ]);
+
+    $response = getJson(
+        config('venditio.routes.api.v1.prefix')
+        . '/products?all=1&collection_ids[]=' . $collection->getKey()
+    )->assertOk();
+
+    $json = $response->json();
+    $items = is_array(data_get($json, 'data'))
+        ? data_get($json, 'data')
+        : $json;
+
+    expect(collect($items)->pluck('id')->all())->toBe([
+        $secondProduct->getKey(),
+        $thirdProduct->getKey(),
+        $firstProduct->getKey(),
+    ])->and(collect($items)->pluck('sort_order')->all())->toBe([10, 10, 20]);
+
+    collect($items)->each(
+        fn (array $item) => expect($item)->not->toHaveKey('collection_sort_order')
+    );
+
+    $sortedResponse = getJson(
+        config('venditio.routes.api.v1.prefix')
+        . '/products?all=1&collection_ids[]=' . $collection->getKey()
+        . '&sort_by=id&sort_dir=desc'
+    )->assertOk();
+
+    $sortedJson = $sortedResponse->json();
+    $sortedItems = is_array(data_get($sortedJson, 'data'))
+        ? data_get($sortedJson, 'data')
+        : $sortedJson;
+
+    expect(collect($sortedItems)->pluck('id')->all())->toBe([
+        $thirdProduct->getKey(),
+        $secondProduct->getKey(),
+        $firstProduct->getKey(),
+    ]);
+});
+
 it('searches products index by exact id and partial searchable fields while respecting scopes', function () {
     $matchingId = Product::factory()->create([
         'name' => 'Plain Product',

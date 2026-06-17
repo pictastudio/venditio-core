@@ -554,6 +554,8 @@ class ProductController extends Controller
 
             unset($filters['sort_by']);
         }
+
+        $this->applySingleCollectionOrdering($query, $filters);
     }
 
     protected function applyPriceSort(Builder $query, array $filters): void
@@ -585,6 +587,40 @@ class ProductController extends Controller
                 ->limit(1),
             $sortDirection
         );
+    }
+
+    protected function applySingleCollectionOrdering(Builder $query, array $filters): void
+    {
+        if (
+            isset($filters['sort_by'])
+            || !isset($filters['collection_ids'])
+            || !is_array($filters['collection_ids'])
+            || count($filters['collection_ids']) !== 1
+        ) {
+            return;
+        }
+
+        $collectionId = (int) $filters['collection_ids'][0];
+        $productModel = app(resolve_model('product'));
+        $productTable = method_exists($productModel, 'getTableName')
+            ? $productModel->getTableName()
+            : $productModel->getTable();
+        $productKey = $productModel->getKeyName();
+
+        $collectionsRelation = $productModel->collections();
+        $pivotTable = $collectionsRelation->getTable();
+        $foreignPivotKey = $collectionsRelation->getForeignPivotKeyName();
+        $relatedPivotKey = $collectionsRelation->getRelatedPivotKeyName();
+        $collectionSortOrder = fn () => DB::table($pivotTable)
+            ->select('sort_order')
+            ->whereColumn($foreignPivotKey, $productTable . '.' . $productKey)
+            ->where($relatedPivotKey, $collectionId)
+            ->limit(1);
+
+        $query
+            ->addSelect(['collection_sort_order' => $collectionSortOrder()])
+            ->orderBy($collectionSortOrder())
+            ->orderBy($productTable . '.' . $productKey);
     }
 
     protected function sanitizePriceOperator(string $operator): string

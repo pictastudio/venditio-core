@@ -23,13 +23,28 @@ class ProductResource extends JsonResource
     {
         return $this->applyAttributesTransformation(
             collect($this->resolveResourceAttributes())
-                ->except($this->getAttributesToExclude())
+                ->except([...$this->getAttributesToExclude(), 'collection_sort_order'])
                 ->map(fn (mixed $value, string $key) => (
                     $this->mutateAttributeBasedOnCast($key, $value)
                 ))
+                ->merge($this->getCollectionSortOrderAttribute())
                 ->merge($this->getRelationshipsToInclude($request))
                 ->toArray()
         );
+    }
+
+    protected function getCollectionSortOrderAttribute(): array
+    {
+        if (
+            !$this->resource instanceof Model
+            || !array_key_exists('collection_sort_order', $this->resource->getAttributes())
+        ) {
+            return [];
+        }
+
+        return [
+            'sort_order' => (int) $this->resource->getAttribute('collection_sort_order'),
+        ];
     }
 
     protected function getRelationshipsToInclude(Request $request): array
