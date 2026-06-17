@@ -2,6 +2,26 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.10.2 - 2026-06-17
+
+### What's Changed
+
+This patch release makes single-collection product lists expose and respect the collection pivot order, giving headless clients a stable `sort_order` field when listing products for one collection.
+
+### Features
+
+- **Collection product ordering** - `GET /products` now orders by `product_collection_product.sort_order` and exposes `sort_order` when filtered by exactly one `collection_ids[]` value and no explicit `sort_by` is provided.
+
+### Tooling
+
+- Updated the Bruno products list request documentation to describe the single-collection `sort_order` response field and default ordering behavior.
+
+### Tests
+
+- Added product API coverage for single-collection pivot ordering, `sort_order` exposure, internal alias hiding, and explicit `sort_by=id` precedence.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.10.1...v2.10.2
+
 ## v2.10.1 - 2026-06-17
 
 ### What's Changed
