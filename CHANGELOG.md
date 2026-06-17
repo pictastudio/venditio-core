@@ -2,6 +2,28 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.10.1 - 2026-06-17
+
+### What's Changed
+
+This patch release moves list API searching into shared base filtering so every resource using `applyBaseFilters()` can use a fast direct-column `search` parameter, while replacing direct resource `name` filters with `search` and keeping request examples aligned with the new contract.
+
+### Features
+
+- **Shared index search** - Added `search` to public list APIs backed by `applyBaseFilters()`, with case-insensitive direct-column text matching and numeric exact matching for resource IDs plus configured integer foreign keys.
+- **Expanded searchable fields** - Extended product search to `ean` and `slug`, order search to `tracking_code` and `discount_code`, and added credit-note search/filter metadata for credit-note index endpoints.
+- **Name filter replacement** - Removed direct resource `name` filters in favor of `search` while keeping `sort_by=name` available for resources with a `name` column.
+
+### Tooling
+
+- Updated API documentation and Bruno list requests to document `search`, remove resource-name filter examples, and clarify the speed-first direct-column search constraint.
+
+### Tests
+
+- Added and updated feature coverage for shared search behavior, rejected direct `name` filters, preserved `sort_by=name`, non-name string filters, numeric FK search, product/order search fields, and credit-note list filters.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.10.0...v2.10.1
+
 ## v2.10.0 - 2026-06-16
 
 ### What's Changed
