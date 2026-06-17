@@ -16,9 +16,9 @@ params:query {
   ~per_page: 30
   ~sort_by: id
   ~sort_dir: desc
+  ~search: sample
   ~id[]: 1
   ~currency_id: 1
-  ~name: sample
   ~iso_2: sample
   ~iso_3: sample
   ~phone_code: sample
@@ -57,9 +57,9 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - id[] (integer[]): Filter by one or more resource IDs.
   - currency_id (integer): Exact-match filter for currency_id.
-  - name (string): Exact-match filter for name.
   - iso_2 (string): Exact-match filter for iso_2.
   - iso_3 (string): Exact-match filter for iso_3.
   - phone_code (string): Exact-match filter for phone_code.

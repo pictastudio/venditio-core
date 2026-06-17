@@ -16,6 +16,7 @@ params:query {
   ~per_page: 30
   ~sort_by: sort_order
   ~sort_dir: asc
+  ~search: sample
   ~exclude_all_scopes: 0
   ~exclude_active_scope: 0
   ~exclude_date_range_scope: 0
@@ -23,7 +24,6 @@ params:query {
   ~parent_id: 1
   ~product_type_id: 1
   ~path: sample
-  ~name: sample
   ~slug: sample
   ~abstract: sample
   ~description: sample
@@ -73,6 +73,7 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - exclude_date_range_scope (boolean): Skip only the date range global scope when available.
@@ -80,7 +81,6 @@ docs {
   - parent_id (integer): Exact-match filter for parent_id.
   - product_type_id (integer): Exact-match filter for product_type_id.
   - path (string): Exact-match filter for path.
-  - name (string): Exact-match filter for name.
   - slug (string): Exact-match filter for slug.
   - abstract (string): Exact-match filter for abstract.
   - description (string): Exact-match filter for description.

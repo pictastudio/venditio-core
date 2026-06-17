@@ -30,7 +30,6 @@ params:query {
   ~category_ids[]: 1
   ~collection_ids[]: 1
   ~tag_ids[]: 1
-  ~name: sample
   ~slug: sample
   ~status: sample
   ~active: 0
@@ -95,7 +94,7 @@ docs {
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - exclude_date_range_scope (boolean): Skip only the date range global scope when available.
-  - search (string): Case-insensitive partial search across name and sku; numeric values also match id exactly.
+  - search (string): Case-insensitive partial search across name, sku, ean, and slug; numeric values also match id exactly.
   - id[] (integer[]): Filter by one or more resource IDs.
   - not_ids[] (integer[]): Exclude products whose IDs are in this list.
   - parent_id (integer): Exact-match filter for parent_id.
@@ -106,7 +105,6 @@ docs {
   - category_ids[] (integer[]): Match products assigned to at least one category in this list.
   - collection_ids[] (integer[]): Match products assigned to at least one collection in this list.
   - tag_ids[] (integer[]): Match products assigned to at least one tag in this list.
-  - name (string): Exact-match filter for name.
   - slug (string): Exact-match filter for slug.
   - status (string): Exact-match filter for status.
   - active (boolean): Exact-match filter for active.

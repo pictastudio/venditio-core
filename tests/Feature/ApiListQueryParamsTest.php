@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PictaStudio\Venditio\Models\{Brand, PriceList, ProductCollection, ReturnReason, Tag};
+use PictaStudio\Venditio\Models\{Brand, Country, CountryTaxClass, Currency, PriceList, ProductCollection, ReturnReason, Tag, TaxClass};
 
 use function Pest\Laravel\getJson;
 
@@ -134,7 +134,7 @@ it('orders list endpoints by sort_order by default when the resource has sort_or
     ]);
 });
 
-it('filters string columns with case-insensitive partial matching', function () {
+it('searches list endpoints with case-insensitive partial matching', function () {
     $matchingBrand = Brand::factory()->create([
         'name' => 'Acme Premium Goods',
     ]);
@@ -144,7 +144,7 @@ it('filters string columns with case-insensitive partial matching', function () 
     ]);
 
     $response = getJson(
-        config('venditio.routes.api.v1.prefix') . '/brands?all=1&name=' . urlencode('premium')
+        config('venditio.routes.api.v1.prefix') . '/brands?all=1&search=' . urlencode('premium')
     )->assertOk();
 
     $ids = collect(apiListData($response->json()))
@@ -153,6 +153,80 @@ it('filters string columns with case-insensitive partial matching', function () 
 
     expect($ids)->toContain($matchingBrand->getKey())
         ->not->toContain($nonMatchingBrand->getKey());
+});
+
+it('rejects direct name filters while preserving name sorting and other string filters', function () {
+    $alphaBrand = Brand::factory()->create([
+        'name' => 'Alpha Goods',
+        'slug' => 'alpha-goods',
+    ]);
+    $zuluBrand = Brand::factory()->create([
+        'name' => 'Zulu Supplies',
+        'slug' => 'zulu-special',
+    ]);
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/brands?all=1&name=' . urlencode('Alpha'))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name']);
+
+    $sortResponse = getJson(config('venditio.routes.api.v1.prefix') . '/brands?all=1&sort_by=name&sort_dir=asc')
+        ->assertOk();
+
+    expect(collect(apiListData($sortResponse->json()))->pluck('id')->all())
+        ->toBe([$alphaBrand->getKey(), $zuluBrand->getKey()]);
+
+    $slugResponse = getJson(config('venditio.routes.api.v1.prefix') . '/brands?all=1&slug=' . urlencode('special'))
+        ->assertOk();
+
+    expect(collect(apiListData($slugResponse->json()))->pluck('id')->all())
+        ->toContain($zuluBrand->getKey())
+        ->not->toContain($alphaBrand->getKey());
+});
+
+it('searches id-heavy list endpoints by exact configured integer columns', function () {
+    $currency = Currency::factory()->create();
+    $matchingCountry = Country::query()->create([
+        'currency_id' => $currency->getKey(),
+        'name' => 'Italy',
+        'iso_2' => 'IT',
+        'iso_3' => 'ITA',
+        'phone_code' => '+39',
+        'flag_emoji' => 'IT',
+    ]);
+    $otherCountry = Country::query()->create([
+        'currency_id' => $currency->getKey(),
+        'name' => 'France',
+        'iso_2' => 'FR',
+        'iso_3' => 'FRA',
+        'phone_code' => '+33',
+        'flag_emoji' => 'FR',
+    ]);
+    $matchingTaxClass = TaxClass::query()->create([
+        'name' => 'Standard',
+    ]);
+    $otherTaxClass = TaxClass::query()->create([
+        'name' => 'Reduced',
+    ]);
+    $matching = CountryTaxClass::query()->create([
+        'country_id' => $matchingCountry->getKey(),
+        'tax_class_id' => $matchingTaxClass->getKey(),
+        'rate' => 22,
+    ]);
+    $nonMatching = CountryTaxClass::query()->create([
+        'country_id' => $otherCountry->getKey(),
+        'tax_class_id' => $otherTaxClass->getKey(),
+        'rate' => 20,
+    ]);
+
+    $response = getJson(config('venditio.routes.api.v1.prefix') . '/country_tax_classes?all=1&search=' . $matchingCountry->getKey())
+        ->assertOk();
+
+    $ids = collect(apiListData($response->json()))
+        ->pluck('id')
+        ->all();
+
+    expect($ids)->toContain($matching->getKey())
+        ->not->toContain($nonMatching->getKey());
 });
 
 it('supports pagination and sorting query params on list endpoints', function () {

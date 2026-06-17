@@ -99,6 +99,11 @@ class Controller extends BaseController
                     $keyName
                 ),
             ],
+            'search' => [
+                'sometimes',
+                'string',
+                'max:255',
+            ],
             ...($supportsSoftDeletes ? [
                 'with_trashed' => [
                     'sometimes',
@@ -180,6 +185,8 @@ class Controller extends BaseController
                 $query->where($column, '<=', $validatedFilters[$endKey]);
             }
         }
+
+        $this->applySearchFilter($query, $model, $validatedFilters['search'] ?? null);
 
         $all = array_key_exists('all', $validatedFilters)
             ? filter_var($validatedFilters['all'], FILTER_VALIDATE_BOOL)
@@ -313,14 +320,22 @@ class Controller extends BaseController
     protected function buildStaticFilterRules(string $model, string $keyName): array
     {
         $columns = $this->queryFilterColumns()[$model] ?? [];
+        $replacedFilters = $this->filtersReplacedBySearch()[$model] ?? [];
         $rules = [];
-        $filterableColumns = array_keys($columns);
+        $filterableColumns = [];
         $sortableColumns = [$keyName];
-        $columnTypes = $columns;
+        $columnTypes = [];
         $rangeableColumns = [];
 
         foreach ($columns as $column => $columnType) {
             $sortableColumns[] = $column;
+
+            if (in_array($column, $replacedFilters, true)) {
+                continue;
+            }
+
+            $filterableColumns[] = $column;
+            $columnTypes[$column] = $columnType;
             $rules[$column] = $this->buildRulesForDeclaredType($columnType);
 
             if ($this->isDateDeclaredType($columnType)) {
@@ -367,6 +382,41 @@ class Controller extends BaseController
                 )
                 ->all()
         );
+    }
+
+    protected function applySearchFilter(Builder $query, string $model, mixed $search): void
+    {
+        if (!is_string($search) || blank($search)) {
+            return;
+        }
+
+        $search = mb_trim($search);
+        $stringColumns = $this->searchableStringColumns()[$model] ?? [];
+        $exactColumns = $this->searchableExactIntegerColumns()[$model] ?? [];
+        $matchesInteger = preg_match('/^\d+$/', $search) === 1;
+
+        if (!$matchesInteger && $stringColumns === []) {
+            $query->whereRaw('0 = 1');
+
+            return;
+        }
+
+        $modelInstance = $query->getModel();
+        $stringSearch = $this->prepareStringFilterValue($search);
+
+        $query->where(function (Builder $query) use ($exactColumns, $matchesInteger, $modelInstance, $search, $stringColumns, $stringSearch): void {
+            if ($matchesInteger) {
+                $query->orWhere($modelInstance->getQualifiedKeyName(), (int) $search);
+
+                foreach ($exactColumns as $column) {
+                    $query->orWhere($modelInstance->qualifyColumn($column), (int) $search);
+                }
+            }
+
+            foreach ($stringColumns as $column) {
+                $query->orWhereLike($modelInstance->qualifyColumn($column), $stringSearch, caseSensitive: false);
+            }
+        });
     }
 
     protected function castFilterValueForDeclaredType(mixed $value, ?string $columnType): mixed
@@ -455,6 +505,86 @@ class Controller extends BaseController
             ['date'],
             true
         );
+    }
+
+    protected function searchableStringColumns(): array
+    {
+        return [
+            'address' => ['first_name', 'last_name', 'email', 'phone', 'company_name', 'vat_number', 'fiscal_code', 'city', 'zip'],
+            'brand' => ['name', 'slug'],
+            'cart' => ['identifier', 'user_email', 'user_first_name', 'user_last_name', 'discount_code'],
+            'cart_line' => ['product_name', 'product_sku', 'discount_code'],
+            'country' => ['name', 'iso_2', 'iso_3', 'phone_code', 'capital', 'native'],
+            'credit_note' => ['identifier', 'currency_code'],
+            'currency' => ['name', 'code', 'symbol'],
+            'discount' => ['name', 'code'],
+            'discount_application' => ['discountable_type'],
+            'free_gift' => ['name'],
+            'municipality' => ['name', 'zip', 'istat_code', 'cadastral_code'],
+            'order' => ['identifier', 'tracking_code', 'user_email', 'user_first_name', 'user_last_name', 'discount_code'],
+            'order_line' => ['product_name', 'product_sku', 'discount_code'],
+            'payment_method' => ['code', 'name'],
+            'price_list' => ['name', 'code'],
+            'product' => ['name', 'sku', 'ean', 'slug'],
+            'product_category' => ['name', 'slug', 'path'],
+            'product_collection' => ['name', 'slug'],
+            'product_custom_field' => ['name', 'type'],
+            'product_type' => ['name', 'slug'],
+            'product_variant' => ['name'],
+            'product_variant_option' => ['name', 'hex_color'],
+            'province' => ['name', 'code'],
+            'region' => ['name', 'code'],
+            'return_reason' => ['code', 'name'],
+            'shipping_method' => ['code', 'name'],
+            'shipping_status' => ['external_code', 'name'],
+            'shipping_zone' => ['code', 'name'],
+            'tag' => ['name', 'slug', 'path'],
+            'tax_class' => ['name'],
+            'wishlist' => ['name', 'slug'],
+        ];
+    }
+
+    protected function searchableExactIntegerColumns(): array
+    {
+        return [
+            'country_tax_class' => ['country_id', 'tax_class_id'],
+            'credit_note' => ['invoice_id', 'return_request_id'],
+            'discount_application' => ['discount_id', 'user_id', 'cart_id', 'order_id', 'order_line_id'],
+            'inventory' => ['product_id', 'currency_id'],
+            'price_list_price' => ['product_id', 'price_list_id'],
+            'return_request' => ['order_id', 'user_id', 'return_reason_id'],
+            'shipping_method_zone' => ['shipping_method_id', 'shipping_zone_id'],
+        ];
+    }
+
+    protected function filtersReplacedBySearch(): array
+    {
+        return [
+            'brand' => ['name'],
+            'country' => ['name'],
+            'currency' => ['name'],
+            'discount' => ['name'],
+            'free_gift' => ['name'],
+            'municipality' => ['name'],
+            'payment_method' => ['name'],
+            'price_list' => ['name'],
+            'product' => ['name'],
+            'product_category' => ['name'],
+            'product_collection' => ['name'],
+            'product_custom_field' => ['name'],
+            'product_type' => ['name'],
+            'product_variant' => ['name'],
+            'product_variant_option' => ['name'],
+            'province' => ['name'],
+            'region' => ['name'],
+            'return_reason' => ['name'],
+            'shipping_method' => ['name'],
+            'shipping_status' => ['name'],
+            'shipping_zone' => ['name'],
+            'tag' => ['name'],
+            'tax_class' => ['name'],
+            'wishlist' => ['name'],
+        ];
     }
 
     protected function queryFilterColumns(): array
@@ -569,6 +699,21 @@ class Controller extends BaseController
                 'country_id' => 'integer',
                 'tax_class_id' => 'integer',
                 'rate' => 'numeric',
+                'created_at' => 'date',
+                'updated_at' => 'date',
+            ],
+            'credit_note' => [
+                'order_id' => 'integer',
+                'invoice_id' => 'integer',
+                'return_request_id' => 'integer',
+                'identifier' => 'string',
+                'issued_at' => 'date',
+                'currency_code' => 'string',
+                'template_key' => 'string',
+                'template_version' => 'string',
+                'locale' => 'string',
+                'paper' => 'string',
+                'orientation' => 'string',
                 'created_at' => 'date',
                 'updated_at' => 'date',
             ],

@@ -16,6 +16,7 @@ params:query {
   ~per_page: 30
   ~sort_by: id
   ~sort_dir: asc
+  ~search: sample
   ~include: variants,variants_options_table,brand,categories,collections,discounts,valid_discounts,expired_discounts,tags,product_type,tax_class,price_lists,price_breakdown
 }
 
@@ -44,6 +45,7 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable product columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - include (string|array): Optional product includes for each related product.
 
   path params:

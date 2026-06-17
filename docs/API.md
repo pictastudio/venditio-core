@@ -35,8 +35,13 @@ Most index endpoints support:
 - `all` boolean, returns full collection (no pagination)
 - `id[]` array of ids
 - `per_page` pagination size
+- `search` string, a speed-first search across each resource's configured direct table columns
+  - text columns use case-insensitive partial matching
+  - numeric search terms also match the resource id and any configured integer search columns
+  - search does not join related tables, JSON payloads, or translation tables
 - string field filters use case-insensitive partial matching (`LIKE %value%`)
 - non-string field filters keep exact-match behavior
+- direct `name` filters have been replaced by `search`; `sort_by=name` remains supported on resources with a `name` column
 
 Additional supported filters:
 
@@ -49,7 +54,7 @@ Additional supported filters:
 - `product_variant_id` on `/product_variant_options`
 - `product_id` and `price_list_id` on `/price_list_prices`
 - `invoice_id`, `return_request_id`, and `identifier` on `/orders/{order}/credit_notes`
-- `/return_reasons`: `code`, `name`, `description`, `is_active`
+- `/return_reasons`: `code`, `description`, `is_active`
 - `/return_requests`: `order_id`, `user_id`, `return_reason_id`, `is_accepted`, `is_verified`
 - `as_tree` boolean on `/product_categories` and `/tags`
   - tree responses order root nodes by `sort_order`; each child branch is ordered independently by `sort_order`, so numbering starts at `1` for roots and starts at `1` again for every sibling branch

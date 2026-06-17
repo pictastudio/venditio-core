@@ -932,7 +932,7 @@ it('filters products index by multiple brands, categories, and collections', fun
         ->not->toContain($notMatchingBrand->getKey(), $notMatchingCategory->getKey(), $notMatchingCollection->getKey());
 });
 
-it('searches products index by exact id and partial name or sku while respecting scopes', function () {
+it('searches products index by exact id and partial searchable fields while respecting scopes', function () {
     $matchingId = Product::factory()->create([
         'name' => 'Plain Product',
         'sku' => 'PLAIN-SKU',
@@ -950,6 +950,22 @@ it('searches products index by exact id and partial name or sku while respecting
     $matchingSku = Product::factory()->create([
         'name' => 'Denim Jacket',
         'sku' => 'SKU-NEEDLE-CODE',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $matchingEan = Product::factory()->create([
+        'name' => 'Canvas Tote',
+        'sku' => 'CANVAS-TOTE',
+        'ean' => '9780001112223',
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ]);
+    $matchingSlug = Product::factory()->create([
+        'name' => 'Harbor Jacket',
+        'slug' => 'catalog-harbor-jacket',
+        'sku' => 'HARBOR-JACKET',
         'active' => true,
         'visible_from' => null,
         'visible_until' => null,
@@ -983,10 +999,14 @@ it('searches products index by exact id and partial name or sku while respecting
         ->assertOk();
     $skuResponse = getJson(config('venditio.routes.api.v1.prefix') . '/products?all=1&search=' . urlencode('needle-code'))
         ->assertOk();
+    $eanResponse = getJson(config('venditio.routes.api.v1.prefix') . '/products?all=1&search=' . urlencode('111222'))
+        ->assertOk();
+    $slugResponse = getJson(config('venditio.routes.api.v1.prefix') . '/products?all=1&search=' . urlencode('catalog-harbor'))
+        ->assertOk();
 
     expect(collect($idResponse->json())->pluck('id')->all())
         ->toContain($matchingId->getKey())
-        ->not->toContain($nonMatch->getKey());
+        ->not->toContain($scopedOut->getKey());
 
     expect(collect($nameResponse->json())->pluck('id')->all())
         ->toContain($matchingName->getKey())
@@ -994,6 +1014,14 @@ it('searches products index by exact id and partial name or sku while respecting
 
     expect(collect($skuResponse->json())->pluck('id')->all())
         ->toContain($matchingSku->getKey())
+        ->not->toContain($nonMatch->getKey(), $scopedOut->getKey(), $variant->getKey());
+
+    expect(collect($eanResponse->json())->pluck('id')->all())
+        ->toContain($matchingEan->getKey())
+        ->not->toContain($nonMatch->getKey(), $scopedOut->getKey(), $variant->getKey());
+
+    expect(collect($slugResponse->json())->pluck('id')->all())
+        ->toContain($matchingSlug->getKey())
         ->not->toContain($nonMatch->getKey(), $scopedOut->getKey(), $variant->getKey());
 });
 

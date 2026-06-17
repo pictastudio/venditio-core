@@ -16,10 +16,10 @@ params:query {
   ~per_page: 30
   ~sort_by: id
   ~sort_dir: desc
+  ~search: sample
   ~exclude_all_scopes: 0
   ~exclude_active_scope: 0
   ~id[]: 1
-  ~name: sample
   ~slug: sample
   ~active: 0
   ~is_default: 0
@@ -58,10 +58,10 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - id[] (integer[]): Filter by one or more resource IDs.
-  - name (string): Exact-match filter for name.
   - slug (string): Exact-match filter for slug.
   - active (boolean): Exact-match filter for active.
   - is_default (boolean): Exact-match filter for is_default.

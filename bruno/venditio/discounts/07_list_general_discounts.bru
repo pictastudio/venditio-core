@@ -16,6 +16,7 @@ params:query {
   ~apply_to_cart_total: 1
   ~sort_by: id
   ~sort_dir: desc
+  ~search: sample
 }
 
 headers {
@@ -37,6 +38,7 @@ docs {
   - apply_to_cart_total (boolean): Optional extra filter to keep only cart-total discounts among the general ones.
   - sort_by (string): Optional sort field.
   - sort_dir (string): Optional sort direction.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
 
   path params:
   - none

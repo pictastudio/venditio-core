@@ -2,7 +2,6 @@
 
 namespace PictaStudio\Venditio\Http\Controllers\Api\V1;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use PictaStudio\Venditio\Http\Controllers\Api\Controller;
@@ -23,21 +22,11 @@ class OrderController extends Controller
         $filters = request()->except('include');
         $orders = query('order')->with($this->orderIndexRelationsForIncludes($includes));
 
-        if (isset($filters['search']) && is_string($filters['search']) && filled($filters['search'])) {
-            $this->applyOrderSearch($orders, $filters['search']);
-        }
-
         return OrderResource::collection(
             $this->applyBaseFilters(
                 $orders,
                 $filters,
-                'order',
-                [
-                    'search' => [
-                        'sometimes',
-                        'string',
-                    ],
-                ]
+                'order'
             )
         );
     }
@@ -137,15 +126,4 @@ class OrderController extends Controller
             ->all();
     }
 
-    protected function applyOrderSearch(Builder $query, string $search): void
-    {
-        $search = $this->prepareStringFilterValue($search);
-        $model = $query->getModel();
-
-        $query->where(function (Builder $query) use ($model, $search): void {
-            foreach (['identifier', 'user_first_name', 'user_last_name', 'user_email'] as $column) {
-                $query->orWhereLike($model->qualifyColumn($column), $search, caseSensitive: false);
-            }
-        });
-    }
 }

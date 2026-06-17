@@ -16,6 +16,7 @@ params:query {
   ~per_page: 30
   ~sort_by: parent_id
   ~sort_dir: asc
+  ~search: sample
   ~exclude_all_scopes: 0
   ~exclude_active_scope: 0
   ~exclude_date_range_scope: 0
@@ -24,7 +25,6 @@ params:query {
   ~brand_id: 1
   ~product_type_id: 1
   ~tax_class_id: 1
-  ~name: sample
   ~slug: sample
   ~status: sample
   ~active: 0
@@ -86,6 +86,7 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - exclude_date_range_scope (boolean): Skip only the date range global scope when available.
@@ -94,7 +95,6 @@ docs {
   - brand_id (integer): Exact-match filter for brand_id.
   - product_type_id (integer): Exact-match filter for product_type_id.
   - tax_class_id (integer): Exact-match filter for tax_class_id.
-  - name (string): Exact-match filter for name.
   - slug (string): Exact-match filter for slug.
   - status (string): Exact-match filter for status.
   - active (boolean): Exact-match filter for active.

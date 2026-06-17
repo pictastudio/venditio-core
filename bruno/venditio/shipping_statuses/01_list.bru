@@ -16,9 +16,9 @@ params:query {
   ~per_page: 30
   ~sort_by: id
   ~sort_dir: desc
+  ~search: sample
   ~id[]: 1
   ~external_code: sample
-  ~name: sample
   ~created_at: 2026-01-01
   ~created_at_start: 2026-01-01
   ~created_at_end: 2026-12-31
@@ -51,9 +51,9 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - id[] (integer[]): Filter by one or more resource IDs.
   - external_code (string): Exact-match filter for external_code.
-  - name (string): Exact-match filter for name.
   - created_at (date): Exact-match filter for created_at.
   - created_at_start (date): Filter created_at greater than or equal to this date.
   - created_at_end (date): Filter created_at less than or equal to this date.

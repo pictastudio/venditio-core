@@ -20,6 +20,7 @@ params:query {
   ~per_page: 30
   ~sort_by: id
   ~sort_dir: asc
+  ~search: sample
   ~id[]: 1
   ~invoice_id: 1
   ~return_request_id: 1
@@ -56,6 +57,7 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - id[] (integer[]): Filter by one or more credit note IDs.
   - invoice_id (integer): Exact-match filter for the related invoice.
   - return_request_id (integer): Exact-match filter for the credited return request.

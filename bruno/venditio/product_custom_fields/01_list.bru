@@ -16,10 +16,10 @@ params:query {
   ~per_page: 30
   ~sort_by: sort_order
   ~sort_dir: asc
+  ~search: sample
   ~exclude_all_scopes: 0
   ~id[]: 1
   ~product_type_id: 1
-  ~name: sample
   ~required: 0
   ~sort_order: 1
   ~type: sample
@@ -55,10 +55,10 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - id[] (integer[]): Filter by one or more resource IDs.
   - product_type_id (integer): Exact-match filter for product_type_id.
-  - name (string): Exact-match filter for name.
   - required (boolean): Exact-match filter for required.
   - sort_order (integer): Exact-match filter for sort_order.
   - type (string): Exact-match filter for type.

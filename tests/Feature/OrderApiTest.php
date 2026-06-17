@@ -91,7 +91,7 @@ it('clears order payment method when payment method is deleted', function () {
     expect($order->refresh()->payment_method_id)->toBeNull();
 });
 
-it('searches orders by identifier and user snapshot fields', function () {
+it('searches orders by identifier, tracking, discount, and user snapshot fields', function () {
     $defaultAttributes = [
         'addresses' => [
             'billing' => [],
@@ -123,11 +123,27 @@ it('searches orders by identifier and user snapshot fields', function () {
         'user_last_name' => 'Verdi',
         'user_email' => 'shopper.needle@example.test',
     ]));
-    $nonMatch = Order::factory()->create(array_merge($defaultAttributes, [
+    $trackingMatch = Order::factory()->create(array_merge($defaultAttributes, [
         'identifier' => 'ORD-PLAIN-005',
+        'tracking_code' => 'TRACK-NEEDLE-001',
         'user_first_name' => 'Elena',
         'user_last_name' => 'Neri',
         'user_email' => 'elena@example.test',
+    ]));
+    $discountMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-PLAIN-006',
+        'discount_code' => 'NEEDLE-SALE',
+        'user_first_name' => 'Fabio',
+        'user_last_name' => 'Gialli',
+        'user_email' => 'fabio@example.test',
+    ]));
+    $nonMatch = Order::factory()->create(array_merge($defaultAttributes, [
+        'identifier' => 'ORD-PLAIN-007',
+        'tracking_code' => 'TRACK-PLAIN-001',
+        'discount_code' => 'PLAIN-SALE',
+        'user_first_name' => 'Giulia',
+        'user_last_name' => 'Blu',
+        'user_email' => 'giulia@example.test',
     ]));
 
     $response = getJson(config('venditio.routes.api.v1.prefix') . '/orders?all=1&search=' . urlencode('nEeDlE'))
@@ -142,6 +158,8 @@ it('searches orders by identifier and user snapshot fields', function () {
         $firstNameMatch->getKey(),
         $lastNameMatch->getKey(),
         $emailMatch->getKey(),
+        $trackingMatch->getKey(),
+        $discountMatch->getKey(),
     ])->not->toContain($nonMatch->getKey());
 });
 

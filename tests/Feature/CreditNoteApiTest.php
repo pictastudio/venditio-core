@@ -72,6 +72,20 @@ it('creates, lists, returns, and downloads a persisted credit note pdf', functio
 
     expect($indexedIds)->toBe([$creditNoteId]);
 
+    $searchResponse = getJson($prefix . '/orders/' . $order->getKey() . '/credit_notes?all=1&search=' . urlencode($creditNote->identifier))
+        ->assertOk();
+    $invoiceFilterResponse = getJson($prefix . '/orders/' . $order->getKey() . '/credit_notes?all=1&invoice_id=' . $invoice->getKey())
+        ->assertOk();
+    $returnRequestFilterResponse = getJson($prefix . '/orders/' . $order->getKey() . '/credit_notes?all=1&return_request_id=' . $returnRequest->getKey())
+        ->assertOk();
+
+    expect(collect(creditNoteApiListData($searchResponse->json()))->pluck('id')->all())
+        ->toBe([$creditNoteId])
+        ->and(collect(creditNoteApiListData($invoiceFilterResponse->json()))->pluck('id')->all())
+        ->toBe([$creditNoteId])
+        ->and(collect(creditNoteApiListData($returnRequestFilterResponse->json()))->pluck('id')->all())
+        ->toBe([$creditNoteId]);
+
     getJson($prefix . '/orders/' . $order->getKey() . '/credit_notes/' . $creditNoteId)
         ->assertOk()
         ->assertJsonPath('id', $creditNoteId)

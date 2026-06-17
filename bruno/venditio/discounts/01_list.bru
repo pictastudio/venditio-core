@@ -16,6 +16,7 @@ params:query {
   ~per_page: 30
   ~sort_by: id
   ~sort_dir: desc
+  ~search: sample
   ~exclude_all_scopes: 0
   ~exclude_active_scope: 0
   ~id[]: 1
@@ -24,7 +25,6 @@ params:query {
   ~discountable_id: 1
   ~type: fixed_price
   ~value: 10
-  ~name: sample
   ~code: sample
   ~active: 0
   ~starts_at: 2026-01-01
@@ -76,6 +76,7 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - exclude_all_scopes (boolean): Skip all global scopes for this request.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - id[] (integer[]): Filter by one or more resource IDs.
@@ -84,7 +85,6 @@ docs {
   - discountable_id (integer): Exact-match filter for discountable_id.
   - type (string): Exact-match filter for type. Supported values: percentage, fixed, fixed_price.
   - value (number): Exact-match filter for value.
-  - name (string): Exact-match filter for name.
   - code (string): Exact-match filter for code.
   - active (boolean): Exact-match filter for active.
   - starts_at (date): Exact-match filter for starts_at.

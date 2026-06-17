@@ -16,8 +16,8 @@ params:query {
   ~per_page: 30
   ~sort_by: sort_order
   ~sort_dir: asc
+  ~search: sample
   ~id[]: 1
-  ~name: sample
   ~slug: sample
   ~abstract: sample
   ~description: sample
@@ -60,8 +60,8 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
+  - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
   - id[] (integer[]): Filter by one or more resource IDs.
-  - name (string): Exact-match filter for name.
   - slug (string): Exact-match filter for slug.
   - abstract (string): Exact-match filter for abstract.
   - description (string): Exact-match filter for description.
