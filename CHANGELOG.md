@@ -2,6 +2,27 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.10.3 - 2026-06-22
+
+### What's Changed
+
+This patch release normalizes persisted cart, order, product, and address snapshots so stored ecommerce payloads keep the fields needed for pricing, taxes, invoices, and returns while dropping unnecessary relation and metadata data.
+
+### Fixes
+
+- **Compact persisted snapshots** - Added shared product and address snapshot normalizers and applied them to cart/order DTOs, cart/order line writes, return billing addresses, invoice payload addresses, and cart line product pricing snapshots.
+- **Product preview loading** - Adjusted product relation loading so price previews still receive discount-relevant brand, category, collection, product type, and parent context without loading variant option media unless the variants options table is requested.
+
+### Tooling
+
+- Updated Bruno cart, order, and order-line request documentation to describe address and product snapshot normalization.
+
+### Tests
+
+- Added and updated feature coverage for compact cart line product snapshots, stripped unsupported address keys, and sanitized price-list pricing snapshot payloads.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.10.2...v2.10.3
+
 ## v2.10.2 - 2026-06-17
 
 ### What's Changed
