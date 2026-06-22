@@ -46,9 +46,11 @@ class ProductVariantOptionResource extends JsonResource
 
     protected function resolveSharedImages(): array
     {
-        $variantProducts = $this->resource->relationLoaded('variantProducts')
-            ? $this->resource->variantProducts
-            : $this->resource->variantProducts()->get();
+        if (!$this->resource->relationLoaded('variantProducts')) {
+            return [];
+        }
+
+        $variantProducts = $this->resource->variantProducts;
 
         $sharedImages = $variantProducts
             ->flatMap(function (Product $product): array {

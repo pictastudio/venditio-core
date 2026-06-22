@@ -178,7 +178,6 @@ class ProductResource extends JsonResource
         ]);
 
         if ($this->resource instanceof Model) {
-            $this->resource->loadMissing(['categories', 'collections', 'brand', 'productType', 'parent']);
             $previewLine->setRelation('product', $this->resource);
         }
 

@@ -9,6 +9,7 @@ use PictaStudio\Venditio\Http\Controllers\Api\Controller;
 use PictaStudio\Venditio\Http\Requests\V1\OrderLine\{StoreOrderLineRequest, UpdateOrderLineRequest};
 use PictaStudio\Venditio\Http\Resources\V1\OrderLineResource;
 use PictaStudio\Venditio\Models\OrderLine;
+use PictaStudio\Venditio\Support\ProductSnapshot;
 
 use function PictaStudio\Venditio\Helpers\Functions\query;
 
@@ -35,6 +36,7 @@ class OrderLineController extends Controller
 
         $payload = $request->validated();
         $payload['currency_id'] = $this->resolveInventoryCurrencyId((int) $payload['product_id']);
+        $payload['product_data'] = ProductSnapshot::fromArray($payload['product_data']);
 
         $orderLine = query('order_line')->create($payload);
 
@@ -60,6 +62,10 @@ class OrderLineController extends Controller
 
         if (array_key_exists('product_id', $payload)) {
             $payload['currency_id'] = $this->resolveInventoryCurrencyId((int) $payload['product_id']);
+        }
+
+        if (array_key_exists('product_data', $payload)) {
+            $payload['product_data'] = ProductSnapshot::fromArray($payload['product_data']);
         }
 
         $orderLine->fill($payload);

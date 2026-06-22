@@ -247,7 +247,10 @@ class ProductController extends Controller
 
     protected function productRelationsForIncludes(array $includes): array
     {
-        $relations = ['variantOptions.productVariant', 'variantOptions.variantProducts', 'inventory'];
+        $relations = [
+            'inventory',
+            ...$this->productPricePreviewRelations(),
+        ];
         $includesCollection = collect($includes);
 
         if (config('venditio.price_lists.enabled', false)) {
@@ -267,21 +270,11 @@ class ProductController extends Controller
         }
 
         if ($includesCollection->contains('related_products')) {
-            $relations[] = 'relatedProducts.variantOptions.productVariant';
-            $relations[] = 'relatedProducts.variantOptions.variantProducts';
             $relations[] = 'relatedProducts.inventory';
-
-            if ($includesCollection->contains('brand')) {
-                $relations[] = 'relatedProducts.brand';
-            }
-
-            if ($includesCollection->contains('categories')) {
-                $relations[] = 'relatedProducts.categories';
-            }
-
-            if ($includesCollection->contains('collections')) {
-                $relations[] = 'relatedProducts.collections';
-            }
+            $relations = [
+                ...$relations,
+                ...$this->prefixedProductPricePreviewRelations('relatedProducts'),
+            ];
 
             $relations = [
                 ...$relations,
@@ -323,21 +316,11 @@ class ProductController extends Controller
         }
 
         if (in_array('variants', $includes, true) || in_array('variants_options_table', $includes, true)) {
-            $relations[] = 'variants.variantOptions.productVariant';
-            $relations[] = 'variants.variantOptions.variantProducts';
             $relations[] = 'variants.inventory';
-
-            if ($includesCollection->contains('brand')) {
-                $relations[] = 'variants.brand';
-            }
-
-            if ($includesCollection->contains('categories')) {
-                $relations[] = 'variants.categories';
-            }
-
-            if ($includesCollection->contains('collections')) {
-                $relations[] = 'variants.collections';
-            }
+            $relations = [
+                ...$relations,
+                ...$this->prefixedProductPricePreviewRelations('variants'),
+            ];
 
             $relations = [
                 ...$relations,
@@ -361,9 +344,32 @@ class ProductController extends Controller
             }
         }
 
+        if (in_array('variants_options_table', $includes, true)) {
+            $relations[] = 'variants.variantOptions.productVariant';
+            $relations[] = 'variants.variantOptions.variantProducts';
+        }
+
         return collect($relations)
             ->unique()
             ->values()
+            ->all();
+    }
+
+    protected function productPricePreviewRelations(): array
+    {
+        return [
+            'categories',
+            'collections',
+            'brand',
+            'productType',
+            'parent',
+        ];
+    }
+
+    protected function prefixedProductPricePreviewRelations(string $prefix): array
+    {
+        return collect($this->productPricePreviewRelations())
+            ->map(fn (string $relation): string => "{$prefix}.{$relation}")
             ->all();
     }
 

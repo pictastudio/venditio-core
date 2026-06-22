@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use PictaStudio\Venditio\Dto\CartDto;
 use PictaStudio\Venditio\Enums\{DiscountType, ProductStatus};
-use PictaStudio\Venditio\Models\{Cart, Country, CountryTaxClass, Currency, Product, TaxClass, User};
+use PictaStudio\Venditio\Models\{Cart, Country, CountryTaxClass, Currency, Product, ProductCategory, TaxClass, User};
 use PictaStudio\Venditio\Pipelines\Cart\CartCreationPipeline;
 
 use function Pest\Laravel\{assertSoftDeleted, deleteJson, getJson, patchJson, postJson};
@@ -115,6 +115,39 @@ it('creates a cart through api with lines', function () {
         ->assertOk()
         ->assertJsonPath('lines.0.product_id', $product->getKey())
         ->assertJsonPath('lines.0.qty', 2);
+});
+
+it('stores compact product snapshots on cart lines', function () {
+    $taxClass = TaxClass::factory()->create();
+    setupCartTaxEnvironment($taxClass);
+    $product = createCartProduct($taxClass);
+    $category = ProductCategory::factory()->create();
+    $product->categories()->attach($category->getKey());
+
+    $response = postJson(config('venditio.routes.api.v1.prefix') . '/carts', [
+        'lines' => [
+            ['product_id' => $product->getKey(), 'qty' => 1],
+        ],
+    ])->assertCreated();
+
+    $cart = Cart::query()
+        ->with('lines')
+        ->findOrFail($response->json('id'));
+    $productData = $cart->lines->first()->product_data;
+
+    expect($productData)->toBeArray()
+        ->and(data_get($productData, 'id'))->toBe($product->getKey())
+        ->and(data_get($productData, 'brand_id'))->toBe($product->brand_id)
+        ->and(data_get($productData, 'inventory.price_includes_tax'))->toBeFalse()
+        ->and((float) data_get($productData, 'price_calculated.price'))->toBe(100.0)
+        ->and(data_get($productData, 'brand'))->toBeNull()
+        ->and(data_get($productData, 'categories'))->toBeNull()
+        ->and(data_get($productData, 'collections'))->toBeNull()
+        ->and(data_get($productData, 'variant_options'))->toBeNull()
+        ->and(data_get($productData, 'price_list_prices'))->toBeNull()
+        ->and(data_get($productData, 'description'))->toBeNull()
+        ->and(data_get($productData, 'metadata'))->toBeNull()
+        ->and(data_get($productData, 'active'))->toBeNull();
 });
 
 it('creates a cart through api for out-of-stock products when inventory stock management is disabled', function () {
@@ -475,6 +508,7 @@ it('accepts sdi and pec in cart addresses', function () {
             'billing' => [
                 'sdi' => 'ABC1234',
                 'pec' => 'billing@pec.example.test',
+                'unneeded_blob' => ['keep' => false],
             ],
         ],
     ])->assertCreated()
@@ -483,7 +517,8 @@ it('accepts sdi and pec in cart addresses', function () {
     getJson($prefix . '/carts/' . $cartId)
         ->assertOk()
         ->assertJsonPath('addresses.billing.sdi', 'ABC1234')
-        ->assertJsonPath('addresses.billing.pec', 'billing@pec.example.test');
+        ->assertJsonPath('addresses.billing.pec', 'billing@pec.example.test')
+        ->assertJsonMissingPath('addresses.billing.unneeded_blob');
 });
 
 it('rejects invalid pec in cart addresses', function () {

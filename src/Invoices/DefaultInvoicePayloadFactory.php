@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use PictaStudio\Venditio\Contracts\{InvoicePayloadFactoryInterface, InvoiceSellerResolverInterface};
+use PictaStudio\Venditio\Support\AddressSnapshot;
 
 class DefaultInvoicePayloadFactory implements InvoicePayloadFactoryInterface
 {
@@ -143,12 +144,6 @@ class DefaultInvoicePayloadFactory implements InvoicePayloadFactoryInterface
      */
     protected function normalizeAddress(mixed $address): array
     {
-        if (!is_array($address)) {
-            return [];
-        }
-
-        return collect($address)
-            ->filter(fn (mixed $value): bool => $value !== null && $value !== '')
-            ->all();
+        return AddressSnapshot::make($address);
     }
 }

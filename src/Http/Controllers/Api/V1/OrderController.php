@@ -9,6 +9,7 @@ use PictaStudio\Venditio\Http\Requests\V1\Order\{StoreOrderRequest, UpdateOrderR
 use PictaStudio\Venditio\Http\Resources\V1\OrderResource;
 use PictaStudio\Venditio\Models\Order;
 use PictaStudio\Venditio\Pipelines\Order\OrderCreationPipeline;
+use PictaStudio\Venditio\Support\AddressSnapshot;
 
 use function PictaStudio\Venditio\Helpers\Functions\{query, resolve_dto};
 
@@ -60,7 +61,13 @@ class OrderController extends Controller
     {
         $this->authorizeIfConfigured('update', $order);
 
-        $order->fill($request->validated());
+        $payload = $request->validated();
+
+        if (array_key_exists('addresses', $payload)) {
+            $payload['addresses'] = AddressSnapshot::collection($payload['addresses']) ?? [];
+        }
+
+        $order->fill($payload);
         $order->save();
 
         $includes = $this->resolveOrderIncludes();
@@ -125,5 +132,4 @@ class OrderController extends Controller
             ->values()
             ->all();
     }
-
 }

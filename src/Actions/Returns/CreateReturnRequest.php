@@ -5,6 +5,7 @@ namespace PictaStudio\Venditio\Actions\Returns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\{Arr, Fluent};
 use Illuminate\Support\Facades\DB;
+use PictaStudio\Venditio\Support\AddressSnapshot;
 
 use function PictaStudio\Venditio\Helpers\Functions\query;
 
@@ -50,7 +51,7 @@ class CreateReturnRequest
 
         $billingAddress = data_get($addresses, 'billing');
 
-        return is_array($billingAddress) ? $billingAddress : [];
+        return AddressSnapshot::make($billingAddress);
     }
 
     private function relations(): array

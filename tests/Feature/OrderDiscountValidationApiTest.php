@@ -196,11 +196,13 @@ it('accepts sdi and pec when updating order addresses', function () {
             'billing' => [
                 'sdi' => 'ABC1234',
                 'pec' => 'billing@pec.example.test',
+                'unneeded_blob' => ['keep' => false],
             ],
         ],
     ])->assertOk()
         ->assertJsonPath('addresses.billing.sdi', 'ABC1234')
-        ->assertJsonPath('addresses.billing.pec', 'billing@pec.example.test');
+        ->assertJsonPath('addresses.billing.pec', 'billing@pec.example.test')
+        ->assertJsonMissingPath('addresses.billing.unneeded_blob');
 });
 
 it('rejects invalid pec when updating order addresses', function () {

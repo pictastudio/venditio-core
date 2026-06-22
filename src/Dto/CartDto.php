@@ -3,9 +3,10 @@
 namespace PictaStudio\Venditio\Dto;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\{Collection, Fluent};
+use Illuminate\Support\Collection;
 use PictaStudio\Venditio\Dto\Contracts\CartDtoContract;
 use PictaStudio\Venditio\Models\Cart;
+use PictaStudio\Venditio\Support\AddressSnapshot;
 use ReflectionClass;
 
 use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
@@ -110,11 +111,7 @@ class CartDto extends Dto implements CartDtoContract
     {
         $addresses = $this->addresses ?? $this->getCart()?->addresses;
 
-        if ($addresses instanceof Fluent) {
-            return $addresses->toArray();
-        }
-
-        return $addresses;
+        return AddressSnapshot::collection($addresses);
     }
 
     /**

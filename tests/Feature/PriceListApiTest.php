@@ -218,7 +218,11 @@ it('upserts multiple price list prices across multiple products and price lists'
     ]);
     $secondProduct = $secondProduct->refresh();
     $retail = PriceList::factory()->create(['name' => 'Retail']);
-    $wholesale = PriceList::factory()->create(['name' => 'Wholesale']);
+    $wholesale = PriceList::factory()->create([
+        'name' => 'Wholesale',
+        'description' => 'Internal wholesale notes',
+        'metadata' => ['erp_segment' => 'b2b'],
+    ]);
 
     $existingPrice = PriceListPrice::factory()->create([
         'product_id' => $firstProduct->getKey(),
@@ -381,7 +385,11 @@ it('uses the default price list price in cart line pricing when enabled', functi
         ->assertOk()
         ->assertJsonPath('lines.0.unit_price', 95)
         ->assertJsonPath('lines.0.product_data.pricing.price_list.name', 'Wholesale')
-        ->assertJsonPath('lines.0.product_data.pricing.price_list.allow_discounts', true);
+        ->assertJsonPath('lines.0.product_data.pricing.price_list.allow_discounts', true)
+        ->assertJsonMissingPath('lines.0.product_data.pricing.price_list.description')
+        ->assertJsonMissingPath('lines.0.product_data.pricing.price_list.metadata')
+        ->assertJsonMissingPath('lines.0.product_data.pricing.price_source.price_list.description')
+        ->assertJsonMissingPath('lines.0.product_data.pricing.price_source.price_list.metadata');
 });
 
 it('suppresses product price breakdown discounts when the resolved price list disallows discounts', function () {

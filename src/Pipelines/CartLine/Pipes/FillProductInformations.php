@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use PictaStudio\Venditio\Contracts\ProductPriceResolverInterface;
 use PictaStudio\Venditio\Dto\Contracts\CartLineDtoContract;
+use PictaStudio\Venditio\Support\ProductSnapshot;
 
 use function PictaStudio\Venditio\Helpers\Functions\query;
 
@@ -25,19 +26,22 @@ class FillProductInformations
 
         $product = $this->fetchProduct($cartLineDto);
         $resolvedPricing = app(ProductPriceResolverInterface::class)->resolve($product);
-        $productData = $product->toArray();
+        $productData = $this->productSnapshot($product);
+        $priceList = ProductSnapshot::priceListSummary($resolvedPricing['price_list'] ?? null);
+        $priceSource = ProductSnapshot::priceSource($resolvedPricing['price_source'] ?? null);
 
         data_set($productData, 'inventory.price_includes_tax', (bool) ($resolvedPricing['price_includes_tax'] ?? true));
-        data_set($productData, 'pricing.price_list', $resolvedPricing['price_list'] ?? null);
-        data_set($productData, 'pricing.price_source', $resolvedPricing['price_source'] ?? null);
+        data_set($productData, 'pricing.price_list', $priceList);
+        data_set($productData, 'pricing.price_source', $priceSource);
         data_set($productData, 'price_calculated', [
             'price' => (float) ($resolvedPricing['unit_price'] ?? 0),
             'price_final' => (float) ($resolvedPricing['unit_price'] ?? 0),
             'purchase_price' => isset($resolvedPricing['purchase_price']) ? (float) $resolvedPricing['purchase_price'] : null,
             'price_includes_tax' => (bool) ($resolvedPricing['price_includes_tax'] ?? true),
-            'price_list' => $resolvedPricing['price_list'] ?? null,
-            'price_source' => $resolvedPricing['price_source'] ?? null,
+            'price_list' => $priceList,
+            'price_source' => $priceSource,
         ]);
+        $productData = ProductSnapshot::fromArray($productData);
 
         $cartLine->product()->associate($product);
         $currencyId = $this->resolveCurrencyIdForProduct($product);
@@ -59,18 +63,22 @@ class FillProductInformations
     {
         $productId = $cartLineDto->getPurchasableModelId();
 
+        $relations = [
+            'inventory',
+            'categories',
+            'collections',
+            'brand',
+            'productType',
+            'parent',
+        ];
+
+        if (config('venditio.price_lists.enabled', false)) {
+            $relations[] = 'priceListPrices.priceList';
+        }
+
         $query = query('product')
             ->withoutGlobalScopes()
-            ->with([
-                'inventory',
-                'categories',
-                'collections',
-                'brand',
-                'productType',
-                'variantOptions',
-                'parent',
-                'priceListPrices.priceList',
-            ])
+            ->with($relations)
             ->whereKey($productId);
 
         $this->applyPurchasableProductConstraints($query);
@@ -128,6 +136,11 @@ class FillProductInformations
         }
 
         return (int) $currencyId;
+    }
+
+    private function productSnapshot(Model $product): array
+    {
+        return ProductSnapshot::make($product);
     }
 
     private function resolveDefaultCurrencyId(): ?int

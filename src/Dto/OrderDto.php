@@ -5,6 +5,7 @@ namespace PictaStudio\Venditio\Dto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\{Collection, Fluent};
 use PictaStudio\Venditio\Dto\Contracts\OrderDtoContract;
+use PictaStudio\Venditio\Support\AddressSnapshot;
 use ReflectionClass;
 
 use function PictaStudio\Venditio\Helpers\Functions\get_fresh_model_instance;
@@ -69,8 +70,8 @@ class OrderDto extends Dto implements OrderDtoContract
             $cart->discount_code,
             $cart->discount_amount,
             $cart->total_final,
-            $cart->shippingMethod?->toArray(),
-            $cart->shippingZone?->toArray(),
+            static::modelSnapshot($cart->shippingMethod),
+            static::modelSnapshot($cart->shippingZone),
         ]);
 
         return $dto;
@@ -114,6 +115,11 @@ class OrderDto extends Dto implements OrderDtoContract
         return get_fresh_model_instance('order');
     }
 
+    private static function modelSnapshot(?Model $model): ?array
+    {
+        return $model?->attributesToArray();
+    }
+
     public function toArray(): array
     {
         return [
@@ -134,12 +140,12 @@ class OrderDto extends Dto implements OrderDtoContract
             'discount_code' => $this->getDiscountCode(),
             'discount_amount' => $this->discountAmount ?? $this->cart?->discount_amount ?? 0,
             'total_final' => $this->totalFinal ?? $this->cart?->total_final ?? 0,
-            'addresses' => $this->addresses
-                ?? $this->normalizeAddresses($this->cart?->addresses)
-                ?? [],
+            'addresses' => AddressSnapshot::collection(
+                $this->addresses ?? $this->cart?->addresses
+            ) ?? [],
             'customer_notes' => $this->getCustomerNotes(),
-            'shipping_method_data' => $this->shippingMethodData ?? $this->cart?->shippingMethod?->toArray(),
-            'shipping_zone_data' => $this->shippingZoneData ?? $this->cart?->shippingZone?->toArray(),
+            'shipping_method_data' => $this->shippingMethodData ?? static::modelSnapshot($this->cart?->shippingMethod),
+            'shipping_zone_data' => $this->shippingZoneData ?? static::modelSnapshot($this->cart?->shippingZone),
         ];
     }
 
@@ -209,14 +215,6 @@ class OrderDto extends Dto implements OrderDtoContract
 
     private function normalizeAddresses(mixed $addresses): ?array
     {
-        if (is_array($addresses)) {
-            return $addresses;
-        }
-
-        if ($addresses instanceof Fluent) {
-            return $addresses->toArray();
-        }
-
-        return null;
+        return AddressSnapshot::collection($addresses);
     }
 }
