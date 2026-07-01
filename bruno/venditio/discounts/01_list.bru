@@ -77,7 +77,7 @@ docs {
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
   - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
-  - exclude_all_scopes (boolean): Skip all global scopes for this request.
+  - exclude_all_scopes (boolean): Skip all non-soft-delete global scopes for this request; use with_trashed or only_trashed for soft-deleted records.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - id[] (integer[]): Filter by one or more resource IDs.
   - is_general (boolean): When true, return only discounts without a discountable target. When false, return only scoped discounts.

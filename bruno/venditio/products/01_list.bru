@@ -91,7 +91,7 @@ docs {
   - per_page (integer): Items per page (bounded by API config).
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
-  - exclude_all_scopes (boolean): Skip all global scopes for this request.
+  - exclude_all_scopes (boolean): Skip all non-soft-delete global scopes for this request; use with_trashed or only_trashed for soft-deleted records.
   - exclude_active_scope (boolean): Skip only the active global scope when available.
   - exclude_date_range_scope (boolean): Skip only the date range global scope when available.
   - search (string): Case-insensitive partial search across name, sku, ean, and slug; numeric values also match id exactly.

@@ -56,7 +56,7 @@ docs {
   - sort_by (string): Sort field. Allowed: id and filterable columns.
   - sort_dir (string): Sort direction: asc or desc.
   - search (string): Case-insensitive partial search across the resource's configured searchable fields; numeric values also match id and configured integer search columns.
-  - exclude_all_scopes (boolean): Skip all global scopes for this request.
+  - exclude_all_scopes (boolean): Skip all non-soft-delete global scopes for this request; use with_trashed or only_trashed for soft-deleted records.
   - id[] (integer[]): Filter by one or more resource IDs.
   - product_variant_id (integer): Exact-match filter for product_variant_id.
   - hex_color (string): Exact-match filter for hex_color.

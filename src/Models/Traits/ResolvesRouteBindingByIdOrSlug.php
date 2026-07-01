@@ -3,17 +3,22 @@
 namespace PictaStudio\Venditio\Models\Traits;
 
 use Illuminate\Database\Eloquent\{Builder, Model};
+use PictaStudio\Venditio\Support\NonSoftDeletingScopeExcluder;
 
 trait ResolvesRouteBindingByIdOrSlug
 {
     public function resolveRouteBinding($value, $field = null): ?Model
     {
         if ($field !== null) {
-            return parent::resolveRouteBinding($value, $field);
+            return $this->resolveRouteBindingQuery(
+                $this->newRouteBindingQuery(),
+                $value,
+                $field
+            )->first();
         }
 
         $model = $this->resolveRouteBindingQuery(
-            $this->newQuery(),
+            $this->newRouteBindingQuery(),
             $value,
             $this->getKeyName()
         )->first();
@@ -23,7 +28,7 @@ trait ResolvesRouteBindingByIdOrSlug
         }
 
         $model = $this->resolveRouteBindingQuery(
-            $this->newQuery(),
+            $this->newRouteBindingQuery(),
             $value,
             'slug'
         )->first();
@@ -78,9 +83,20 @@ trait ResolvesRouteBindingByIdOrSlug
         }
 
         return $this->resolveRouteBindingQuery(
-            $this->newQuery(),
+            $this->newRouteBindingQuery(),
             $translatedId,
             $this->getKeyName()
         )->first();
+    }
+
+    private function newRouteBindingQuery(): Builder
+    {
+        $query = $this->newQuery();
+
+        if (request()->boolean('exclude_all_scopes')) {
+            return NonSoftDeletingScopeExcluder::apply($query);
+        }
+
+        return $query;
     }
 }

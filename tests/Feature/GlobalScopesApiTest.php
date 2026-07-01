@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PictaStudio\Venditio\Enums\ProductStatus;
 use PictaStudio\Venditio\Models\{Brand, Product, ProductCategory, TaxClass};
@@ -191,6 +192,54 @@ it('applies the active global scope to brands by default and allows excluding it
         ->toContain($activeBrand->getKey(), $inactiveBrand->getKey());
 });
 
+it('excludes host global scopes but keeps soft delete scope when exclude_all_scopes is true', function () {
+    config()->set('venditio.models.brand', BrandWithHostVisibilityScope::class);
+
+    $visibleBrand = Brand::factory()->create([
+        'name' => 'Visible Brand',
+        'active' => true,
+    ]);
+
+    $hostHiddenBrand = Brand::factory()->create([
+        'name' => 'Hidden Brand',
+        'active' => true,
+    ]);
+
+    $deletedBrand = Brand::factory()->create([
+        'name' => 'Deleted Brand',
+        'active' => true,
+    ]);
+    $deletedBrand->delete();
+
+    $defaultResponse = getJson(config('venditio.routes.api.v1.prefix') . '/brands?all=1')
+        ->assertOk();
+
+    expect(collect($defaultResponse->json())->pluck('id')->all())
+        ->toContain($visibleBrand->getKey())
+        ->not->toContain($hostHiddenBrand->getKey(), $deletedBrand->getKey());
+
+    getJson(config('venditio.routes.api.v1.prefix') . "/brands/{$hostHiddenBrand->getKey()}")
+        ->assertNotFound();
+
+    $excludeAllResponse = getJson(config('venditio.routes.api.v1.prefix') . '/brands?all=1&exclude_all_scopes=1')
+        ->assertOk();
+
+    expect(collect($excludeAllResponse->json())->pluck('id')->all())
+        ->toContain($visibleBrand->getKey(), $hostHiddenBrand->getKey())
+        ->not->toContain($deletedBrand->getKey());
+
+    getJson(config('venditio.routes.api.v1.prefix') . "/brands/{$hostHiddenBrand->getKey()}?exclude_all_scopes=1")
+        ->assertOk()
+        ->assertJsonPath('id', $hostHiddenBrand->getKey());
+
+    $withTrashedResponse = getJson(
+        config('venditio.routes.api.v1.prefix') . '/brands?all=1&exclude_all_scopes=1&with_trashed=1'
+    )->assertOk();
+
+    expect(collect($withTrashedResponse->json())->pluck('id')->all())
+        ->toContain($visibleBrand->getKey(), $hostHiddenBrand->getKey(), $deletedBrand->getKey());
+});
+
 it('allows explicit date filters to override the date range global scope', function () {
     $futureCategory = ProductCategory::factory()->create([
         'active' => true,
@@ -212,3 +261,17 @@ it('allows explicit date filters to override the date range global scope', funct
 
     expect(collect($response->json())->pluck('id')->all())->toContain($futureCategory->getKey());
 });
+
+class BrandWithHostVisibilityScope extends Brand
+{
+    protected $table = 'brands';
+
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        static::addGlobalScope('host_visible', function (Builder $builder): void {
+            $builder->where('name', 'like', 'Visible%');
+        });
+    }
+}

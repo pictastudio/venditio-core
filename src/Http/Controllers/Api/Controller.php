@@ -13,6 +13,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\{Rule, ValidationException};
 use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange, Ordered, ProductStatusActive};
+use PictaStudio\Venditio\Support\NonSoftDeletingScopeExcluder;
 use PictaStudio\Venditio\Traits\ValidatesData;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
@@ -118,6 +119,13 @@ class Controller extends BaseController
 
         $this->ensureNoUnknownFilterParameters($filters, $rules);
         $validatedFilters = $this->validateData($filters, $rules);
+
+        if (
+            array_key_exists('exclude_all_scopes', $validatedFilters)
+            && filter_var($validatedFilters['exclude_all_scopes'], FILTER_VALIDATE_BOOL)
+        ) {
+            NonSoftDeletingScopeExcluder::apply($query);
+        }
 
         $this->removeImplicitScopesOverriddenByExplicitFilters($query, $model, $validatedFilters);
 
