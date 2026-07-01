@@ -41,7 +41,7 @@ docs {
   - path: /product/:product-id-or-slug/:variant-option-id/upload
 
   path params:
-  - product-id-or-slug: Base product id/slug, or a variant product id/slug to target a single matching variant.
+  - product-id-or-slug: Base product canonical positive integer ID or slug, or a variant product canonical positive integer ID or slug to target a single matching variant. Leading-zero or mixed values (for example `001` or `01-slug`) resolve as slugs.
   - variant-option-id: Variant option id whose matching products will receive the uploaded media.
 
   body:

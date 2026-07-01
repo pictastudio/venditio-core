@@ -62,7 +62,7 @@ docs {
   - include (string|array): Optional includes: tags, products_count, discounts, valid_discounts, expired_discounts.
 
   path params:
-  - id-or-slug: Replace with target resource identifier.
+  - id-or-slug: Use a canonical positive integer for ID lookup, or any slug. Leading-zero or mixed values (for example `001` or `01-slug`) resolve as slugs.
 
   body:
   - JSON payload.

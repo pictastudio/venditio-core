@@ -29,7 +29,7 @@ docs {
   - path: /brands/:id-or-slug/images/:image-id
 
   path params:
-  - id-or-slug: Replace with target brand identifier.
+  - id-or-slug: Use a canonical positive integer brand ID, or any brand slug. Leading-zero or mixed values (for example `001` or `01-slug`) resolve as slugs.
   - image-id: Unique image id returned in the brand `images` array.
 
   behavior:

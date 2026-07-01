@@ -40,7 +40,7 @@ docs {
   - By default, deleting a parent product category preserves direct child categories, moves them to the deleted category's parent, and rebuilds their tree paths.
 
   path params:
-  - id-or-slug: Replace with target resource identifier.
+  - id-or-slug: Use a canonical positive integer for ID lookup, or any slug. Leading-zero or mixed values (for example `001` or `01-slug`) resolve as slugs.
 
   body:
   - none

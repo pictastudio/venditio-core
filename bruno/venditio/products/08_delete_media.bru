@@ -29,7 +29,7 @@ docs {
   - path: /products/:id-or-slug/media/:media-id
 
   path params:
-  - id-or-slug: Replace with target product identifier.
+  - id-or-slug: Use a canonical positive integer product ID, or any product slug. Leading-zero or mixed values (for example `001` or `01-slug`) resolve as slugs.
   - media-id: Unique media id returned in the product `files` array.
 
   behavior:

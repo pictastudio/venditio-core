@@ -29,7 +29,7 @@ docs {
   - path: /tags/:id-or-slug/images/:image-id
 
   path params:
-  - id-or-slug: Replace with target tag identifier.
+  - id-or-slug: Use a canonical positive integer tag ID, or any tag slug. Leading-zero or mixed values (for example `001` or `01-slug`) resolve as slugs.
   - image-id: Unique image id returned in the tag `images` array.
 
   behavior:

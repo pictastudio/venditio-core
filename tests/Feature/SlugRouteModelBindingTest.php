@@ -162,6 +162,54 @@ it('resolves products by slug for show, update and variants routes', function ()
         ->assertJsonPath('id', $productId);
 });
 
+it('resolves non-canonical numeric-looking product route values by slug', function () {
+    $taxClass = TaxClass::factory()->create();
+
+    $firstProductResponse = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
+        'tax_class_id' => $taxClass->getKey(),
+        'name' => 'First Collision Product',
+        'sku' => 'SLUG-BINDING-COLLISION-001',
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ])->assertCreated();
+
+    $mixedSlugResponse = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
+        'tax_class_id' => $taxClass->getKey(),
+        'name' => '01 slug',
+        'sku' => 'SLUG-BINDING-COLLISION-002',
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ])->assertCreated();
+
+    $leadingZeroSlugResponse = postJson(config('venditio.routes.api.v1.prefix') . '/products', [
+        'tax_class_id' => $taxClass->getKey(),
+        'name' => '001',
+        'sku' => 'SLUG-BINDING-COLLISION-003',
+        'status' => ProductStatus::Published,
+        'active' => true,
+        'visible_from' => null,
+        'visible_until' => null,
+    ])->assertCreated();
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/products/' . $firstProductResponse->json('id'))
+        ->assertOk()
+        ->assertJsonPath('id', $firstProductResponse->json('id'));
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/products/01-slug')
+        ->assertOk()
+        ->assertJsonPath('id', $mixedSlugResponse->json('id'))
+        ->assertJsonPath('slug', '01-slug');
+
+    getJson(config('venditio.routes.api.v1.prefix') . '/products/001')
+        ->assertOk()
+        ->assertJsonPath('id', $leadingZeroSlugResponse->json('id'))
+        ->assertJsonPath('slug', '001');
+});
+
 it('resolves products by translated slug for show, update and variants routes', function () {
     config()->set('translatable.locales', ['en', 'it']);
     app()->setLocale('en');

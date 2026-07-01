@@ -10,6 +10,10 @@ trait ResolvesRouteBindingByIdOrSlug
     public function resolveRouteBinding($value, $field = null): ?Model
     {
         if ($field !== null) {
+            if ($field === $this->getKeyName() && !$this->isCanonicalRouteKey($value)) {
+                return null;
+            }
+
             return $this->resolveRouteBindingQuery(
                 $this->newRouteBindingQuery(),
                 $value,
@@ -17,11 +21,13 @@ trait ResolvesRouteBindingByIdOrSlug
             )->first();
         }
 
-        $model = $this->resolveRouteBindingQuery(
-            $this->newRouteBindingQuery(),
-            $value,
-            $this->getKeyName()
-        )->first();
+        $model = $this->isCanonicalRouteKey($value)
+            ? $this->resolveRouteBindingQuery(
+                $this->newRouteBindingQuery(),
+                $value,
+                $this->getKeyName()
+            )->first()
+            : null;
 
         if ($model !== null) {
             return $model;
@@ -38,6 +44,19 @@ trait ResolvesRouteBindingByIdOrSlug
         }
 
         return $this->resolveByTranslatedSlug($value);
+    }
+
+    private function isCanonicalRouteKey(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        if (!is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[1-9][0-9]*$/', $value) === 1;
     }
 
     private function resolveByTranslatedSlug(mixed $value): ?Model
