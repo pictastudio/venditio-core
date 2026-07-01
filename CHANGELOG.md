@@ -2,6 +2,27 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.10.4 - 2026-07-01
+
+### What's Changed
+
+This patch release tightens scope and route-binding behavior so API consumers can safely bypass host global scopes without surfacing soft-deleted records, while numeric-looking slugs resolve predictably as slugs instead of being coerced into ID lookups.
+
+### Fixes
+
+- **Scope exclusion safety** - `exclude_all_scopes` now removes host and package global scopes while preserving the soft-delete scope unless `with_trashed` or `only_trashed` is explicitly requested.
+- **ID-or-slug route binding** - Route binding now treats only canonical positive integers as primary-key lookups, allowing values like `01-slug` and `001` to resolve by slug.
+
+### Tooling
+
+- Updated Bruno request documentation to clarify `exclude_all_scopes` soft-delete behavior and the ID-or-slug resolution rules for numeric-looking slugs.
+
+### Tests
+
+- Added feature coverage for soft-delete preservation when excluding global scopes and for numeric-looking product slugs in route model binding.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.10.3...v2.10.4
+
 ## v2.10.3 - 2026-06-22
 
 ### What's Changed
