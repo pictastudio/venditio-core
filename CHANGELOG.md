@@ -2,6 +2,29 @@
 
 All notable changes to `venditio` will be documented in this file.
 
+## v2.11.0 - 2026-07-30
+
+### What's Changed
+
+This minor release adds configurable slug lifecycle and API editability controls across slug-enabled catalog resources and wishlists, including locale-aware translated slug synchronization, while strengthening morph-map regression coverage for every configurable Venditio model.
+
+### Features
+
+- **Configurable slug lifecycle** - Added global and per-resource `regenerate_on_update` controls for brands, products, product categories, product collections, product types, tags, and wishlists while preserving automatic slug generation on create.
+- **Slug API editability** - Added global and per-resource `editable_via_api` controls so host applications can allow or reject explicit base and localized slug input without changing model code.
+- **Translated slug synchronization** - Explicit localized slugs now take precedence for their save, omitted locale slugs are generated from translated names, and update regeneration behavior is applied consistently across base and translated values.
+
+### Tooling
+
+- Documented slug configuration and API behavior in the README, API reference, architecture guide, and affected Bruno store/update requests.
+
+### Tests
+
+- Added feature coverage for slug defaults, resource overrides, API editability, explicit localized input, and regeneration behavior.
+- Added complete morph-map coverage for all 41 configurable models, including stable aliases and host model overrides.
+
+**Full Changelog**: https://github.com/pictastudio/venditio/compare/v2.10.4...v2.11.0
+
 ## v2.10.4 - 2026-07-01
 
 ### What's Changed
