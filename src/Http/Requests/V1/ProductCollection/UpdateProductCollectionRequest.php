@@ -25,6 +25,5 @@ class UpdateProductCollectionRequest extends FormRequest
     {
         $this->normalizeMetadataInput();
         $this->prepareTranslatableInput();
-        $this->prepareTranslatedSlugInput();
     }
 }

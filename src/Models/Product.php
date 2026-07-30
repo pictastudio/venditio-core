@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany, H
 use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
 use PictaStudio\Venditio\Enums\Contracts\ProductStatus as ProductStatusContract;
 use PictaStudio\Venditio\Models\Scopes\{Active, InDateRange, ProductStatusActive};
-use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug, VenditioTranslatable};
+use PictaStudio\Venditio\Models\Traits\{EnsuresSlug, HasDiscounts, HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug, SyncsTranslatedSlugs, VenditioTranslatable};
 use PictaStudio\Venditio\Support\{CatalogImage, ProductMedia};
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
@@ -16,6 +16,7 @@ use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class Product extends Model implements TranslatableContract
 {
+    use EnsuresSlug;
     use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
@@ -23,6 +24,7 @@ class Product extends Model implements TranslatableContract
     use LogsActivity;
     use ResolvesRouteBindingByIdOrSlug;
     use SoftDeletes;
+    use SyncsTranslatedSlugs;
     use VenditioTranslatable;
 
     public array $translatedAttributes = [
@@ -199,8 +201,11 @@ class Product extends Model implements TranslatableContract
 
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+        return $this->venditioSlugOptions(
+            SlugOptions::create()
+                ->generateSlugsFrom('name')
+                ->saveSlugsTo('slug'),
+            'product',
+        );
     }
 }

@@ -149,6 +149,8 @@ docs {
   - {locale}.slug / slug:{locale}
   - {locale}.description / description:{locale}
   - {locale}.description_short / description_short:{locale}
+  - Slug fields are accepted only when venditio.slugs.editable_via_api (or the product override) is true; disabled input returns 422.
+  - Omitted slugs are generated on create; on update, omitted slugs follow venditio.slugs.regenerate_on_update.
   - Note: file uploads require multipart/form-data.
   - Note: if `mimetype` is omitted, the backend fills it from the uploaded file.
   - Note: product images follow the catalog image shape used by brands, categories, and collections.

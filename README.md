@@ -48,6 +48,7 @@ All behavior is configured through `config/venditio.php`.
 
 - `routes.api`: route enable/prefix/name/middleware/pagination and resource wrapping
 - `models`: model overrides (all package models are replaceable)
+- `slugs`: global and per-resource slug regeneration and API editability
 - `validations`: validation contract to implementation bindings
 - `authorize_using_policies`: optional policy/gate authorization
 - `price_lists`: optional multi-price feature
@@ -112,6 +113,39 @@ public function boot(): void
     $this->app->singleton(AddressValidationRules::class, AddressValidation::class);
 }
 ```
+
+### Slug configuration
+
+Slug behavior is configurable globally and per resource through `venditio.slugs`.
+The supported resource keys are `brand`, `product`, `product_category`,
+`product_collection`, `product_type`, `tag`, and `wishlist`.
+
+```php
+'slugs' => [
+    'regenerate_on_update' => env('VENDITIO_SLUGS_REGENERATE_ON_UPDATE', true),
+    'editable_via_api' => env('VENDITIO_SLUGS_EDITABLE_VIA_API', true),
+    'resources' => [
+        'product' => [
+            'regenerate_on_update' => false,
+        ],
+        'product_type' => [
+            'editable_via_api' => false,
+        ],
+    ],
+],
+```
+
+- `regenerate_on_update` controls whether changing a resource name regenerates
+  its slug. Slugs are still generated on create when omitted.
+- `editable_via_api` controls slug input on create, update, and localized
+  payloads. When disabled, supplied slug fields return a `422 Unprocessable
+  Entity` validation response.
+- Values under `resources` override their global counterpart.
+
+An explicit API slug takes precedence for the current save, including localized
+slugs. A later update that omits the slug follows `regenerate_on_update` again.
+Slug output, filtering, and route binding remain available regardless of API
+editability.
 
 ### Identifier generator customization
 

@@ -7,19 +7,21 @@ use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use PictaStudio\Translatable\Contracts\Translatable as TranslatableContract;
 use PictaStudio\Venditio\Models\Scopes\Active;
-use PictaStudio\Venditio\Models\Traits\{HasDiscounts, HasHelperMethods, ResolvesRouteBindingByIdOrSlug, VenditioTranslatable};
+use PictaStudio\Venditio\Models\Traits\{EnsuresSlug, HasDiscounts, HasHelperMethods, ResolvesRouteBindingByIdOrSlug, SyncsTranslatedSlugs, VenditioTranslatable};
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductType extends Model implements TranslatableContract
 {
+    use EnsuresSlug;
     use HasDiscounts;
     use HasFactory;
     use HasHelperMethods;
     use HasSlug;
     use ResolvesRouteBindingByIdOrSlug;
     use SoftDeletes;
+    use SyncsTranslatedSlugs;
     use VenditioTranslatable;
 
     public array $translatedAttributes = ['name', 'slug'];
@@ -63,8 +65,11 @@ class ProductType extends Model implements TranslatableContract
 
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+        return $this->venditioSlugOptions(
+            SlugOptions::create()
+                ->generateSlugsFrom('name')
+                ->saveSlugsTo('slug'),
+            'product_type',
+        );
     }
 }

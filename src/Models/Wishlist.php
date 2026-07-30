@@ -5,19 +5,21 @@ namespace PictaStudio\Venditio\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
-use PictaStudio\Venditio\Models\Traits\{HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug};
+use PictaStudio\Venditio\Models\Traits\{EnsuresSlug, HasHelperMethods, LogsActivity, ResolvesRouteBindingByIdOrSlug, TracksExplicitSlugInput};
 use Spatie\Sluggable\{HasSlug, SlugOptions};
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class Wishlist extends Model
 {
+    use EnsuresSlug;
     use HasFactory;
     use HasHelperMethods;
     use HasSlug;
     use LogsActivity;
     use ResolvesRouteBindingByIdOrSlug;
     use SoftDeletes;
+    use TracksExplicitSlugInput;
 
     protected $guarded = [
         'id',
@@ -69,8 +71,18 @@ class Wishlist extends Model
 
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+        return $this->venditioSlugOptions(
+            SlugOptions::create()
+                ->generateSlugsFrom('name')
+                ->saveSlugsTo('slug'),
+            'wishlist',
+        );
+    }
+
+    public function fill(array $attributes)
+    {
+        $this->rememberExplicitSlugInput($attributes);
+
+        return parent::fill($attributes);
     }
 }

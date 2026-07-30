@@ -25,6 +25,5 @@ class UpdateTagRequest extends FormRequest
     {
         $this->normalizeMetadataInput();
         $this->prepareTranslatableInput();
-        $this->prepareTranslatedSlugInput();
     }
 }

@@ -25,6 +25,5 @@ class UpdateProductCategoryRequest extends FormRequest
     {
         $this->normalizeMetadataInput();
         $this->prepareTranslatableInput();
-        $this->prepareTranslatedSlugInput();
     }
 }

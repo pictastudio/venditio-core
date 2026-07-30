@@ -49,6 +49,5 @@ class UpdateProductTypeRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->prepareTranslatableInput();
-        $this->prepareTranslatedSlugInput();
     }
 }

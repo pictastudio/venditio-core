@@ -121,6 +121,7 @@ Main configuration sections:
 
 - `routes.api`
 - `models`
+- `slugs`
 - `validations`
 - `authorize_using_policies`
 - `credit_notes`

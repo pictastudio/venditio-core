@@ -3,18 +3,21 @@
 namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
+use PictaStudio\Venditio\Validations\Concerns\InteractsWithSlugRules;
 use PictaStudio\Venditio\Validations\Contracts\WishlistValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class WishlistValidation implements WishlistValidationRules
 {
+    use InteractsWithSlugRules;
+
     public function getStoreValidationRules(): array
     {
         return [
             'user_id' => ['required', 'integer', Rule::exists($this->tableFor('user'), 'id')],
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('wishlist'),
             'description' => ['nullable', 'string'],
             'is_default' => ['sometimes', 'boolean'],
             'metadata' => ['sometimes', 'nullable', 'array'],
@@ -28,7 +31,7 @@ class WishlistValidation implements WishlistValidationRules
         return [
             'user_id' => ['sometimes', 'integer', Rule::exists($this->tableFor('user'), 'id')],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('wishlist'),
             'description' => ['nullable', 'string'],
             'is_default' => ['sometimes', 'boolean'],
             'metadata' => ['sometimes', 'nullable', 'array'],

@@ -4,13 +4,14 @@ namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Support\CatalogImage;
-use PictaStudio\Venditio\Validations\Concerns\{InteractsWithTranslatableRules, ValidatesSeoMetadata};
+use PictaStudio\Venditio\Validations\Concerns\{InteractsWithSlugRules, InteractsWithTranslatableRules, ValidatesSeoMetadata};
 use PictaStudio\Venditio\Validations\Contracts\ProductCollectionValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductCollectionValidation implements ProductCollectionValidationRules
 {
+    use InteractsWithSlugRules;
     use InteractsWithTranslatableRules;
     use ValidatesSeoMetadata;
 
@@ -18,7 +19,7 @@ class ProductCollectionValidation implements ProductCollectionValidationRules
     {
         return [
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('product_collection'),
             'description' => ['nullable', 'string'],
             ...$this->seoMetadataValidationRules(),
             'tag_ids' => ['nullable', 'array'],
@@ -40,7 +41,7 @@ class ProductCollectionValidation implements ProductCollectionValidationRules
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('product_collection'),
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),
         ];
@@ -50,7 +51,7 @@ class ProductCollectionValidation implements ProductCollectionValidationRules
     {
         return [
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('product_collection'),
             'description' => ['nullable', 'string'],
             ...$this->seoMetadataValidationRules(),
             'tag_ids' => ['nullable', 'array'],
@@ -81,7 +82,7 @@ class ProductCollectionValidation implements ProductCollectionValidationRules
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('product_collection'),
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),
         ];

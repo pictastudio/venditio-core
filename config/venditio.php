@@ -89,6 +89,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Slugs
+    |--------------------------------------------------------------------------
+    |
+    | Slugs are generated on create when they are not explicitly provided.
+    | Host applications may configure update regeneration and API editability
+    | globally, then override either behavior for individual resources.
+    |
+    */
+    'slugs' => [
+        'regenerate_on_update' => env('VENDITIO_SLUGS_REGENERATE_ON_UPDATE', true),
+        'editable_via_api' => env('VENDITIO_SLUGS_EDITABLE_VIA_API', true),
+        'resources' => [],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Validation
     |--------------------------------------------------------------------------
     |

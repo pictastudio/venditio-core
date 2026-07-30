@@ -36,6 +36,5 @@ class StoreProductCollectionRequest extends FormRequest
     {
         $this->normalizeMetadataInput();
         $this->prepareTranslatableInput();
-        $this->prepareTranslatedSlugInput();
     }
 }

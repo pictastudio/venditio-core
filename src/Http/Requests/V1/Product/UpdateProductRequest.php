@@ -54,6 +54,5 @@ class UpdateProductRequest extends FormRequest
     {
         $this->normalizeMetadataInput();
         $this->prepareTranslatableInput();
-        $this->prepareTranslatedSlugInput();
     }
 }

@@ -477,6 +477,9 @@ See `config/venditio.php` for:
 
 - route prefix/version/middleware
 - model overrides
+- slug regeneration and API editability through `slugs`, globally or per
+  `brand`, `product`, `product_category`, `product_collection`, `product_type`,
+  `tag`, and `wishlist`
 - validations binding map
 - policy enable toggle
 - price list feature flag and resolver

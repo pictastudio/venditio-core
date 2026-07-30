@@ -24,6 +24,9 @@ final class VenditioConfigMergeTest extends TestCase
         $this->assertSame(15, config('venditio.routes.api.v1.pagination.per_page'));
         $this->assertTrue(config('venditio.routes.api.enable'));
         $this->assertFalse(config('venditio.routes.api.json_resource_enable_wrapping'));
+        $this->assertTrue(config('venditio.slugs.regenerate_on_update'));
+        $this->assertTrue(config('venditio.slugs.editable_via_api'));
+        $this->assertSame([], config('venditio.slugs.resources'));
     }
 
     #[WithConfig('venditio', [

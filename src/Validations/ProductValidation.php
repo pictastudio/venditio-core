@@ -5,13 +5,14 @@ namespace PictaStudio\Venditio\Validations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Support\CatalogImage;
-use PictaStudio\Venditio\Validations\Concerns\{InteractsWithTranslatableRules, ValidatesSeoMetadata};
+use PictaStudio\Venditio\Validations\Concerns\{InteractsWithSlugRules, InteractsWithTranslatableRules, ValidatesSeoMetadata};
 use PictaStudio\Venditio\Validations\Contracts\ProductValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductValidation implements ProductValidationRules
 {
+    use InteractsWithSlugRules;
     use InteractsWithTranslatableRules;
     use ValidatesSeoMetadata;
 
@@ -39,7 +40,7 @@ class ProductValidation implements ProductValidationRules
                 Rule::exists($this->tableFor('tax_class'), 'id'),
             ],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('product'),
             'status' => [
                 'required',
                 'string',
@@ -105,7 +106,7 @@ class ProductValidation implements ProductValidationRules
             'inventory.purchase_price' => ['nullable', 'numeric', 'min:0'],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('product'),
                 'description' => ['sometimes', 'nullable', 'string'],
                 'description_short' => ['sometimes', 'nullable', 'string'],
             ]),
@@ -140,7 +141,7 @@ class ProductValidation implements ProductValidationRules
                 Rule::exists($this->tableFor('tax_class'), 'id'),
             ],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('product'),
             'status' => [
                 'sometimes',
                 'string',
@@ -214,7 +215,7 @@ class ProductValidation implements ProductValidationRules
             'inventory.purchase_price' => ['nullable', 'numeric', 'min:0'],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('product'),
                 'description' => ['sometimes', 'nullable', 'string'],
                 'description_short' => ['sometimes', 'nullable', 'string'],
             ]),

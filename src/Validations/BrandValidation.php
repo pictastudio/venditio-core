@@ -4,13 +4,14 @@ namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Support\CatalogImage;
-use PictaStudio\Venditio\Validations\Concerns\{InteractsWithTranslatableRules, ValidatesSeoMetadata};
+use PictaStudio\Venditio\Validations\Concerns\{InteractsWithSlugRules, InteractsWithTranslatableRules, ValidatesSeoMetadata};
 use PictaStudio\Venditio\Validations\Contracts\BrandValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class BrandValidation implements BrandValidationRules
 {
+    use InteractsWithSlugRules;
     use InteractsWithTranslatableRules;
     use ValidatesSeoMetadata;
 
@@ -18,7 +19,7 @@ class BrandValidation implements BrandValidationRules
     {
         return [
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('brand'),
             'abstract' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             ...$this->seoMetadataValidationRules(),
@@ -42,7 +43,7 @@ class BrandValidation implements BrandValidationRules
             ],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('brand'),
                 'abstract' => ['sometimes', 'nullable', 'string'],
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),
@@ -53,7 +54,7 @@ class BrandValidation implements BrandValidationRules
     {
         return [
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('brand'),
             'abstract' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             ...$this->seoMetadataValidationRules(),
@@ -77,7 +78,7 @@ class BrandValidation implements BrandValidationRules
             ],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('brand'),
                 'abstract' => ['sometimes', 'nullable', 'string'],
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),

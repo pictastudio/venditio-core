@@ -2,7 +2,6 @@
 
 namespace PictaStudio\Venditio\Http\Requests\V1\Concerns;
 
-use Illuminate\Support\Str;
 use PictaStudio\Translatable\Locales;
 
 trait InteractsWithTranslatableInput
@@ -38,40 +37,6 @@ trait InteractsWithTranslatableInput
         }
 
         $this->merge($preparedTranslations);
-    }
-
-    protected function prepareTranslatedSlugInput(
-        string $nameAttribute = 'name',
-        string $slugAttribute = 'slug'
-    ): void {
-        $slugInput = [];
-
-        $defaultName = $this->input($nameAttribute);
-
-        if ($this->isFilledTranslatableValue($defaultName) && is_string($defaultName)) {
-            $slugInput[$slugAttribute] = Str::slug($defaultName);
-        }
-
-        foreach ($this->translatableLocales() as $locale) {
-            $localizedName = $this->input($nameAttribute . ':' . $locale);
-
-            if ($this->isFilledTranslatableValue($localizedName) && is_string($localizedName)) {
-                $slugInput[$slugAttribute . ':' . $locale] = Str::slug($localizedName);
-            }
-
-            $localePayload = $this->input($locale);
-            $localeName = data_get($localePayload, $nameAttribute);
-
-            if ($this->isFilledTranslatableValue($localeName) && is_string($localeName)) {
-                $slugInput[$locale . '.' . $slugAttribute] = Str::slug($localeName);
-            }
-        }
-
-        if ($slugInput === []) {
-            return;
-        }
-
-        $this->merge($slugInput);
     }
 
     protected function hasTranslatableValue(string $attribute): bool

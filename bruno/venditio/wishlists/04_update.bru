@@ -57,4 +57,6 @@ docs {
   - metadata (array)
   - product_ids (array, sync semantics when present)
   - product_ids.*
+  - Slug fields are accepted only when venditio.slugs.editable_via_api (or the wishlist override) is true; disabled input returns 422.
+  - Omitted slugs are generated on create; on update, omitted slugs follow venditio.slugs.regenerate_on_update.
 }

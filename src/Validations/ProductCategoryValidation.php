@@ -4,13 +4,14 @@ namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Support\CatalogImage;
-use PictaStudio\Venditio\Validations\Concerns\{InteractsWithTranslatableRules, ValidatesSeoMetadata};
+use PictaStudio\Venditio\Validations\Concerns\{InteractsWithSlugRules, InteractsWithTranslatableRules, ValidatesSeoMetadata};
 use PictaStudio\Venditio\Validations\Contracts\ProductCategoryValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class ProductCategoryValidation implements ProductCategoryValidationRules
 {
+    use InteractsWithSlugRules;
     use InteractsWithTranslatableRules;
     use ValidatesSeoMetadata;
 
@@ -23,7 +24,7 @@ class ProductCategoryValidation implements ProductCategoryValidationRules
                 Rule::exists($this->tableFor('product_category'), 'id'),
             ],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('product_category'),
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => [
                 'integer',
@@ -49,7 +50,7 @@ class ProductCategoryValidation implements ProductCategoryValidationRules
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('product_category'),
                 'abstract' => ['sometimes', 'nullable', 'string'],
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),
@@ -66,7 +67,7 @@ class ProductCategoryValidation implements ProductCategoryValidationRules
                 Rule::exists($this->tableFor('product_category'), 'id'),
             ],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('product_category'),
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => [
                 'integer',
@@ -92,7 +93,7 @@ class ProductCategoryValidation implements ProductCategoryValidationRules
             'visible_until' => ['nullable', 'date', 'after_or_equal:visible_from'],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('product_category'),
                 'abstract' => ['sometimes', 'nullable', 'string'],
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),

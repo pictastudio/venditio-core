@@ -55,4 +55,6 @@ docs {
   - {locale}.slug (locale object notation)
   - name:{locale} (locale suffix notation)
   - slug:{locale} (locale suffix notation)
+  - Slug fields are accepted only when venditio.slugs.editable_via_api (or the product_type override) is true; disabled input returns 422.
+  - Omitted slugs are generated on create; on update, omitted slugs follow venditio.slugs.regenerate_on_update.
 }

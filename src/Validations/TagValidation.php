@@ -4,13 +4,14 @@ namespace PictaStudio\Venditio\Validations;
 
 use Illuminate\Validation\Rule;
 use PictaStudio\Venditio\Support\CatalogImage;
-use PictaStudio\Venditio\Validations\Concerns\{InteractsWithTranslatableRules, ValidatesSeoMetadata};
+use PictaStudio\Venditio\Validations\Concerns\{InteractsWithSlugRules, InteractsWithTranslatableRules, ValidatesSeoMetadata};
 use PictaStudio\Venditio\Validations\Contracts\TagValidationRules;
 
 use function PictaStudio\Venditio\Helpers\Functions\resolve_model;
 
 class TagValidation implements TagValidationRules
 {
+    use InteractsWithSlugRules;
     use InteractsWithTranslatableRules;
     use ValidatesSeoMetadata;
 
@@ -28,7 +29,7 @@ class TagValidation implements TagValidationRules
                 Rule::exists($this->tableFor('product_type'), 'id'),
             ],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('tag'),
             'abstract' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             ...$this->seoMetadataValidationRules(),
@@ -58,7 +59,7 @@ class TagValidation implements TagValidationRules
             'tag_ids.*' => ['integer', 'distinct', Rule::exists($this->tableFor('tag'), 'id')],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('tag'),
                 'abstract' => ['sometimes', 'nullable', 'string'],
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),
@@ -81,7 +82,7 @@ class TagValidation implements TagValidationRules
                 Rule::exists($this->tableFor('product_type'), 'id'),
             ],
             'name' => ['sometimes', 'filled', 'string', 'max:255'],
-            'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+            'slug' => $this->slugRules('tag'),
             'abstract' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             ...$this->seoMetadataValidationRules(),
@@ -111,7 +112,7 @@ class TagValidation implements TagValidationRules
             'tag_ids.*' => ['integer', 'distinct', Rule::exists($this->tableFor('tag'), 'id')],
             ...$this->translatableLocaleRules([
                 'name' => ['sometimes', 'filled', 'string', 'max:255'],
-                'slug' => ['sometimes', 'filled', 'string', 'max:255'],
+                'slug' => $this->slugRules('tag'),
                 'abstract' => ['sometimes', 'nullable', 'string'],
                 'description' => ['sometimes', 'nullable', 'string'],
             ]),
